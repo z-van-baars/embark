@@ -67,7 +67,7 @@ def main(global_variables, map_dimensions):
 world_sizes = [(20, 20), (50, 50), (100, 100), (1000, 1000)]
 global_variables = GlobalVariables(1200, 900)
 
-world_dimensions = (200, 200)
+world_dimensions = (75, 75)
 
 main(global_variables, world_dimensions)
 

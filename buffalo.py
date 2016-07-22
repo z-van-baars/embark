@@ -6,18 +6,20 @@ from wheat import Wheat
 
 
 class Buffalo(entity.Entity):
-    def __init__(self, x, y, current_map, current_tile):
-        super().__init__((x + 2), (y + 2), utilities.colors.red, 6, 6, current_map)
-        self.speed = 60
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, utilities.colors.red, 6, 6, current_map)
+        self.speed = 3
         self.time_since_last_move = 0
         self.age = 0
         self.ticks_without_food = 0
         self.change_x = 0
         self.change_y = 0
         self.hunger_saturation = 50
-        self.max_hunger_saturation = 200
+        self.max_hunger_saturation = 400
         self.target_food = None
-        self.current_tile = current_tile
+        self.horizontal_sight = 20
+        self.vertical_sight = 20
+        self.migration_target = None
 
     def do_thing(self):
         self.age += 1
@@ -25,60 +27,88 @@ class Buffalo(entity.Entity):
         self.hunger_saturation -= 0.1
         self.time_since_last_move += 1
         self.starvation_check()
-        if self.target_food:
-            self.eat()
-            if self.target_food:
-                self.calculate_step()
-        else:
-            if self.hunger_saturation < 200:
-                self.target_food = self.find_local_food()
+        if self.hunger_saturation < 400:
+            if self.target_food and self.target_food.is_valid:
+                self.eat()
+                if self.target_food:
+                    self.calculate_step()
             else:
-                self.idle()
+                self.target_food = self.find_local_food()
+                if not self.target_food:
+                    if not self.migration_target:
+                        self.pick_migration_target()
+                    elif self.migration_target:
+                        if self.tile_x == self.migration_target[0] and self.tile_y == self.migration_target[1]:
+                            self.migration_target = None
+                            self.pick_migration_target()
+                    self.calculate_step()
+                else:
+                    self.migration_target = None
+        else:
+            self.idle()
+
         if self.time_since_last_move == self.speed:
             self.time_since_last_move = 0
             self.move()
 
     def eat(self):
-        wheat_collision = pygame.sprite.spritecollide(self, self.current_map.entity_group[Wheat], True)
-        if wheat_collision:
-            for wheat_object in wheat_collision:
+        if self.current_tile.wheat_list:
+            for wheat_object in self.current_tile.wheat_list:
+                wheat_object.is_valid = False
                 self.hunger_saturation += wheat_object.food_value
+                self.current_tile.wheat_list.remove(wheat_object)
                 self.current_map.entity_group[Wheat].remove(wheat_object)
                 if self.hunger_saturation > self.max_hunger_saturation:
                     self.hunger_saturation = self.max_hunger_saturation
                 self.ticks_without_food = 0
+
             self.target_food = None
+            self.migration_target = None
 
     def move(self):
-        if 0 <= (self.rect.x + self.change_x) <= self.current_map.width:
-            self.rect.x += self.change_x
-        if 0 <= (self.rect.y + self.change_y) <= self.current_map.height:
-            self.rect.y += self.change_y
+        self.tile_x += self.change_x
+        if self.tile_x < 0:
+            self.tile_x = 0
+        elif self.tile_x >= self.current_map.number_of_columns:
+            self.tile_x = self.current_map.number_of_columns - 1
+        self.tile_y += self.change_y
+        if self.tile_y < 0:
+            self.tile_y = 0
+        elif self.tile_y >= self.current_map.number_of_rows:
+            self.tile_y = self.current_map.number_of_rows - 1
+
+        self.current_tile = self.current_map.game_tile_rows[self.tile_y][self.tile_x]
+        self.rect.x = self.tile_x * 10 + ((10 - self.width) / 2)
+        self.rect.y = self.tile_y * 10 + ((10 - self.height) / 2)
         self.change_x = 0
         self.change_y = 0
 
     def calculate_step(self):
-        x_dist = self.rect.x - self.target_food.rect.x
-        y_dist = self.rect.y - self.target_food.rect.y
+        if self.target_food:
+            x_dist = self.tile_x - self.target_food.tile_x
+            y_dist = self.tile_y - self.target_food.tile_y
+        else:
+            x_dist = self.tile_x - self.migration_target[0]
+            y_dist = self.tile_y - self.migration_target[1]
         if abs(x_dist) > abs(y_dist):
             if x_dist < 0:
-                self.change_x = -10
-            else:
-                self.change_x = 10
+                self.change_x = 1
+            elif x_dist > 0:
+                self.change_x = -1
         elif abs(x_dist) < abs(y_dist):
             if y_dist < 0:
-                self.change_y = -10
-            else:
-                self.change_y = 10
+                self.change_y = 1
+            elif y_dist > 0:
+                self.change_y = -1
         else:
             if y_dist < 0:
-                self.change_y = -10
-            else:
-                self.change_y = 10
+                self.change_y = 1
+            elif y_dist > 0:
+                self.change_y = -1
             if x_dist < 0:
-                self.change_x = -10
-            else:
-                self.change_x = 10
+                self.change_x = 1
+            elif x_dist > 0:
+                self.change_x = -1
 
     def starvation_check(self):
         if self.ticks_without_food > 50000:
@@ -86,42 +116,48 @@ class Buffalo(entity.Entity):
         if self.hunger_saturation < 1:
             self.expire()
 
+    def pick_migration_target(self):
+        target_x = random.randint(0, self.current_map.number_of_columns - 1)
+        target_y = random.randint(0, self.current_map.number_of_rows - 1)
+        self.migration_target = (target_x, target_y)
+
     def find_local_food(self):
-        collision_checker = Buffalo(self.rect.x, self.rect.y, self.current_map, self.current_map.game_tile_rows[int(self.rect.y / 10)][int(self.rect.x / 10)])
-        nearby_food_list = []
-        collision_checker.rect.x -= 60
-        collision_checker.rect.y -= 60
-        for row in range(13):
-            for column in range(13):
-                new_potential_food = (pygame.sprite.spritecollide(collision_checker, self.current_map.entity_group[Wheat], False))
-                if new_potential_food:
-                    nearby_food_list += new_potential_food
-                collision_checker.rect.x += 10
-            collision_checker.rect.x -= 140
-            collision_checker.rect.y += 10
+        nearby_wheat_list = []
+        tile_x = self.tile_x - 6
+        tile_y = self.tile_y - 6
+        for map_tile_row in range(self.vertical_sight):
+            for map_tile in range(self.horizontal_sight):
+                if tile_x >= 0 and tile_y >= 0:
+                    if tile_x <= len(self.current_map.game_tile_rows[0]) - 1 and tile_y <= len(self.current_map.game_tile_rows) - 1:
+                        wheat_at_this_tile = self.current_map.game_tile_rows[tile_y][tile_x].wheat_list
+                        nearby_wheat_list.extend(wheat_at_this_tile)
+                tile_x += 1
+            tile_x -= (self.horizontal_sight * 2 + 1)
+            tile_y += 1
 
         targets_to_sort = []
-        for target in nearby_food_list:
-            dist = utilities.distance(target.rect.x, target.rect.y, self.rect.x, self.rect.y)
+        for target in nearby_wheat_list:
+            dist = utilities.distance(target.tile_x, target.tile_y, self.tile_x, self.tile_y)
             targets_to_sort.append((dist, target))
 
         possible_targets = sorted(targets_to_sort)
         if possible_targets:
+            print("debug b")
             return possible_targets[0][1]
         else:
-            self.idle()
+            print("debug c")
             return None
 
     def idle(self):
-        action = random.randint(0, 4000)
+        action = random.randint(0, 900)
         if action <= 10:
-            self.change_x = 10
+            self.change_x = 1
         elif 10 < action <= 20:
-            self.change_x = -10
+            self.change_x = -1
         elif 20 < action <= 30:
-            self.change_y = 10
+            self.change_y = 1
         elif 30 < action <= 40:
-            self.change_y = -10
+            self.change_y = -1
         elif action > 750:
             self.change_x = 0
             self.change_y = 0
