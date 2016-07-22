@@ -6,7 +6,7 @@ from wheat import Wheat
 
 
 class Buffalo(entity.Entity):
-    def __init__(self, x, y, current_map):
+    def __init__(self, x, y, current_map, current_tile):
         super().__init__((x + 2), (y + 2), utilities.colors.red, 6, 6, current_map)
         self.speed = 60
         self.time_since_last_move = 0
@@ -17,6 +17,7 @@ class Buffalo(entity.Entity):
         self.hunger_saturation = 50
         self.max_hunger_saturation = 200
         self.target_food = None
+        self.current_tile = current_tile
 
     def do_thing(self):
         self.age += 1
@@ -86,7 +87,7 @@ class Buffalo(entity.Entity):
             self.expire()
 
     def find_local_food(self):
-        collision_checker = Buffalo(self.rect.x, self.rect.y, self.current_map)
+        collision_checker = Buffalo(self.rect.x, self.rect.y, self.current_map, self.current_map.game_tile_rows[int(self.rect.y / 10)][int(self.rect.x / 10)])
         nearby_food_list = []
         collision_checker.rect.x -= 60
         collision_checker.rect.y -= 60

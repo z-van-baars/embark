@@ -3,7 +3,7 @@ import pygame
 #terrain_type = ("Name", (color_tuple))
 
 
-class Tile(pygame.sprite.Sprite):
+class DisplayTile(pygame.sprite.Sprite):
     def __init__(self, terrain_type):
         super().__init__()
         self.name = terrain_type[0]

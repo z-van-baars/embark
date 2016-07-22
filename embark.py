@@ -2,7 +2,7 @@ import pygame
 import random
 import utilities
 from utilities import GlobalVariables
-from tile import Tile
+from tile import DisplayTile
 from buffalo import Buffalo
 from wheat import Wheat
 from game_map import Map
@@ -52,7 +52,7 @@ def main(global_variables, map_dimensions):
                 if event.key == pygame.K_LSHIFT:
                     super_scroll = 1
 
-        for tile in new_map.tiles:
+        for tile in new_map.display_tiles:
             global_variables.screen.blit(tile.image, [(tile.rect.x + new_map.x_shift), (tile.rect.y + new_map.y_shift)])
         for vegetation in new_map.entity_group[Wheat]:
             global_variables.screen.blit(vegetation.image, [(vegetation.rect.x + new_map.x_shift), (vegetation.rect.y + new_map.y_shift)])
