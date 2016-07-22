@@ -31,25 +31,32 @@ def main(global_variables, map_dimensions):
     new_map = Map(world_dimensions)
     new_map.map_generation()
     done = False
+    super_scroll = 1
     while not done:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    new_map.world_scroll(0, 10, global_variables.screen_width, global_variables.screen_height)
+                    new_map.world_scroll(0, (10 * super_scroll), global_variables.screen_width, global_variables.screen_height)
                 elif event.key == pygame.K_DOWN:
-                    new_map.world_scroll(0, -10, global_variables.screen_width, global_variables.screen_height)
+                    new_map.world_scroll(0, (-10 * super_scroll), global_variables.screen_width, global_variables.screen_height)
                 elif event.key == pygame.K_LEFT:
-                    new_map.world_scroll(10, 0, global_variables.screen_width, global_variables.screen_height)
+                    new_map.world_scroll((10 * super_scroll), 0, global_variables.screen_width, global_variables.screen_height)
                 elif event.key == pygame.K_RIGHT:
-                    new_map.world_scroll(-10, 0, global_variables.screen_width, global_variables.screen_height)
+                    new_map.world_scroll((-10 * super_scroll), 0, global_variables.screen_width, global_variables.screen_height)
+                elif event.key == pygame.K_LSHIFT:
+                    super_scroll = 10
+
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_LSHIFT:
+                    super_scroll = 1
 
         for tile in new_map.tiles:
             global_variables.screen.blit(tile.image, [(tile.rect.x + new_map.x_shift), (tile.rect.y + new_map.y_shift)])
-        for vegetation in new_map.vegetation_group:
+        for vegetation in new_map.entity_group[Wheat]:
             global_variables.screen.blit(vegetation.image, [(vegetation.rect.x + new_map.x_shift), (vegetation.rect.y + new_map.y_shift)])
-        for animal in new_map.animals_group:
+        for animal in new_map.entity_group[Buffalo]:
             animal.do_thing()
             global_variables.screen.blit(animal.image, [(animal.rect.x + new_map.x_shift), (animal.rect.y + new_map.y_shift)])
 
@@ -58,15 +65,9 @@ def main(global_variables, map_dimensions):
         global_variables.time += 1
 
 world_sizes = [(20, 20), (50, 50), (100, 100), (1000, 1000)]
-global_variables = GlobalVariables(600, 600)
+global_variables = GlobalVariables(1200, 900)
 
-grass_1 = ("Grass 1", (utilities.colors.light_green))
-grass_2 = ("Grass 2", (utilities.colors.dark_green))
-
-terrain_types = [grass_1, grass_2]
-
-
-world_dimensions = (100, 100)
+world_dimensions = (200, 200)
 
 main(global_variables, world_dimensions)
 
