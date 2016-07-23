@@ -44,7 +44,7 @@ class Map(object):
 
         self.generate_vegetation()
 
-        for new_buf in range(10):
+        for new_buf in range(20):
 
             x_position = random.randint(0, self.number_of_columns - 1)
             y_position = random.randint(0, self.number_of_rows - 1)

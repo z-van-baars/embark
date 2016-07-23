@@ -15,12 +15,12 @@ class Entity(pygame.sprite.Sprite):
         self.rect.x = self.tile_x * 10 + ((10 - self.width) / 2)
         self.rect.y = self.tile_y * 10 + ((10 - self.height) / 2)
         self.current_map = current_map
-        self.current_tile = self.current_map.game_tile_rows[self.tile_y][self.tile_x]
+        self.current_tile = None
         self.is_valid = True
 
         self.current_map.entity_group[type(self)].add(self)
 
-        self.get_tile()
+        self.assign_tile()
 
     def __lt__(self, other):
         if self.tile_x < other.tile_x:
@@ -35,7 +35,10 @@ class Entity(pygame.sprite.Sprite):
         self.current_tile.entity_group[type(self)].remove(self)
         self.current_map.entity_group[type(self)].remove(self)
 
-    def get_tile(self):
+    def assign_tile(self):
+        if self.current_tile:
+            self.current_tile.entity_group[type(self)].remove(self)
+            self.current_tile = None
         self.current_tile = self.current_map.game_tile_rows[self.tile_y][self.tile_x]
         self.current_tile.entity_group[type(self)].append(self)
 

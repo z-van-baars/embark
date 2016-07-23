@@ -8,7 +8,7 @@ from wheat import Wheat
 class Buffalo(entity.Entity):
     def __init__(self, x, y, current_map):
         super().__init__(x, y, utilities.colors.red, 6, 6, current_map)
-        self.speed = 1
+        self.speed = 20
         self.time_since_last_move = 0
         self.age = 0
         self.ticks_without_food = 0
@@ -26,7 +26,6 @@ class Buffalo(entity.Entity):
         self.ticks_without_food += 1
         self.hunger_saturation -= 0.1
         self.time_since_last_move += 1
-        self.starvation_check()
         if self.hunger_saturation < self.max_hunger_saturation:
             if self.target_food and self.target_food.is_valid:
                 self.eat()
@@ -48,6 +47,7 @@ class Buffalo(entity.Entity):
         if self.time_since_last_move == self.speed:
             self.time_since_last_move = 0
             self.move()
+        self.starvation_check()
 
     def eat(self):
         if self.current_tile.entity_group[Wheat]:
@@ -71,7 +71,7 @@ class Buffalo(entity.Entity):
         elif self.tile_y >= self.current_map.number_of_rows:
             self.tile_y = self.current_map.number_of_rows - 1
 
-        self.current_tile = self.current_map.game_tile_rows[self.tile_y][self.tile_x]
+        self.assign_tile()
         self.rect.x = self.tile_x * 10 + ((10 - self.width) / 2)
         self.rect.y = self.tile_y * 10 + ((10 - self.height) / 2)
         self.change_x = 0
