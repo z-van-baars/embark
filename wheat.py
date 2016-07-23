@@ -13,16 +13,16 @@ class Wheat(entity.Entity):
         self.growth_stages = []
         self.growth_stage = 0
         seedling = (100, (201, 227, 73))
-        young = (400, (227, 196, 73))
-        mature = (600, (189, 158, 30))
+        young = (250, (227, 196, 73))
+        mature = (400, (189, 158, 30))
         withered = (700, (133, 107, 7))
         dead = (9999, (0, 0, 0))
         self.growth_stages = [seedling, young, mature, withered, dead]
         # the higher the more babbys
-        self.likelihood_of_reproducing = 100
+        self.likelihood_of_reproducing = 5
         # max and min number of babies possible in a single run of reproduce()
         self.minimum_number_of_babies = 1
-        self.max_number_of_babies = 1
+        self.max_number_of_babies = 2
 
     def tick_cycle(self):
         self.age += 1

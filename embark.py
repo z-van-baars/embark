@@ -81,9 +81,9 @@ def main(global_variables, map_dimensions):
         global_variables.clock.tick(60)
         global_variables.time += 1
 
-global_variables = GlobalVariables(800, 800)
+global_variables = GlobalVariables(700, 700)
 
-world_dimensions = (80, 80)
+world_dimensions = (70, 70)
 
 main(global_variables, world_dimensions)
 
