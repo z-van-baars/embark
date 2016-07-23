@@ -7,7 +7,7 @@ from manure import Manure
 
 class Wheat(entity.Entity):
     def __init__(self, x, y, current_map, age):
-        super().__init__(x, y, (201, 227, 73), 6, 6, current_map)
+        super().__init__(x, y, (201, 227, 73), 6, 6, current_map, None)
         self.age = age
         self.food_value = 25
         self.growth_stages = []
@@ -15,16 +15,16 @@ class Wheat(entity.Entity):
         seedling = (100, (201, 227, 73))
         young = (400, (227, 196, 73))
         mature = (600, (189, 158, 30))
-        withered = (950, (133, 107, 7))
+        withered = (700, (133, 107, 7))
         dead = (9999, (0, 0, 0))
         self.growth_stages = [seedling, young, mature, withered, dead]
         # the higher the more babbys
         self.likelihood_of_reproducing = 100
         # max and min number of babies possible in a single run of reproduce()
         self.minimum_number_of_babies = 1
-        self.max_number_of_babies = 2
+        self.max_number_of_babies = 1
 
-    def do_thing(self):
+    def tick_cycle(self):
         self.age += 1
         if self.age > self.growth_stages[self.growth_stage][0]:
             self.growth_stage += 1
@@ -33,6 +33,8 @@ class Wheat(entity.Entity):
             self.baby_roll()
         elif self.growth_stage == 4:
             self.expire()
+            if random.randrange(0, 10) > 2:
+                Wheat(self.tile_x, self.tile_y, self.current_map, random.randint(5, 20))
 
     def baby_roll(self):
         chance_to_reproduce = random.randint(0, self.likelihood_of_reproducing)

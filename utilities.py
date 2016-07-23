@@ -3,7 +3,7 @@ import math
 
 pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.init()
-pygame.display.set_caption("Embark v 0.1")
+pygame.display.set_caption("Embark v 0.2")
 
 
 class GlobalVariables(object):

@@ -6,6 +6,7 @@ from tile import DisplayTile
 from buffalo import Buffalo
 from wheat import Wheat
 from game_tile import GameTile
+from herd import Herd
 
 
 class Map(object):
@@ -22,9 +23,10 @@ class Map(object):
         self.entity_group = {}
         self.entity_group[Wheat] = pygame.sprite.Group()
         self.entity_group[Buffalo] = pygame.sprite.Group()
+        self.herds = []
 
-        self.number_of_buffalo = 30
-        self.number_of_wheat_clusters = 100
+        self.number_of_buffalo_herds = 1
+        self.number_of_wheat_clusters = 10
 
         grass_1 = ("Grass 1", (utilities.colors.light_green))
         grass_2 = ("Grass 2", (utilities.colors.dark_green))
@@ -47,12 +49,8 @@ class Map(object):
 
         self.generate_vegetation()
 
-        for new_buf in range(self.number_of_buffalo):
-
-            x_position = random.randint(0, self.number_of_columns - 1)
-            y_position = random.randint(0, self.number_of_rows - 1)
-
-            Buffalo(x_position, y_position, self)
+        for new_herd in range(self.number_of_buffalo_herds):
+            self.generate_buffalo_herd(Buffalo)
 
     def generate_vegetation(self):
         for wheat_clusters in range(self.number_of_wheat_clusters):
@@ -64,6 +62,38 @@ class Map(object):
 
         return (x_position, y_position)
 
+    def generate_buffalo_herd(self, animal_type):
+        alpha_placed = False
+        new_herd = Herd(self)
+        while not alpha_placed:
+            space_occupied = False
+            coordinates = self.get_random_coordinates(0, self.number_of_columns - 1, 0, self.number_of_rows - 1)
+            if self.game_tile_rows[coordinates[1]][coordinates[0]].entity_group[animal_type]:
+                space_occupied = True
+            if not space_occupied:
+                # needed to make neighbors
+                new_herd_alpha = animal_type(coordinates[0], coordinates[1], self, new_herd)
+                new_herd.alpha = new_herd_alpha
+                new_herd_alpha.is_alpha = True
+                new_herd_alpha.image.fill(new_herd_alpha.alpha_color)
+                alpha_placed = True
+        self.entity_group[animal_type].add(new_herd_alpha)
+        cluster_left_edge = max(new_herd_alpha.tile_x - 7, 0)
+        cluster_right_edge = min(new_herd_alpha.tile_x + 7, (self.number_of_columns - 1))
+        cluster_top_edge = max(new_herd_alpha.tile_y - 7, 0)
+        cluster_bottom_edge = min(new_herd_alpha.tile_y + 7, (self.number_of_rows - 1))
+        number_of_herd_members = random.randint(new_herd_alpha.min_initial_herd_size, new_herd_alpha.max_initial_herd_size)
+        for beast in range(number_of_herd_members):
+            beast_placed = False
+            while not beast_placed:
+                space_occupied = False
+                coordinates = self.get_random_coordinates(cluster_left_edge, cluster_right_edge, cluster_top_edge, cluster_bottom_edge)
+                if self.game_tile_rows[coordinates[1]][coordinates[0]].entity_group[animal_type]:
+                    space_occupied = True
+                if not space_occupied:
+                    animal_type(coordinates[0], coordinates[1], self, new_herd)
+                    beast_placed = True
+        self.herds.append(new_herd)
 
     def generate_wheat_cluster(self):
         wheat_cluster_placed = False
@@ -74,7 +104,7 @@ class Map(object):
                 space_occupied = True
             if not space_occupied:
                 # needed to make neighbors
-                cluster_center_wheat = Wheat(coordinates[0], coordinates[1], self, random.randint(0, 60))
+                cluster_center_wheat = Wheat(coordinates[0], coordinates[1], self, random.randint(0, 600))
                 wheat_cluster_placed = True
         self.entity_group[Wheat].add(cluster_center_wheat)
         cluster_left_edge = max(cluster_center_wheat.tile_x - 7, 0)
@@ -90,7 +120,7 @@ class Map(object):
                 if self.game_tile_rows[coordinates[1]][coordinates[0]].entity_group[Wheat]:
                     space_occupied = True
                 if not space_occupied:
-                    Wheat(coordinates[0], coordinates[1], self, random.randint(0, 40))
+                    Wheat(coordinates[0], coordinates[1], self, random.randint(0, 500))
                     neighbor_placed = True
 
 

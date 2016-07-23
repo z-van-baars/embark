@@ -65,23 +65,25 @@ def main(global_variables, map_dimensions):
         for tile in new_map.display_tiles:
             global_variables.screen.blit(tile.image, [(tile.rect.x + new_map.x_shift), (tile.rect.y + new_map.y_shift)])
         for vegetation in new_map.entity_group[Wheat]:
-            vegetation.do_thing()
+            vegetation.tick_cycle()
             global_variables.screen.blit(
                 vegetation.image,
                 [(vegetation.rect.x + new_map.x_shift),
                     (vegetation.rect.y + new_map.y_shift)])
+        for herd in new_map.herds:
+            herd.check_food_supply()
 
         for animal in new_map.entity_group[Buffalo]:
-            animal.do_thing()
+            animal.tick_cycle()
             global_variables.screen.blit(animal.image, [(animal.rect.x + new_map.x_shift), (animal.rect.y + new_map.y_shift)])
 
         pygame.display.flip()
         global_variables.clock.tick(60)
         global_variables.time += 1
 
-global_variables = GlobalVariables(600, 600)
+global_variables = GlobalVariables(800, 800)
 
-world_dimensions = (200, 200)
+world_dimensions = (75, 75)
 
 main(global_variables, world_dimensions)
 
