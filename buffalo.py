@@ -8,7 +8,7 @@ from wheat import Wheat
 class Buffalo(entity.Entity):
     def __init__(self, x, y, current_map):
         super().__init__(x, y, utilities.colors.red, 6, 6, current_map)
-        self.speed = 3
+        self.speed = 1
         self.time_since_last_move = 0
         self.age = 0
         self.ticks_without_food = 0
@@ -27,7 +27,7 @@ class Buffalo(entity.Entity):
         self.hunger_saturation -= 0.1
         self.time_since_last_move += 1
         self.starvation_check()
-        if self.hunger_saturation < 400:
+        if self.hunger_saturation < self.max_hunger_saturation:
             if self.target_food and self.target_food.is_valid:
                 self.eat()
                 if self.target_food:
@@ -42,8 +42,6 @@ class Buffalo(entity.Entity):
                             self.migration_target = None
                             self.pick_migration_target()
                     self.calculate_step()
-                else:
-                    self.migration_target = None
         else:
             self.idle()
 
@@ -52,18 +50,14 @@ class Buffalo(entity.Entity):
             self.move()
 
     def eat(self):
-        if self.current_tile.wheat_list:
-            for wheat_object in self.current_tile.wheat_list:
-                wheat_object.is_valid = False
+        if self.current_tile.entity_group[Wheat]:
+            for wheat_object in self.current_tile.entity_group[Wheat]:
                 self.hunger_saturation += wheat_object.food_value
-                self.current_tile.wheat_list.remove(wheat_object)
-                self.current_map.entity_group[Wheat].remove(wheat_object)
+                self.ticks_without_food = 0
+                wheat_object.expire()
                 if self.hunger_saturation > self.max_hunger_saturation:
                     self.hunger_saturation = self.max_hunger_saturation
-                self.ticks_without_food = 0
-
             self.target_food = None
-            self.migration_target = None
 
     def move(self):
         self.tile_x += self.change_x
@@ -123,16 +117,15 @@ class Buffalo(entity.Entity):
 
     def find_local_food(self):
         nearby_wheat_list = []
-        tile_x = self.tile_x - 6
-        tile_y = self.tile_y - 6
-        for map_tile_row in range(self.vertical_sight):
-            for map_tile in range(self.horizontal_sight):
-                if tile_x >= 0 and tile_y >= 0:
-                    if tile_x <= len(self.current_map.game_tile_rows[0]) - 1 and tile_y <= len(self.current_map.game_tile_rows) - 1:
-                        wheat_at_this_tile = self.current_map.game_tile_rows[tile_y][tile_x].wheat_list
-                        nearby_wheat_list.extend(wheat_at_this_tile)
+        tile_x = self.tile_x - (self.horizontal_sight)
+        tile_y = self.tile_y - (self.vertical_sight)
+        for map_tile_row in range(self.vertical_sight * 2 + 1):
+            for map_tile in range(self.horizontal_sight * 2 + 1):
+                if utilities.within_map(tile_x, tile_y, self.current_map):
+                    wheat_at_this_tile = self.current_map.game_tile_rows[tile_y][tile_x].entity_group[Wheat]
+                    nearby_wheat_list.extend(wheat_at_this_tile)
                 tile_x += 1
-            tile_x -= (self.horizontal_sight * 2 + 1)
+            tile_x = self.tile_x - (self.horizontal_sight)
             tile_y += 1
 
         targets_to_sort = []
@@ -142,10 +135,8 @@ class Buffalo(entity.Entity):
 
         possible_targets = sorted(targets_to_sort)
         if possible_targets:
-            print("debug b")
             return possible_targets[0][1]
         else:
-            print("debug c")
             return None
 
     def idle(self):

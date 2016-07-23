@@ -47,6 +47,17 @@ def main(global_variables, map_dimensions):
                     new_map.world_scroll((-10 * super_scroll), 0, global_variables.screen_width, global_variables.screen_height)
                 elif event.key == pygame.K_LSHIFT:
                     super_scroll = 10
+                elif event.key == pygame.K_SPACE:
+                    paused = True
+                    while paused:
+                        for new_event in pygame.event.get():
+                            if new_event.type == pygame.QUIT:
+                                paused = False
+                                done = True
+                            elif new_event.type == pygame.KEYDOWN:
+                                if new_event.key == pygame.K_SPACE:
+                                    paused = False
+
 
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_LSHIFT:
@@ -55,6 +66,7 @@ def main(global_variables, map_dimensions):
         for tile in new_map.display_tiles:
             global_variables.screen.blit(tile.image, [(tile.rect.x + new_map.x_shift), (tile.rect.y + new_map.y_shift)])
         for vegetation in new_map.entity_group[Wheat]:
+            vegetation.do_thing()
             global_variables.screen.blit(vegetation.image, [(vegetation.rect.x + new_map.x_shift), (vegetation.rect.y + new_map.y_shift)])
         for animal in new_map.entity_group[Buffalo]:
             animal.do_thing()
@@ -67,7 +79,7 @@ def main(global_variables, map_dimensions):
 world_sizes = [(20, 20), (50, 50), (100, 100), (1000, 1000)]
 global_variables = GlobalVariables(1200, 900)
 
-world_dimensions = (75, 75)
+world_dimensions = (100, 100)
 
 main(global_variables, world_dimensions)
 

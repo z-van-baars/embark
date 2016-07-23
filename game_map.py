@@ -44,17 +44,16 @@ class Map(object):
 
         self.generate_vegetation()
 
-        for new_buf in range(1):
+        for new_buf in range(10):
 
             x_position = random.randint(0, self.number_of_columns - 1)
             y_position = random.randint(0, self.number_of_rows - 1)
 
-            new_buffalo = Buffalo(x_position, y_position, self)
-
-            self.entity_group[Buffalo].add(new_buffalo)
+            Buffalo(x_position, y_position, self)
 
     def generate_vegetation(self):
         number_of_wheat_clusters = random.randint(4, 10)
+        number_of_wheat_clusters = 30
 
         for wheat_clusters in range(number_of_wheat_clusters):
 
@@ -70,13 +69,14 @@ class Map(object):
     def generate_wheat_cluster(self):
         wheat_cluster_placed = False
         while not wheat_cluster_placed:
+            space_occupied = False
             coordinates = self.get_random_coordinates(0, self.number_of_columns - 1, 0, self.number_of_rows - 1)
-            cluster_center_wheat = Wheat(coordinates[0], coordinates[1], self)
-            vegetation_collisions = []
-            vegetation_collisions = (pygame.sprite.spritecollide(cluster_center_wheat, self.entity_group[Wheat], False))
-            if not vegetation_collisions:
+            if self.game_tile_rows[coordinates[1]][coordinates[0]].entity_group[Wheat]:
+                space_occupied = True
+            if not space_occupied:
+                # needed to make neighbors
+                cluster_center_wheat = Wheat(coordinates[0], coordinates[1], self)
                 wheat_cluster_placed = True
-                cluster_center_wheat.current_tile.wheat_list.append(cluster_center_wheat)
         self.entity_group[Wheat].add(cluster_center_wheat)
         cluster_left_edge = max(cluster_center_wheat.tile_x - 7, 0)
         cluster_right_edge = min(cluster_center_wheat.tile_x + 7, (self.number_of_columns - 1))
@@ -86,14 +86,13 @@ class Map(object):
         for wheat in range(number_of_neighbors):
             neighbor_placed = False
             while not neighbor_placed:
+                space_occupied = False
                 coordinates = self.get_random_coordinates(cluster_left_edge, cluster_right_edge, cluster_top_edge, cluster_bottom_edge)
-                new_neighbor = Wheat(coordinates[0], coordinates[1], self)
-                vegetation_collisions = []
-                vegetation_collisions = (pygame.sprite.spritecollide(new_neighbor, self.entity_group[Wheat], False))
-                if not vegetation_collisions:
+                if self.game_tile_rows[coordinates[1]][coordinates[0]].entity_group[Wheat]:
+                    space_occupied = True
+                if not space_occupied:
+                    Wheat(coordinates[0], coordinates[1], self)
                     neighbor_placed = True
-                    new_neighbor.current_tile.wheat_list.append(new_neighbor)
-            self.entity_group[Wheat].add(new_neighbor)
 
 
     def world_scroll(self, shift_x, shift_y, screen_width, screen_height):

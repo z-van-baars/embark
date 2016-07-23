@@ -28,6 +28,7 @@ class Colors(object):
         self.purple = (255, 0, 255)
         self.wheat_gold = (220, 187, 0)
         self.key = (255, 0, 128)
+        self.brown = (112, 87, 46)
 
 colors = Colors()
 
@@ -50,3 +51,7 @@ def get_vector(self, a, b, x, y):
     change_y = round(change_y)
 
     return (change_x, change_y)
+
+
+def within_map(x, y, current_map):
+    return 0 <= x <= len(current_map.game_tile_rows[0]) - 1 and 0 <= y <= len(current_map.game_tile_rows) - 1

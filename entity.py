@@ -1,6 +1,7 @@
 import pygame
 import utilities
 
+
 class Entity(pygame.sprite.Sprite):
     def __init__(self, x, y, color, width, height, current_map):
         super().__init__()
@@ -17,6 +18,10 @@ class Entity(pygame.sprite.Sprite):
         self.current_tile = self.current_map.game_tile_rows[self.tile_y][self.tile_x]
         self.is_valid = True
 
+        self.current_map.entity_group[type(self)].add(self)
+
+        self.get_tile()
+
     def __lt__(self, other):
         if self.tile_x < other.tile_x:
             return True
@@ -26,4 +31,13 @@ class Entity(pygame.sprite.Sprite):
             return False
 
     def expire(self):
+        self.is_valid = False
+        self.current_tile.entity_group[type(self)].remove(self)
         self.current_map.entity_group[type(self)].remove(self)
+
+    def get_tile(self):
+        self.current_tile = self.current_map.game_tile_rows[self.tile_y][self.tile_x]
+        self.current_tile.entity_group[type(self)].append(self)
+
+    def leave_tile(self):
+        self.current_tile.entity_group[type(self)].remove(self)

@@ -1,3 +1,6 @@
+from buffalo import Buffalo
+from manure import Manure
+from wheat import Wheat
 
 
 class GameTile(object):
@@ -5,5 +8,7 @@ class GameTile(object):
         self.row = row
         self.column = column
         self.terrain_type = terrain_type
-        self.buffalo_list = []
-        self.wheat_list = []
+        self.entity_group = {Buffalo: [],
+        Wheat: [],
+        Manure: [],
+        }
