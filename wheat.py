@@ -26,7 +26,7 @@ class Wheat(entity.Entity):
             self.image.fill(self.growth_stages[self.growth_stage][1])
         if self.growth_stage == 2:
             self.baby_roll()
-        elif self.growth_stage == 3:
+        elif self.growth_stage == 4:
             self.expire()
 
     def baby_roll(self):
