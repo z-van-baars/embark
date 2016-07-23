@@ -12,12 +12,17 @@ class Wheat(entity.Entity):
         self.food_value = 25
         self.growth_stages = []
         self.growth_stage = 0
-        seedling = (30, (201, 227, 73))
-        young = (90, (227, 196, 73))
+        seedling = (100, (201, 227, 73))
+        young = (400, (227, 196, 73))
         mature = (600, (189, 158, 30))
-        withered = (950, (133, 107, 7))
+        withered = (750, (133, 107, 7))
         dead = (9999, (0, 0, 0))
         self.growth_stages = [seedling, young, mature, withered, dead]
+        # the higher the more babbys
+        self.likelihood_of_reproducing = 200
+        # max and min number of babies possible in a single run of reproduce()
+        self.minimum_number_of_babies = 1
+        self.max_number_of_babies = 2
 
     def do_thing(self):
         self.age += 1
@@ -30,9 +35,9 @@ class Wheat(entity.Entity):
             self.expire()
 
     def baby_roll(self):
-        chance_to_reproduce = random.randint(0, 1000)
-        if chance_to_reproduce > 990:
-            for x in range(random.randint(0, 1)):
+        chance_to_reproduce = random.randint(0, self.likelihood_of_reproducing)
+        if chance_to_reproduce < 1:
+            for x in range(random.randint(self.minimum_number_of_babies, self.max_number_of_babies)):
                 self.reproduce()
 
     def reproduce(self):
