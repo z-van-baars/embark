@@ -53,5 +53,29 @@ def get_vector(self, a, b, x, y):
     return (change_x, change_y)
 
 
+def calculate_step(self, target_x, target_y):
+    x_dist = self.tile_x - target_x
+    y_dist = self.tile_y - target_y
+    if abs(x_dist) > abs(y_dist):
+        if x_dist < 0:
+            self.change_x = 1
+        elif x_dist > 0:
+            self.change_x = -1
+    elif abs(x_dist) < abs(y_dist):
+        if y_dist < 0:
+            self.change_y = 1
+        elif y_dist > 0:
+            self.change_y = -1
+    else:
+        if y_dist < 0:
+            self.change_y = 1
+        elif y_dist > 0:
+            self.change_y = -1
+        if x_dist < 0:
+            self.change_x = 1
+        elif x_dist > 0:
+            self.change_x = -1
+
+
 def within_map(x, y, current_map):
     return 0 <= x <= len(current_map.game_tile_rows[0]) - 1 and 0 <= y <= len(current_map.game_tile_rows) - 1

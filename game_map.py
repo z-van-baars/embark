@@ -25,8 +25,8 @@ class Map(object):
         self.entity_group[Buffalo] = pygame.sprite.Group()
         self.herds = []
 
-        self.number_of_buffalo_herds = 1
-        self.number_of_wheat_clusters = 10
+        self.number_of_buffalo_herds = 2
+        self.number_of_wheat_clusters = 8
 
         grass_1 = ("Grass 1", (utilities.colors.light_green))
         grass_2 = ("Grass 2", (utilities.colors.dark_green))
@@ -78,10 +78,10 @@ class Map(object):
                 new_herd_alpha.image.fill(new_herd_alpha.alpha_color)
                 alpha_placed = True
         self.entity_group[animal_type].add(new_herd_alpha)
-        cluster_left_edge = max(new_herd_alpha.tile_x - 7, 0)
-        cluster_right_edge = min(new_herd_alpha.tile_x + 7, (self.number_of_columns - 1))
-        cluster_top_edge = max(new_herd_alpha.tile_y - 7, 0)
-        cluster_bottom_edge = min(new_herd_alpha.tile_y + 7, (self.number_of_rows - 1))
+        cluster_left_edge = max(new_herd_alpha.tile_x - new_herd_alpha.herd_radius, 0)
+        cluster_right_edge = min(new_herd_alpha.tile_x + new_herd_alpha.herd_radius, (self.number_of_columns - 1))
+        cluster_top_edge = max(new_herd_alpha.tile_y - new_herd_alpha.herd_radius, 0)
+        cluster_bottom_edge = min(new_herd_alpha.tile_y + new_herd_alpha.herd_radius, (self.number_of_rows - 1))
         number_of_herd_members = random.randint(new_herd_alpha.min_initial_herd_size, new_herd_alpha.max_initial_herd_size)
         for beast in range(number_of_herd_members):
             beast_placed = False

@@ -83,7 +83,7 @@ def main(global_variables, map_dimensions):
 
 global_variables = GlobalVariables(800, 800)
 
-world_dimensions = (75, 75)
+world_dimensions = (80, 80)
 
 main(global_variables, world_dimensions)
 

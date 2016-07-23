@@ -9,7 +9,7 @@ from herd import Herd
 class Buffalo(entity.Entity):
     def __init__(self, x, y, current_map, herd):
         super().__init__(x, y, utilities.colors.red, 6, 6, current_map, Wheat)
-        self.speed = 2
+        self.speed = 1
         self.time_since_last_move = 0
         self.age = 0
         self.ticks_without_food = 0
@@ -23,13 +23,15 @@ class Buffalo(entity.Entity):
         self.vertical_sight = 20
         self.migration_target = None
         self.local_food_supply = []
-        self.herd_radius = 40
+        self.herd_radius = 5
         self.herd = herd
         self.is_alpha = False
         self.alpha_color = (215, 0, 0)
 
-        self.min_initial_herd_size = 6
-        self.max_initial_herd_size = 20
+        self.min_initial_herd_size = 5
+        self.max_initial_herd_size = 10
+
+        self.incompatible_objects = [Buffalo]
 
         self.herd.members.append(self)
 
@@ -46,7 +48,8 @@ class Buffalo(entity.Entity):
 
         if self.time_since_last_move == self.speed:
             self.time_since_last_move = 0
-            self.move()
+            if self.check_next_tile(None):
+                self.move()
         self.starvation_check()
 
     def is_hungry(self):
@@ -56,7 +59,7 @@ class Buffalo(entity.Entity):
             if self.target_food and self.target_food.is_valid:
                 if self.target_food:
                     self.migration_target = None
-                    self.calculate_step()
+                    utilities.calculate_step(self, self.target_food.tile_x, self.target_food.tile_y)
             else:
                 self.target_food = None
                 self.target_food = self.find_local_food()
@@ -65,10 +68,10 @@ class Buffalo(entity.Entity):
                         self.migration_target = self.herd.migration_target
                     else:
                         self.migration_target = self.pick_migration_target()
-                    self.calculate_step()
+                    utilities.calculate_step(self, self.migration_target[0], self.migration_target[1])
         else:
             self.migration_target = (self.herd.alpha.tile_x, self.herd.alpha.tile_y)
-            self.calculate_step()
+            utilities.calculate_step(self, self.migration_target[0], self.migration_target[1])
 
     def is_not_hungry(self):
         distance_from_alpha = utilities.distance(self.tile_x, self.tile_y, self.herd.alpha.tile_x, self.herd.alpha.tile_y)
@@ -105,33 +108,6 @@ class Buffalo(entity.Entity):
         self.change_x = 0
         self.change_y = 0
 
-    def calculate_step(self):
-        if self.target_food:
-            x_dist = self.tile_x - self.target_food.tile_x
-            y_dist = self.tile_y - self.target_food.tile_y
-        else:
-            x_dist = self.tile_x - self.migration_target[0]
-            y_dist = self.tile_y - self.migration_target[1]
-        if abs(x_dist) > abs(y_dist):
-            if x_dist < 0:
-                self.change_x = 1
-            elif x_dist > 0:
-                self.change_x = -1
-        elif abs(x_dist) < abs(y_dist):
-            if y_dist < 0:
-                self.change_y = 1
-            elif y_dist > 0:
-                self.change_y = -1
-        else:
-            if y_dist < 0:
-                self.change_y = 1
-            elif y_dist > 0:
-                self.change_y = -1
-            if x_dist < 0:
-                self.change_x = 1
-            elif x_dist > 0:
-                self.change_x = -1
-
     def starvation_check(self):
         if self.current_hunger_saturation < 1:
             self.expire()
@@ -140,7 +116,6 @@ class Buffalo(entity.Entity):
         target_x = random.randint(0, self.current_map.number_of_columns - 1)
         target_y = random.randint(0, self.current_map.number_of_rows - 1)
         return (target_x, target_y)
-
 
     def idle(self):
         action = random.randint(0, 900)
