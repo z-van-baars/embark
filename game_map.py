@@ -23,6 +23,9 @@ class Map(object):
         self.entity_group[Wheat] = pygame.sprite.Group()
         self.entity_group[Buffalo] = pygame.sprite.Group()
 
+        self.number_of_buffalo = 20
+        self.number_of_wheat_clusters = 30
+
         grass_1 = ("Grass 1", (utilities.colors.light_green))
         grass_2 = ("Grass 2", (utilities.colors.dark_green))
 
@@ -44,7 +47,7 @@ class Map(object):
 
         self.generate_vegetation()
 
-        for new_buf in range(20):
+        for new_buf in range(self.number_of_buffalo):
 
             x_position = random.randint(0, self.number_of_columns - 1)
             y_position = random.randint(0, self.number_of_rows - 1)
@@ -52,11 +55,7 @@ class Map(object):
             Buffalo(x_position, y_position, self)
 
     def generate_vegetation(self):
-        number_of_wheat_clusters = random.randint(4, 10)
-        number_of_wheat_clusters = 30
-
-        for wheat_clusters in range(number_of_wheat_clusters):
-
+        for wheat_clusters in range(self.number_of_wheat_clusters):
             self.generate_wheat_cluster()
 
     def get_random_coordinates(self, x_lower, x_upper, y_lower, y_upper):
