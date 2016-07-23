@@ -23,8 +23,8 @@ class Map(object):
         self.entity_group[Wheat] = pygame.sprite.Group()
         self.entity_group[Buffalo] = pygame.sprite.Group()
 
-        self.number_of_buffalo = 20
-        self.number_of_wheat_clusters = 30
+        self.number_of_buffalo = 30
+        self.number_of_wheat_clusters = 100
 
         grass_1 = ("Grass 1", (utilities.colors.light_green))
         grass_2 = ("Grass 2", (utilities.colors.dark_green))
@@ -74,7 +74,7 @@ class Map(object):
                 space_occupied = True
             if not space_occupied:
                 # needed to make neighbors
-                cluster_center_wheat = Wheat(coordinates[0], coordinates[1], self)
+                cluster_center_wheat = Wheat(coordinates[0], coordinates[1], self, random.randint(0, 60))
                 wheat_cluster_placed = True
         self.entity_group[Wheat].add(cluster_center_wheat)
         cluster_left_edge = max(cluster_center_wheat.tile_x - 7, 0)
@@ -90,7 +90,7 @@ class Map(object):
                 if self.game_tile_rows[coordinates[1]][coordinates[0]].entity_group[Wheat]:
                     space_occupied = True
                 if not space_occupied:
-                    Wheat(coordinates[0], coordinates[1], self)
+                    Wheat(coordinates[0], coordinates[1], self, random.randint(0, 40))
                     neighbor_placed = True
 
 

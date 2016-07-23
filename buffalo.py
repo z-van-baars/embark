@@ -8,7 +8,7 @@ from wheat import Wheat
 class Buffalo(entity.Entity):
     def __init__(self, x, y, current_map):
         super().__init__(x, y, utilities.colors.red, 6, 6, current_map)
-        self.speed = 20
+        self.speed = 1
         self.time_since_last_move = 0
         self.age = 0
         self.ticks_without_food = 0
