@@ -59,30 +59,6 @@ def get_vector(self, a, b, x, y):
     return (change_x, change_y)
 
 
-def calculate_step(self):
-    x_dist = self.tile_x - self.path.tiles[0].column
-    y_dist = self.tile_y - self.path.tiles[0].row
-    if abs(x_dist) > abs(y_dist):
-        if x_dist < 0:
-            self.change_x = 1
-        elif x_dist > 0:
-            self.change_x = -1
-    elif abs(x_dist) < abs(y_dist):
-        if y_dist < 0:
-            self.change_y = 1
-        elif y_dist > 0:
-            self.change_y = -1
-    else:
-        if y_dist < 0:
-            self.change_y = 1
-        elif y_dist > 0:
-            self.change_y = -1
-        if x_dist < 0:
-            self.change_x = 1
-        elif x_dist > 0:
-            self.change_x = -1
-
-
 def within_map(x, y, current_map):
     return 0 <= x <= len(current_map.game_tile_rows[0]) - 1 and 0 <= y <= len(current_map.game_tile_rows) - 1
 
@@ -96,56 +72,3 @@ def get_adjacent_tiles(tile, current_map):
             if within_map(tile_x, tile_y, current_map):
                 adjacent_tiles.append(current_map.game_tile_rows[tile_y][tile_x])
     return adjacent_tiles
-
-
-def get_path(self):
-    if self.target_object:
-        target_x = self.target_object.tile_x
-        target_y = self.target_object.tile_y
-    else:
-        target_x = self.target_coordinates[0]
-        target_y = self.target_coordinates[1]
-
-    target_tile = self.current_map.game_tile_rows[target_y][target_x]
-    start_tile = self.current_map.game_tile_rows[self.tile_y][self.tile_x]
-    
-    target_distance = distance(start_tile.column, start_tile.row, target_x, target_y)
-    tiles_to_process = {start_tile: (0, target_distance, start_tile, start_tile)}
-    visited = {start_tile: True}
-
-    tile_neighbors = get_adjacent_tiles(start_tile, self.current_map)
-    current_frontier = []
-    for each in tile_neighbors:
-        current_frontier.append((each, start_tile))
-    steps = 0
-    while target_tile not in visited:
-        next_frontier = []
-        steps += 1
-        for tile in current_frontier:
-            current_tile = tile[0]
-            previous_tile = tile[1]
-            if current_tile not in visited:
-                if self.check_next_tile(current_tile):
-                    distance_to_target = distance(current_tile.column, current_tile.row, target_x, target_y)
-                    tiles_to_process[current_tile] = (steps, distance_to_target, current_tile, previous_tile)
-                    tile_neighbors = get_adjacent_tiles(current_tile, self.current_map)
-                    for each in tile_neighbors:
-                        entry = (each, current_tile)
-                        next_frontier.append(entry)
-                visited[current_tile] = True
-        current_frontier = next_frontier
-    new_path = Path()
-    new_path.tiles.append(target_tile)
-    new_path.steps.append(tiles_to_process[target_tile][3])
-
-    while start_tile not in new_path.tiles:
-        next_tile = new_path.steps[-1]
-        if next_tile != start_tile:
-            new_path.steps.append(tiles_to_process[next_tile][3])
-        new_path.tiles.append(next_tile)
-    new_path.tiles.reverse()
-    new_path.tiles.pop(0)
-    new_path.steps.reverse()
-    new_path.steps.pop(0)
-
-    return new_path
