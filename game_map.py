@@ -25,8 +25,8 @@ class Map(object):
         self.entity_group[Buffalo] = pygame.sprite.Group()
         self.herds = []
 
-        self.number_of_buffalo_herds = 3
-        self.number_of_wheat_clusters = 35
+        self.number_of_buffalo_herds = 0
+        self.number_of_wheat_clusters = 0
 
         grass_1 = ("Grass 1", (utilities.colors.light_green))
         grass_2 = ("Grass 2", (utilities.colors.dark_green))
@@ -42,9 +42,7 @@ class Map(object):
                 new_display_tile.rect.x = x_column * 10
                 new_display_tile.rect.y = y_row * 10
                 self.display_tiles.add(new_display_tile)
-
-                new_game_tile = GameTile(new_tile_type[0], x_column, y_row)
-                this_row.append(new_game_tile)
+                this_row.append(GameTile(new_tile_type[0], x_column, y_row))
             self.game_tile_rows.append(this_row)
 
         self.generate_vegetation()

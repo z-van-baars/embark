@@ -99,13 +99,15 @@ def main(global_variables, map_dimensions):
             global_variables.screen.blit(animal.image, [(animal.rect.x + new_map.x_shift), (animal.rect.y + new_map.y_shift)])
 
         if debug_stats.debug:
+            for each in new_map.entity_group[Buffalo]:
+                each.search_area_graphic = debug.FoodSearchRadius(new_map, each)
             debug_stats.tile_selector_graphic.update_image(mouse_pos)
             debug_stats.print_to_screen()
             if debug_stats.remove or debug_stats.entity_to_place:
                 pygame.draw.rect(global_variables.screen, (255, 255, 255), debug_stats.tile_selector_graphic.image, 1)
 
         pygame.display.flip()
-        global_variables.clock.tick(60)
+        global_variables.clock.tick(600)
         global_variables.time += 1
 
 global_variables = GlobalVariables(700, 700)

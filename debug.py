@@ -23,6 +23,40 @@ class TileSelectorGraphic(pygame.sprite.Sprite):
         self.image = pygame.Rect((int(mouse_pos[0] / 10) * 10), (int(mouse_pos[1] / 10) * 10), 10, 10)
 
 
+class TileMarker(pygame.sprite.Sprite):
+    def __init__(self, x, y, current_map):
+        super().__init__()
+        self.tile_x = x
+        self.tile_y = y
+        self.current_map = current_map
+
+        self.update_image()
+
+    def update_image(self):
+
+        top = int(self.tile_y * 10) + self.current_map.y_shift
+        left = int(self.tile_x * 10) + self.current_map.x_shift
+        self.image = pygame.Rect(left, top, 10, 10)
+
+
+class FoodSearchRadius(pygame.sprite.Sprite):
+    def __init__(self, current_map, entity):
+        super().__init__()
+        self.current_map = current_map
+        self.entity = entity
+
+        self.update_image()
+
+    def update_image(self):
+        top = self.entity.tile_y * 10 - self.entity.vertical_sight * 10
+        top += self.current_map.y_shift
+        left = self.entity.tile_x * 10 - self.entity.horizontal_sight * 10
+        left += self.current_map.x_shift
+        width = self.entity.horizontal_sight * 20
+        height = self.entity.vertical_sight * 20
+        self.image = pygame.Rect(left, top, width, height)
+
+
 def event_processing(current_map, global_variables, event_key):
     if event_key == pygame.K_c:
         if global_variables.debug_status.remove:
@@ -33,6 +67,16 @@ def event_processing(current_map, global_variables, event_key):
         else:
             global_variables.debug_status.clear = True
             global_variables.debug_status.entity_to_place = None
+    elif event_key == pygame.K_s:
+        if not global_variables.debug_status.draw_search_areas:
+            global_variables.debug_status.draw_search_areas = True
+        else:
+            global_variables.debug_status.draw_search_areas = False
+    elif event_key == pygame.K_p:
+        if not global_variables.debug_status.draw_paths:
+            global_variables.debug_status.draw_paths = True
+        else:
+            global_variables.debug_status.draw_paths = False
     elif event_key == pygame.K_a and global_variables.debug_status.clear:
         clear_all_animals(current_map, global_variables)
     elif event_key == pygame.K_a and global_variables.debug_status.remove:
@@ -103,6 +147,7 @@ def clear_all_animals(current_map, global_variables):
         for each in current_map.entity_group[animal]:
             each.current_tile.entity_group[animal].remove(each)
         current_map.entity_group[animal] = pygame.sprite.Group()
+    current_map.herds = []
 
 
 def clear_all_vegetation(current_map, global_variables):
@@ -135,12 +180,14 @@ class DebugStatus(object):
         self.clear = False
         self.remove = False
         self.entity_to_place = None
+        self.draw_search_areas = False
+        self.draw_paths = False
         self.entity_strings = ["None", "Wheat", "Buffalo", "Wall"]
         self.current_placement_entity_number = 0
+        self.path_stamp = self.font.render("Drawing Paths", True, utilities.colors.black)
 
         self.entity_type_strings = ["None", "Animals", "Vegetation", "All"]
         self.current_removal_entity_number = 0
-
 
         debug = self.font.render("Debug Mode", True, utilities.colors.black)
         item_to_place = self.font.render("Placing Item: ", True, utilities.colors.black)
@@ -177,5 +224,16 @@ class DebugStatus(object):
                 self.global_variables.screen.blit(self.item_removal_stamp, [280, 25])
             else:
                 self.global_variables.screen.blit(self.stamps[4][1], self.stamps[4][0])
+        if self.global_variables.debug_status.draw_search_areas:
+            for each in self.current_map.entity_group[Buffalo]:
+                pygame.draw.rect(self.global_variables.screen, (0, 0, 0), each.search_area_graphic.image, 1)
+        if self.global_variables.debug_status.draw_paths:
+            self.global_variables.screen.blit(self.path_stamp, [10, 40])
+            for each in self.current_map.entity_group[Buffalo]:
+                for tile in each.path.tiles:
+                    marker = TileMarker(tile.column, tile.row, self.current_map)
+                    marker.update_image()
+                    pygame.draw.rect(self.global_variables.screen, (255, 0, 255), marker.image, 1)
+
 
 
