@@ -6,9 +6,9 @@ from manure import Manure
 
 
 class Wheat(entity.Entity):
-    def __init__(self, x, y, current_map, age):
+    def __init__(self, x, y, current_map):
         super().__init__(x, y, (201, 227, 73), 6, 6, current_map, None)
-        self.age = age
+        self.age = random.randint(0, 40)
         self.food_value = 25
         self.growth_stages = []
         self.growth_stage = 0
@@ -34,7 +34,7 @@ class Wheat(entity.Entity):
         elif self.growth_stage == 4:
             self.expire()
             if random.randrange(0, 10) > 2:
-                Wheat(self.tile_x, self.tile_y, self.current_map, random.randint(5, 20))
+                Wheat(self.tile_x, self.tile_y, self.current_map)
 
     def baby_roll(self):
         chance_to_reproduce = random.randint(0, self.likelihood_of_reproducing)
@@ -57,4 +57,4 @@ class Wheat(entity.Entity):
             tile_y += 1
         if growth_candidates:
             growth_tile = random.choice(growth_candidates)
-            Wheat(growth_tile[0], growth_tile[1], self.current_map, random.randint(5, 20))
+            Wheat(growth_tile[0], growth_tile[1], self.current_map)

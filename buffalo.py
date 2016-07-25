@@ -7,7 +7,7 @@ from herd import Herd
 
 
 class Buffalo(entity.Entity):
-    def __init__(self, x, y, current_map, herd):
+    def __init__(self, x, y, current_map, herd=None):
         super().__init__(x, y, utilities.colors.red, 6, 6, current_map, Wheat)
         self.speed = 10
         self.time_since_last_move = 0
@@ -32,6 +32,11 @@ class Buffalo(entity.Entity):
         self.max_initial_herd_size = 10
 
         self.incompatible_objects = [Buffalo]
+
+        if not self.herd:
+            self.herd = Herd(self.current_map)
+            self.herd.members.append(self)
+            self.herd.choose_new_alpha()
 
         self.herd.members.append(self)
 

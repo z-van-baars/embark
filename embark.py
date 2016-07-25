@@ -6,6 +6,7 @@ from tile import DisplayTile
 from buffalo import Buffalo
 from wheat import Wheat
 from game_map import Map
+import debug
 
 
 def select_world_size(world_size_candidates):
@@ -32,7 +33,11 @@ def main(global_variables, map_dimensions):
     new_map.map_generation()
     done = False
     super_scroll = 1
+    debug_stats = debug.DebugStatus(new_map, global_variables)
+    debug_stats.tile_selector_graphic = debug.TileSelectorGraphic(0, 0, new_map)
+    global_variables.debug_status = debug_stats
     while not done:
+        mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
@@ -57,6 +62,22 @@ def main(global_variables, map_dimensions):
                             elif new_event.type == pygame.KEYDOWN:
                                 if new_event.key == pygame.K_SPACE:
                                     paused = False
+                elif event.key == pygame.K_d:
+                    if not debug_stats.debug:
+                        debug_stats.debug = True
+                    else:
+                        debug_stats.debug = False
+                        debug_stats.entity_to_place = None
+                        debug_stats.current_placement_entity_number = 0
+                        debug_stats.clear = False
+                        debug_stats.remove = False
+                        debug_stats.current_removal_entity_number = 0
+                if debug_stats.debug:
+                    debug.event_processing(new_map, global_variables, event.key)
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if debug_stats.debug:
+                    debug.mouse_processing(new_map, global_variables, mouse_pos, event)
 
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_LSHIFT:
@@ -76,6 +97,12 @@ def main(global_variables, map_dimensions):
         for animal in new_map.entity_group[Buffalo]:
             animal.tick_cycle()
             global_variables.screen.blit(animal.image, [(animal.rect.x + new_map.x_shift), (animal.rect.y + new_map.y_shift)])
+
+        if debug_stats.debug:
+            debug_stats.tile_selector_graphic.update_image(mouse_pos)
+            debug_stats.print_to_screen()
+            if debug_stats.remove or debug_stats.entity_to_place:
+                pygame.draw.rect(global_variables.screen, (255, 255, 255), debug_stats.tile_selector_graphic.image, 1)
 
         pygame.display.flip()
         global_variables.clock.tick(60)

@@ -24,7 +24,7 @@ class Herd(object):
     def choose_new_alpha(self):
         herd_rankings = []
         for beast in self.members:
-            herd_rankings.append(beast.age, beast)
+            herd_rankings.append((beast.age, beast))
         herd_rankings = sorted(herd_rankings, reverse=True)
         self.alpha = herd_rankings[0][1]
         self.alpha.is_alpha = True

@@ -3,7 +3,7 @@ import math
 
 pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.init()
-pygame.display.set_caption("Embark v 0.2")
+pygame.display.set_caption("Embark v 0.21")
 
 
 class GlobalVariables(object):
@@ -14,7 +14,7 @@ class GlobalVariables(object):
         self.clock = pygame.time.Clock()
         self.time = 0
         self.font = pygame.font.SysFont('Calibri', 18, True, False)
-
+        self.debug_status = None
 
 class Colors(object):
     def __init__(self):

@@ -104,7 +104,7 @@ class Map(object):
                 space_occupied = True
             if not space_occupied:
                 # needed to make neighbors
-                cluster_center_wheat = Wheat(coordinates[0], coordinates[1], self, random.randint(0, 6))
+                cluster_center_wheat = Wheat(coordinates[0], coordinates[1], self)
                 wheat_cluster_placed = True
         self.entity_group[Wheat].add(cluster_center_wheat)
         cluster_left_edge = max(cluster_center_wheat.tile_x - 7, 0)
@@ -120,7 +120,7 @@ class Map(object):
                 if self.game_tile_rows[coordinates[1]][coordinates[0]].entity_group[Wheat]:
                     space_occupied = True
                 if not space_occupied:
-                    Wheat(coordinates[0], coordinates[1], self, random.randint(0, 5))
+                    Wheat(coordinates[0], coordinates[1], self)
                     neighbor_placed = True
 
 
