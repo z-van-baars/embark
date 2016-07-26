@@ -12,12 +12,12 @@ class Herd(object):
         self.alpha.find_local_food()
         if len(self.alpha.local_food_supply) < (len(self.members) / 4):
             if not self.migration_target:
-                self.migration_target = self.alpha.pick_migration_target()
+                self.migration_target = self.alpha.pick_migration_target(self.current_map, (self.alpha.tile_x, self.alpha.tile_y))
             else:
                 if utilities.distance(self.alpha.tile_x, self.alpha.tile_y, self.migration_target[0], self.migration_target[1]) == 0:
-                    self.migration_target = self.alpha.pick_migration_target()
+                    self.migration_target = self.alpha.pick_migration_target(self.current_map, (self.alpha.tile_x, self.alpha.tile_y))
                 else:
-                    self.alpha.migration_target = self.migration_target
+                    self.alpha.migration_target = self.alpha.pick_migration_target(self.current_map, (self.alpha.tile_x, self.alpha.tile_y))
         else:
             self.migration_target = (self.alpha.tile_x, self.alpha.tile_y)
 
