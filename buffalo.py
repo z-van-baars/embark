@@ -54,7 +54,7 @@ class Buffalo(entity.Entity):
         self.time_since_last_move += 1
 
         if self.current_hunger_saturation < self.hunger_threshold:
-            self.is_hungry()
+            self.solve_hunger()
         else:
             self.is_not_hungry()
 
@@ -64,54 +64,30 @@ class Buffalo(entity.Entity):
             self.path.tiles.pop(0)
         self.starvation_check()
 
-    def is_hungry(self):
+    def solve_hunger(self):
+        '''because of what I have in mind, it could end up doing activities that are a bit abstracted from gathering food
+        but bottomline is: the end result will be different than if it started from a position of no hunger'''
         self.eat()
         distance_from_alpha = utilities.distance(self.tile_x, self.tile_y, self.herd.alpha.tile_x, self.herd.alpha.tile_y)
-        if distance_from_alpha <= self.herd_radius:
-            if self.path and len(self.path.tiles) > 0:
-                self.calculate_step()
-                while not self.check_next_tile(None):
-                    self.path = self.get_path()
-                    self.calculate_step()
-            else:
-                print("debug a")
-                if self.target_object and self.target_object.is_valid:
-                    print("debug b")
-                    self.path = self.get_path()
-                    self.calculate_step()
+        if not self.target_object or not self.target_object.is_valid:
+            self.target_object = self.find_local_food()
+            if not self.target_object:
+                if not self.migration_target:
+                    if self.herd.migration_target:
+                        self.migration_target = self.herd.migration_target
+                        self.target_coordinates = self.migration_target
+                    else:
+                        self.migration_target = self.pick_migration_target()
+                        self.target_coordinates = self.migration_target
                 else:
-                    print("debug c")
-                    self.target_object = self.find_local_food()
-                    if not self.target_object:
-                        print("debug c")
-                        if not self.migration_target:
-                            print("debug d")
-                            if self.herd.migration_target:
-                                print("debug e")
-                                self.migration_target = self.herd.migration_target
-                                self.target_coordinates = self.migration_target
-                                self.path = self.get_path()
-                                self.calculate_step()
-                            else:
-                                print("debug f")
-                                self.migration_target = self.pick_migration_target()
-                                self.target_coordinates = self.migration_target
-                                self.path = self.get_path()
-                                self.calculate_step()
-                        else:
-                            print("debug g")
-                            print(self.migration_target, self.target_coordinates, (self.tile_x, self.tile_y))
-                            if self.target_coordinates == (self.tile_x, self.tile_y):
-                                print("debug h")
-                                self.migration_target = self.pick_migration_target()
-                                self.target_coordinates = self.migration_target
-                                self.path = self.get_path()
-                                self.calculate_step()
-        else:
-            print("debug i")
+                    print(self.migration_target, self.target_coordinates, (self.tile_x, self.tile_y))
+                    if self.target_coordinates == (self.tile_x, self.tile_y):
+                        self.migration_target = self.pick_migration_target()
+                        self.target_coordinates = self.migration_target
+        if distance_from_alpha > self.herd_radius:
             self.target_coordinates = (self.herd.alpha.tile_x, self.herd.alpha.tile_y)
-            self.path = self.get_path()
-            self.calculate_step()
+        self.path = self.get_path()
+        self.calculate_step()
 
     def is_not_hungry(self):
         distance_from_alpha = utilities.distance(self.tile_x, self.tile_y, self.herd.alpha.tile_x, self.herd.alpha.tile_y)

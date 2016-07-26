@@ -116,7 +116,7 @@ def event_processing(current_map, global_variables, event_key):
             global_variables.debug_status.clear = False
         if global_variables.debug_status.remove:
             global_variables.debug_status.remove = False
-            global_variables.debug_stats.current_removal_entity_number = 0
+            global_variables.debug_status.current_removal_entity_number = 0
         global_variables.debug_status.entity_to_place = Buffalo
         global_variables.debug_status.current_placement_entity_number = 2
     elif event_key == pygame.K_w:
@@ -266,10 +266,11 @@ class DebugStatus(object):
         if self.global_variables.debug_status.draw_paths:
             self.global_variables.screen.blit(self.path_stamp, [10, 40])
             for each in self.current_map.entity_group[Buffalo]:
-                for tile in each.path.tiles:
-                    marker = TileMarker(tile.column, tile.row, self.current_map)
-                    marker.update_image()
-                    pygame.draw.rect(self.global_variables.screen, (255, 0, 255), marker.image, 1)
+                if each.path:
+                    for tile in each.path.tiles:
+                        marker = TileMarker(tile.column, tile.row, self.current_map)
+                        marker.update_image()
+                        pygame.draw.rect(self.global_variables.screen, (255, 0, 255), marker.image, 1)
 
 
 
