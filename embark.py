@@ -111,7 +111,7 @@ def main(global_variables, map_dimensions):
                 pygame.draw.rect(global_variables.screen, (255, 255, 255), debug_stats.tile_selector_graphic.image, 1)
 
         pygame.display.flip()
-        global_variables.clock.tick(600)
+        global_variables.clock.tick(60)
         global_variables.time += 1
 
 global_variables = GlobalVariables(700, 700)

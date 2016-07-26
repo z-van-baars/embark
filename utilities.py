@@ -55,6 +55,17 @@ def get_adjacent_tiles(tile, current_map):
     return adjacent_tiles
 
 
+def get_adjacent_movement_tiles(tile, current_map):
+    initial_x = tile.column - 1
+    initial_y = tile.row - 1
+    adjacent_tiles = []
+    for tile_y in range(initial_y, initial_y + 3):
+        for tile_x in range(initial_x, initial_x + 3):
+            if within_map(tile_x, tile_y, current_map):
+                adjacent_tiles.append(current_map.game_tile_rows[tile_y][tile_x])
+    return adjacent_tiles
+
+
 def tile_is_valid(game_map, next_tile_x, next_tile_y, incompatible_objects):
     tile = game_map.game_tile_rows[next_tile_y][next_tile_x]
     for object_type in incompatible_objects:

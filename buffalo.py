@@ -11,7 +11,7 @@ from wall import Wall
 class Buffalo(entity.Entity):
     def __init__(self, x, y, current_map, herd=None):
         super().__init__(x, y, utilities.colors.red, 6, 6, current_map, Wheat)
-        self.speed = 20
+        self.speed = 30
         self.time_since_last_move = 0
         self.age = 0
         self.ticks_without_food = 0
@@ -75,7 +75,7 @@ class Buffalo(entity.Entity):
         assert self.path
         assert len(self.path.tiles) > 0
         change_x, change_y = navigate.calculate_step(my_position, self.path.tiles[0])
-        if utilities.tile_is_valid(self.current_map, my_position[0] + change_x, my_position[1] + change_y, self.incompatible_objects):
+        if not utilities.tile_is_valid(self.current_map, my_position[0] + change_x, my_position[1] + change_y, self.incompatible_objects):
             self.path = navigate.get_path(my_position, self.current_map, target_coordinates, self.incompatible_objects)
             change_x, change_y = navigate.calculate_step(my_position, self.path.tiles[0])
             return change_x, change_y
