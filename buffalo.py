@@ -172,7 +172,7 @@ class Buffalo(entity.Entity):
                         for each in tile_neighbors:
                             entry = (each, current_tile)
                             next_frontier.append(entry)
-                    visited[current_tile] = True
+                        visited[current_tile] = True
             current_frontier = next_frontier
         return visited, tiles_to_process
 
