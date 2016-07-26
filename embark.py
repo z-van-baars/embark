@@ -6,6 +6,7 @@ from tile import DisplayTile
 from buffalo import Buffalo
 from wheat import Wheat
 from game_map import Map
+from wall import Wall
 import debug
 
 
@@ -97,6 +98,9 @@ def main(global_variables, map_dimensions):
         for animal in new_map.entity_group[Buffalo]:
             animal.tick_cycle()
             global_variables.screen.blit(animal.image, [(animal.rect.x + new_map.x_shift), (animal.rect.y + new_map.y_shift)])
+
+        for terrain in new_map.entity_group[Wall]:
+            global_variables.screen.blit(terrain.image, [(terrain.rect.x + new_map.x_shift), (terrain.rect.y + new_map.y_shift)])
 
         if debug_stats.debug:
             for each in new_map.entity_group[Buffalo]:

@@ -3,6 +3,7 @@ import utilities
 import entity
 import random
 from manure import Manure
+from wall import Wall
 
 
 class Wheat(entity.Entity):
@@ -23,6 +24,7 @@ class Wheat(entity.Entity):
         # max and min number of babies possible in a single run of reproduce()
         self.minimum_number_of_babies = 1
         self.max_number_of_babies = 2
+        self.incompatible_objects = [Wheat, Wall]
 
     def tick_cycle(self):
         self.age += 1
@@ -50,7 +52,8 @@ class Wheat(entity.Entity):
             for map_tile in range(3):
                 if utilities.within_map(tile_x, tile_y, self.current_map):
                     wheat_at_this_tile = self.current_map.game_tile_rows[tile_y][tile_x].entity_group[Wheat]
-                    if not wheat_at_this_tile:
+                    wall_at_this_tile = self.current_map.game_tile_rows[tile_y][tile_x].entity_group[Wall]
+                    if not wheat_at_this_tile and not wall_at_this_tile:
                         growth_candidates.append((tile_x, tile_y))
                 tile_x += 1
             tile_x = self.tile_x - 1

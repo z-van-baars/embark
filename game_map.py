@@ -7,6 +7,7 @@ from buffalo import Buffalo
 from wheat import Wheat
 from game_tile import GameTile
 from herd import Herd
+from wall import Wall
 
 
 class Map(object):
@@ -23,6 +24,7 @@ class Map(object):
         self.entity_group = {}
         self.entity_group[Wheat] = pygame.sprite.Group()
         self.entity_group[Buffalo] = pygame.sprite.Group()
+        self.entity_group[Wall] = pygame.sprite.Group()
         self.herds = []
 
         self.number_of_buffalo_herds = 0

@@ -4,12 +4,13 @@ import entity
 import random
 from wheat import Wheat
 from herd import Herd
+from wall import Wall
 
 
 class Buffalo(entity.Entity):
     def __init__(self, x, y, current_map, herd=None):
         super().__init__(x, y, utilities.colors.red, 6, 6, current_map, Wheat)
-        self.speed = 1
+        self.speed = 20
         self.time_since_last_move = 0
         self.age = 0
         self.ticks_without_food = 0
@@ -36,7 +37,7 @@ class Buffalo(entity.Entity):
         self.min_initial_herd_size = 5
         self.max_initial_herd_size = 10
 
-        self.incompatible_objects = [Buffalo]
+        self.incompatible_objects = [Buffalo, Wall]
 
         if not self.herd:
             self.herd = Herd(self.current_map)
@@ -68,40 +69,49 @@ class Buffalo(entity.Entity):
         distance_from_alpha = utilities.distance(self.tile_x, self.tile_y, self.herd.alpha.tile_x, self.herd.alpha.tile_y)
         if distance_from_alpha <= self.herd_radius:
             if self.path and len(self.path.tiles) > 0:
-                utilities.calculate_step(self)
-                if not self.check_next_tile(None):
-                    self.path = utilities.get_path(self)
-                    utilities.calculate_step(self)
+                self.calculate_step()
+                while not self.check_next_tile(None):
+                    self.path = self.get_path()
+                    self.calculate_step()
             else:
+                print("debug a")
                 if self.target_object and self.target_object.is_valid:
-                    self.migration_target = None
-                    self.path = utilities.get_path(self)
-                    utilities.calculate_step(self)
+                    print("debug b")
+                    self.path = self.get_path()
+                    self.calculate_step()
                 else:
-                    self.target_object = None
+                    print("debug c")
                     self.target_object = self.find_local_food()
                     if not self.target_object:
+                        print("debug c")
                         if not self.migration_target:
+                            print("debug d")
                             if self.herd.migration_target:
+                                print("debug e")
                                 self.migration_target = self.herd.migration_target
                                 self.target_coordinates = self.migration_target
-                                self.path = utilities.get_path(self)
-                                utilities.calculate_step(self)
+                                self.path = self.get_path()
+                                self.calculate_step()
                             else:
+                                print("debug f")
                                 self.migration_target = self.pick_migration_target()
                                 self.target_coordinates = self.migration_target
-                                self.path = utilities.get_path(self)
-                                utilities.calculate_step(self)
+                                self.path = self.get_path()
+                                self.calculate_step()
                         else:
-                            if self.migration_target == (self.tile_x, self.tile_y):
+                            print("debug g")
+                            print(self.migration_target, self.target_coordinates, (self.tile_x, self.tile_y))
+                            if self.target_coordinates == (self.tile_x, self.tile_y):
+                                print("debug h")
                                 self.migration_target = self.pick_migration_target()
                                 self.target_coordinates = self.migration_target
-                                self.path = utilities.get_path(self)
-                                utilities.calculate_step(self)
+                                self.path = self.get_path()
+                                self.calculate_step()
         else:
+            print("debug i")
             self.target_coordinates = (self.herd.alpha.tile_x, self.herd.alpha.tile_y)
-            self.path = utilities.get_path(self)
-            utilities.calculate_step(self)
+            self.path = self.get_path()
+            self.calculate_step()
 
     def is_not_hungry(self):
         distance_from_alpha = utilities.distance(self.tile_x, self.tile_y, self.herd.alpha.tile_x, self.herd.alpha.tile_y)
@@ -109,7 +119,7 @@ class Buffalo(entity.Entity):
             self.idle()
         else:
             self.target_coordinates = (self.herd.alpha.tile_x, self.herd.alpha.tile_y)
-            self.path = utilities.get_path(self)
+            self.path = self.get_path()
 
     def eat(self):
         if self.current_tile.entity_group[Wheat]:
@@ -121,56 +131,56 @@ class Buffalo(entity.Entity):
                     self.current_hunger_saturation = self.max_hunger_saturation
             self.target_object = None
 
-def get_path(self):
-    if self.target_object:
-        target_x = self.target_object.tile_x
-        target_y = self.target_object.tile_y
-    else:
-        target_x = self.target_coordinates[0]
-        target_y = self.target_coordinates[1]
+    def get_path(self):
+        if self.target_object:
+            target_x = self.target_object.tile_x
+            target_y = self.target_object.tile_y
+        else:
+            target_x = self.target_coordinates[0]
+            target_y = self.target_coordinates[1]
 
-    target_tile = self.current_map.game_tile_rows[target_y][target_x]
-    start_tile = self.current_map.game_tile_rows[self.tile_y][self.tile_x]
-    target_distance = utilities.distance(start_tile.column, start_tile.row, target_x, target_y)
-    tiles_to_process = {start_tile: (0, target_distance, start_tile, start_tile)}
-    visited = {start_tile: True}
+        target_tile = self.current_map.game_tile_rows[target_y][target_x]
+        start_tile = self.current_map.game_tile_rows[self.tile_y][self.tile_x]
+        target_distance = utilities.distance(start_tile.column, start_tile.row, target_x, target_y)
+        tiles_to_process = {start_tile: (0, target_distance, start_tile, start_tile)}
+        visited = {start_tile: True}
 
-    tile_neighbors = utilities.get_adjacent_tiles(start_tile, self.current_map)
-    current_frontier = []
-    for each in tile_neighbors:
-        current_frontier.append((each, start_tile))
-    steps = 0
-    while target_tile not in visited:
-        next_frontier = []
-        steps += 1
-        for tile in current_frontier:
-            current_tile = tile[0]
-            previous_tile = tile[1]
-            if current_tile not in visited:
-                if self.check_next_tile(current_tile):
-                    distance_to_target = utilities.distance(current_tile.column, current_tile.row, target_x, target_y)
-                    tiles_to_process[current_tile] = (steps, distance_to_target, current_tile, previous_tile)
-                    tile_neighbors = utilities.get_adjacent_tiles(current_tile, self.current_map)
-                    for each in tile_neighbors:
-                        entry = (each, current_tile)
-                        next_frontier.append(entry)
-                visited[current_tile] = True
-        current_frontier = next_frontier
-    new_path = utilities.Path()
-    new_path.tiles.append(target_tile)
-    new_path.steps.append(tiles_to_process[target_tile][3])
+        tile_neighbors = utilities.get_adjacent_tiles(start_tile, self.current_map)
+        current_frontier = []
+        for each in tile_neighbors:
+            current_frontier.append((each, start_tile))
+        steps = 0
+        while target_tile not in visited:
+            next_frontier = []
+            steps += 1
+            for tile in current_frontier:
+                current_tile = tile[0]
+                previous_tile = tile[1]
+                if current_tile not in visited:
+                    if self.check_next_tile(current_tile):
+                        distance_to_target = utilities.distance(current_tile.column, current_tile.row, target_x, target_y)
+                        tiles_to_process[current_tile] = (steps, distance_to_target, current_tile, previous_tile)
+                        tile_neighbors = utilities.get_adjacent_tiles(current_tile, self.current_map)
+                        for each in tile_neighbors:
+                            entry = (each, current_tile)
+                            next_frontier.append(entry)
+                    visited[current_tile] = True
+            current_frontier = next_frontier
+        new_path = utilities.Path()
+        new_path.tiles.append(target_tile)
+        new_path.steps.append(tiles_to_process[target_tile][3])
 
-    while start_tile not in new_path.tiles:
-        next_tile = new_path.steps[-1]
-        if next_tile != start_tile:
-            new_path.steps.append(tiles_to_process[next_tile][3])
-        new_path.tiles.append(next_tile)
-    new_path.tiles.reverse()
-    new_path.tiles.pop(0)
-    new_path.steps.reverse()
-    new_path.steps.pop(0)
+        while start_tile not in new_path.tiles:
+            next_tile = new_path.steps[-1]
+            if next_tile != start_tile:
+                new_path.steps.append(tiles_to_process[next_tile][3])
+            new_path.tiles.append(next_tile)
+        new_path.tiles.reverse()
+        new_path.tiles.pop(0)
+        new_path.steps.reverse()
+        new_path.steps.pop(0)
 
-    return new_path
+        return new_path
 
     def calculate_step(self):
         x_dist = self.tile_x - self.path.tiles[0].column
