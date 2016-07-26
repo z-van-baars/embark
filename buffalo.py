@@ -22,8 +22,6 @@ class Buffalo(entity.Entity):
         self.max_hunger_saturation = 400
         self.horizontal_sight = 5
         self.vertical_sight = 5
-        self.migration_target = None
-        self.local_food_supply = []
         self.herd_radius = 5
         self.herd = herd
         self.is_alpha = False
@@ -45,8 +43,8 @@ class Buffalo(entity.Entity):
             self.herd.members.append(self)
             self.herd.choose_new_alpha()
             self.current_map.herds.append(self.herd)
-
-        self.herd.members.append(self)
+        else:
+            self.herd.members.append(self)
 
     def tick_cycle(self):
         self.age += 1
@@ -55,7 +53,7 @@ class Buffalo(entity.Entity):
         self.time_since_last_move += 1
 
         if self.current_hunger_saturation < self.hunger_threshold:
-            self.solve_hunger((self.tile_x, self.tile_y), self.target_object, self.migration_target, self.target_coordinates, self.herd.migration_target, self.herd.alpha)
+            self.change_x, self.change_y = self.solve_hunger((self.tile_x, self.tile_y), self.target_object, self.target_coordinates, self.herd.migration_target, self.herd.alpha)
         else:
             self.secondary_behavior()
 
@@ -64,7 +62,7 @@ class Buffalo(entity.Entity):
             self.move()
         self.starvation_check()
 
-    def solve_hunger(self, my_position, target_object, migration_target_coordinates, target_coordinates, herd_migration_target_coordinates, alpha):
+    def solve_hunger(self, my_position, target_object, target_coordinates, herd_migration_target_coordinates, alpha):
         '''because of what I have in mind, it could end up doing activities that are a bit abstracted from gathering food
         but bottomline is: the end result will be different than if it started from a position of no hunger'''
         self.eat()
@@ -77,7 +75,7 @@ class Buffalo(entity.Entity):
         assert self.path
         assert len(self.path.tiles) > 0
         change_x, change_y = navigate.calculate_step(my_position, self.path.tiles[0])
-        if utilities.tile_is_valid(game_map, my_position[0] + change_x, my_position[1] + change_y, self.incompatible_objects):
+        if utilities.tile_is_valid(self.current_map, my_position[0] + change_x, my_position[1] + change_y, self.incompatible_objects):
             self.path = navigate.get_path(my_position, self.current_map, target_coordinates, self.incompatible_objects)
             change_x, change_y = navigate.calculate_step(my_position, self.path.tiles[0])
             return change_x, change_y
@@ -97,10 +95,12 @@ class Buffalo(entity.Entity):
         return False
 
     def choose_target(self):
-        target_object = self.find_local_food()
-        if target_object:
+        nearby_food = self.find_local_food()
+        if nearby_food:
+            target_object = self.select_closest_target(nearby_food)
             target_coordinates = (target_object.tile_x, target_object.tile_y)
         else:
+            target_object = None
             target_coordinates = self.herd.migration_target
         return target_object, target_coordinates
 

@@ -10,12 +10,15 @@ class Herd(object):
         self.current_map = current_map
 
     def check_food_supply(self):
-        self.alpha.find_local_food()
-        if len(self.alpha.local_food_supply) < (len(self.members) / 4):
-            self.migration_target = self.choose_random_migration_target(self.current_map, (self.alpha.tile_x, self.alpha.tile_y))
+        local_food_supply = self.alpha.find_local_food()
+        if len(local_food_supply) < (len(self.members) / 4):
+            if not self.migration_target or self.migration_target == (self.alpha.tile_x, self.alpha.tile_y):
+                self.migration_target = self.choose_random_migration_target(self.current_map, (self.alpha.tile_x, self.alpha.tile_y))
+            print(self.migration_target)
         else:
             self.migration_target = (self.alpha.tile_x, self.alpha.tile_y)
         assert self.migration_target
+        assert self.migration_target != (self.alpha.tile_x, self.alpha.tile_y)
 
     def choose_new_alpha(self):
         herd_rankings = []
@@ -27,9 +30,8 @@ class Herd(object):
         self.alpha.image.fill(self.alpha.alpha_color)
 
     def choose_random_migration_target(self, game_map, alpha_coordinates):
-        target_x = -1
-        target_y = -1
-        while alpha_coordinates != (target_x, target_y):
+        target_x, target_y = alpha_coordinates
+        while alpha_coordinates == (target_x, target_y):
             target_x = random.randint(0, game_map.number_of_columns - 1)
             target_y = random.randint(0, game_map.number_of_rows - 1)
         return (target_x, target_y)
