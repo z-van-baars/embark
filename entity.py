@@ -54,37 +54,6 @@ class Entity(pygame.sprite.Sprite):
     def leave_tile(self):
         self.current_tile.entity_group[type(self)].remove(self)
 
-    def check_next_tile(self, next_tile):
-        if not next_tile:
-            next_tile_x = self.tile_x + self.change_x
-            next_tile_y = self.tile_y + self.change_y
-
-            next_tile = self.current_map.game_tile_rows[next_tile_y][next_tile_x]
-        incompatible_objects_list = []
-        for object_type in self.incompatible_objects:
-            object_list = next_tile.entity_group[object_type]
-            incompatible_objects_list.extend(object_list)
-        if len(incompatible_objects_list) > 0:
-            return False
-        else:
-            return True
-
-    def check_all_tiles(self):
-        movement_candidates = []
-        tile_x = self.tile_x - 1
-        tile_y = self.tile_y - 1
-        for map_tile_row in range(3):
-            for map_tile in range(3):
-                if utilities.within_map(tile_x, tile_y, self.current_map):
-                    new_candidate = self.current_map.game_tile_rows[map_tile_row][map_tile]
-                    if self.check_next_tile(new_candidate):
-                        movement_candidates.append(new_candidate)
-                tile_x += 1
-            tile_x = self.tile_x - 1
-            tile_y += 1
-        if movement_candidates:
-            new_next_tile = random.choice(movement_candidates)
-            return new_next_tile
 
     def find_local_food(self):
         nearby_food_list = []

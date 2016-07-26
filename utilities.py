@@ -16,6 +16,7 @@ class GlobalVariables(object):
         self.font = pygame.font.SysFont('Calibri', 18, True, False)
         self.debug_status = None
 
+
 class Colors(object):
     def __init__(self):
         self.black = (0, 0, 0)
@@ -39,26 +40,6 @@ class Path(object):
         self.steps = []
 
 
-def distance(a, b, x, y):
-    a1 = abs(a - x)
-    b1 = abs(b - y)
-    c = math.sqrt((a1 * a1) + (b1 * b1))
-    return c
-
-
-def get_vector(self, a, b, x, y):
-    distance_to_target = distance(a, b, x, y)
-    factor = distance_to_target / self.speed
-    x_dist = a - x
-    y_dist = b - y
-    change_x = x_dist / factor
-    change_y = y_dist / factor
-    change_x = round(change_x)
-    change_y = round(change_y)
-
-    return (change_x, change_y)
-
-
 def within_map(x, y, current_map):
     return 0 <= x <= len(current_map.game_tile_rows[0]) - 1 and 0 <= y <= len(current_map.game_tile_rows) - 1
 
@@ -72,3 +53,11 @@ def get_adjacent_tiles(tile, current_map):
             if within_map(tile_x, tile_y, current_map):
                 adjacent_tiles.append(current_map.game_tile_rows[tile_y][tile_x])
     return adjacent_tiles
+
+
+def tile_is_valid(game_map, next_tile_x, next_tile_y, incompatible_objects):
+    tile = game_map.game_tile_rows[next_tile_y][next_tile_x]
+    for object_type in incompatible_objects:
+        if len(tile.entity_group[object_type]) > 0:
+            return False
+    return True

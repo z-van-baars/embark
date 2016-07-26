@@ -2,6 +2,7 @@ import pygame
 import utilities
 import entity
 import random
+import navigate
 from wheat import Wheat
 from herd import Herd
 from wall import Wall
@@ -60,9 +61,6 @@ class Buffalo(entity.Entity):
 
         if self.time_since_last_move == self.speed:
             self.time_since_last_move = 0
-            if not self.check_next_tile(None):
-                print("whoops, got blocked")
-                self.get_path(self.current_map, self.target_coordinates)
             self.move()
         self.starvation_check()
 
@@ -70,49 +68,41 @@ class Buffalo(entity.Entity):
         '''because of what I have in mind, it could end up doing activities that are a bit abstracted from gathering food
         but bottomline is: the end result will be different than if it started from a position of no hunger'''
         self.eat()
-        distance_from_alpha = utilities.distance(my_position[0], my_position[1], alpha.tile_x, alpha.tile_y)
-        print("Debug A")
-        if not target_object or not target_object.is_valid:
-            print("Debug B")
-            self.target_object = self.find_local_food()
-            if not target_object:
-                print("Debug C")
-                if not migration_target_coordinates:
-                    print("Debug D")
-                    if herd_migration_target_coordinates:
-                        print("Debug E")
-                        self.migration_target = herd_migration_target_coordinates
-                        self.target_coordinates = herd_migration_target_coordinates
-                    else:
-                        print("Debug F")
-                        self.migration_target = self.pick_migration_target(self.current_map, my_position)
-                        self.target_coordinates = self.migration_target
-                else:
-                    print("Debug G")
-                    if my_position == target_coordinates:
-                        print("Debug H")
-                        self.migration_target = self.pick_migration_target(self.current_map, my_position)
-                        self.target_coordinates = self.migration_target
-            elif self.target_object:
-                print("Debug I")
-                self.migration_target = None
-                self.target_coordinates = (self.target_object.tile_x, self.target_object.tile_y)
-        if distance_from_alpha > self.herd_radius:
-            print("Debug J")
-            self.target_coordinates = (self.herd.alpha.tile_x, self.herd.alpha.tile_y)
+        if not self.target_object or not self.target_object.is_valid:
+            target_object, target_coordinates = self.choose_target()
+        assert target_coordinates
+        assert target_coordinates != my_position
         if not self.path or len(self.path.tiles) < 1:
-            self.path = self.get_path(self.current_map, self.target_coordinates)
-        print(my_position, self.target_coordinates)
-        print(len(self.path.tiles))
-        self.calculate_step()
+            self.path = navigate.get_path(my_position, self.current_map, target_coordinates, self.incompatible_objects)
+        assert self.path
+        assert len(self.path.tiles) > 0
+        change_x, change_y = navigate.calculate_step(my_position, self.path.tiles[0])
+        if utilities.tile_is_valid(game_map, my_position[0] + change_x, my_position[1] + change_y, self.incompatible_objects):
+            self.path = navigate.get_path(my_position, self.current_map, target_coordinates, self.incompatible_objects)
+            change_x, change_y = navigate.calculate_step(my_position, self.path.tiles[0])
+            return change_x, change_y
+        return change_x, change_y
 
     def secondary_behavior(self):
-        distance_from_alpha = utilities.distance(self.tile_x, self.tile_y, self.herd.alpha.tile_x, self.herd.alpha.tile_y)
-        if distance_from_alpha < self.herd_radius:
+        if self.within_herd_range(self.tile_x, self.tile_y, self.herd_radius, self.herd.alpha):
             self.idle()
         else:
             self.target_coordinates = (self.herd.alpha.tile_x, self.herd.alpha.tile_y)
             self.path = self.get_path()
+
+    def within_herd_range(self, my_position, herd_radius, alpha):
+        distance_from_alpha = navigate.distance(my_position[0], my_position[1], alpha.tile_x, alpha.tile_y)
+        if distance_from_alpha < herd_radius:
+            return True
+        return False
+
+    def choose_target(self):
+        target_object = self.find_local_food()
+        if target_object:
+            target_coordinates = (target_object.tile_x, target_object.tile_y)
+        else:
+            target_coordinates = self.herd.migration_target
+        return target_object, target_coordinates
 
     def eat(self):
         if self.current_tile.entity_group[Wheat]:
@@ -123,81 +113,6 @@ class Buffalo(entity.Entity):
                 if self.current_hunger_saturation > self.max_hunger_saturation:
                     self.current_hunger_saturation = self.max_hunger_saturation
             self.target_object = None
-
-    def get_path(self, game_map, target_coordinates):
-
-        target_tile = game_map.game_tile_rows[target_coordinates[1]][target_coordinates[0]]
-        start_tile = game_map.game_tile_rows[self.tile_y][self.tile_x]
-        target_distance = utilities.distance(start_tile.column, start_tile.row, target_coordinates[0], target_coordinates[1])
-        tiles_to_process = {start_tile: (0, target_distance, start_tile, start_tile)}
-        visited = {start_tile: True}
-
-        tile_neighbors = utilities.get_adjacent_tiles(start_tile, game_map)
-        current_frontier = []
-        for each in tile_neighbors:
-            current_frontier.append((each, start_tile))
-
-        visited, tiles_to_process = self.explore_frontier_to_target(visited, target_tile, current_frontier, tiles_to_process)
-
-        new_path = utilities.Path()
-        new_path.tiles.append(target_tile)
-        new_path.steps.append(tiles_to_process[target_tile][3])
-
-        while start_tile not in new_path.tiles:
-            next_tile = new_path.steps[-1]
-            if next_tile != start_tile:
-                new_path.steps.append(tiles_to_process[next_tile][3])
-            new_path.tiles.append(next_tile)
-        new_path.tiles.reverse()
-        # removes the start tile from the tiles list and the steps list in the path object
-        new_path.tiles.pop(0)
-        new_path.steps.reverse()
-        new_path.steps.pop(0)
-
-        return new_path
-
-    def explore_frontier_to_target(self, visited, target_tile, current_frontier, tiles_to_process):
-        steps = 0
-        while target_tile not in visited:
-            next_frontier = []
-            steps += 1
-            for tile in current_frontier:
-                current_tile = tile[0]
-                previous_tile = tile[1]
-                if current_tile not in visited:
-                    if self.check_next_tile(current_tile):
-                        distance_to_target = utilities.distance(current_tile.column, current_tile.row, target_tile.column, target_tile.row)
-                        tiles_to_process[current_tile] = (steps, distance_to_target, current_tile, previous_tile)
-                        tile_neighbors = utilities.get_adjacent_tiles(current_tile, self.current_map)
-                        for each in tile_neighbors:
-                            entry = (each, current_tile)
-                            next_frontier.append(entry)
-                        visited[current_tile] = True
-            current_frontier = next_frontier
-        return visited, tiles_to_process
-
-    def calculate_step(self):
-        x_dist = self.tile_x - self.path.tiles[0].column
-        y_dist = self.tile_y - self.path.tiles[0].row
-        if abs(x_dist) > abs(y_dist):
-            if x_dist < 0:
-                self.change_x = 1
-            elif x_dist > 0:
-                self.change_x = -1
-        elif abs(x_dist) < abs(y_dist):
-            if y_dist < 0:
-                self.change_y = 1
-            elif y_dist > 0:
-                self.change_y = -1
-        else:
-            if y_dist < 0:
-                self.change_y = 1
-            elif y_dist > 0:
-                self.change_y = -1
-            if x_dist < 0:
-                self.change_x = 1
-            elif x_dist > 0:
-                self.change_x = -1
 
     def move(self):
         self.tile_x += self.change_x
@@ -221,11 +136,6 @@ class Buffalo(entity.Entity):
     def starvation_check(self):
         if self.current_hunger_saturation < 1:
             self.expire()
-
-    def pick_migration_target(self, game_map, my_coordinates):
-        target_x = random.randint(0, game_map.number_of_columns - 1)
-        target_y = random.randint(0, game_map.number_of_rows - 1)
-        return (target_x, target_y)
 
     def idle(self):
         action = random.randint(0, 900)
