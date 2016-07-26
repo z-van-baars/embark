@@ -1,6 +1,7 @@
 import random
 import math
 import utilities
+import queue
 
 
 def distance(a, b, x, y):
@@ -38,17 +39,18 @@ def calculate_step(my_position, next_tile):
 
 
 def explore_frontier_to_target(game_map, visited, target_tile, frontier, incompatible_objects):
-    steps = 0
-    while frontier:
-        steps += 1
-        current_tile, previous_tile = frontier.pop(0)
-        if current_tile not in visited:
-            if utilities.tile_is_valid(game_map, current_tile.column, current_tile.row, incompatible_objects):
-                distance_to_target = distance(current_tile.column, current_tile.row, target_tile.column, target_tile.row)
-                visited[current_tile] = (steps, distance_to_target, previous_tile)
+    while not frontier.empty():
+        priority, current_tile, previous_tile = frontier.get()
+
+        if utilities.tile_is_valid(game_map, current_tile.column, current_tile.row, incompatible_objects):
+            new_steps = visited[previous_tile][0] + 1
+            if current_tile not in visited or new_steps < visited[current_tile][0]:
                 tile_neighbors = utilities.get_adjacent_tiles(current_tile, game_map)
-                random.shuffle(tile_neighbors)
-                frontier.extend([(each, current_tile) for each in tile_neighbors])
+                for each in tile_neighbors:
+                    distance_to_target = distance(each.column, each.row, target_tile.column, target_tile.row)
+                    priority = distance_to_target + new_steps
+                    frontier.put((priority, each, current_tile))
+                visited[current_tile] = (new_steps, previous_tile)
         if target_tile in visited:
             break
     return visited
@@ -58,24 +60,23 @@ def get_path(my_position, game_map, target_coordinates, incompatible_objects):
 
         target_tile = game_map.game_tile_rows[target_coordinates[1]][target_coordinates[0]]
         start_tile = game_map.game_tile_rows[my_position[1]][my_position[0]]
-        target_distance = distance(start_tile.column, start_tile.row, target_coordinates[0], target_coordinates[1])
-        visited = {start_tile: (0, target_distance, start_tile)}
+        visited = {start_tile: (0, start_tile)}
 
         tile_neighbors = utilities.get_adjacent_tiles(start_tile, game_map)
-        current_frontier = []
+        frontier = queue.PriorityQueue()
         for each in tile_neighbors:
-            current_frontier.append((each, start_tile))
+            frontier.put((0, each, start_tile))
 
-        visited = explore_frontier_to_target(game_map, visited, target_tile, current_frontier, incompatible_objects)
+        visited = explore_frontier_to_target(game_map, visited, target_tile, frontier, incompatible_objects)
 
         new_path = utilities.Path()
         new_path.tiles.append(target_tile)
-        new_path.steps.append(visited[target_tile][2])
+        new_path.steps.append(visited[target_tile][1])
 
         while start_tile not in new_path.tiles:
             next_tile = new_path.steps[-1]
             if next_tile != start_tile:
-                new_path.steps.append(visited[next_tile][2])
+                new_path.steps.append(visited[next_tile][1])
             new_path.tiles.append(next_tile)
         new_path.tiles.reverse()
         # removes the start tile from the tiles list and the steps list in the path object

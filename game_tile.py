@@ -15,3 +15,6 @@ class GameTile(object):
                             Manure: [],
                             Wall: []
                             }
+    def __lt__(self, other):
+        return False
+
