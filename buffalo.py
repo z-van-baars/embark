@@ -11,7 +11,7 @@ from wall import Wall
 class Buffalo(entity.Entity):
     def __init__(self, x, y, current_map, herd=None):
         super().__init__(x, y, utilities.colors.red, 6, 6, current_map, Wheat)
-        self.speed = 30
+        self.speed = 1
         self.time_since_last_move = 0
         self.age = 0
         self.ticks_without_food = 0
@@ -20,8 +20,8 @@ class Buffalo(entity.Entity):
         self.current_hunger_saturation = 200
         self.hunger_threshold = 400
         self.max_hunger_saturation = 400
-        self.horizontal_sight = 5
-        self.vertical_sight = 5
+        self.horizontal_sight = 6
+        self.vertical_sight = 6
         self.herd_radius = 5
         self.herd = herd
         self.is_alpha = False
@@ -60,12 +60,13 @@ class Buffalo(entity.Entity):
         if self.time_since_last_move == self.speed:
             self.time_since_last_move = 0
             self.move()
+        self.eat()
         self.starvation_check()
 
     def solve_hunger(self, my_position, target_object, target_coordinates, herd_migration_target_coordinates, alpha):
         '''because of what I have in mind, it could end up doing activities that are a bit abstracted from gathering food
         but bottomline is: the end result will be different than if it started from a position of no hunger'''
-        self.eat()
+        
         if not self.target_object or not self.target_object.is_valid:
             target_object, target_coordinates = self.choose_target()
         assert target_coordinates
@@ -78,7 +79,6 @@ class Buffalo(entity.Entity):
         if not utilities.tile_is_valid(self.current_map, my_position[0] + change_x, my_position[1] + change_y, self.incompatible_objects):
             self.path = navigate.get_path(my_position, self.current_map, target_coordinates, self.incompatible_objects)
             change_x, change_y = navigate.calculate_step(my_position, self.path.tiles[0])
-            return change_x, change_y
         return change_x, change_y
 
     def secondary_behavior(self):

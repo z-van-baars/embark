@@ -1,6 +1,7 @@
 import pygame
 import utilities
 import random
+import navigate
 
 
 class Entity(pygame.sprite.Sprite):
@@ -58,8 +59,8 @@ class Entity(pygame.sprite.Sprite):
         nearby_food_list = []
         initial_x = self.tile_x - (self.horizontal_sight)
         initial_y = self.tile_y - (self.vertical_sight)
-        for map_tile_row in range(initial_x, ((self.vertical_sight * 2) + 1)):
-            for map_tile in range(initial_y, ((self.horizontal_sight * 2) + 1)):
+        for map_tile_row in range(initial_y, (initial_y + ((self.vertical_sight * 2) + 1))):
+            for map_tile in range(initial_x, (initial_x + ((self.horizontal_sight * 2) + 1))):
                 if utilities.within_map(map_tile, map_tile_row, self.current_map):
                     food_at_this_tile = self.current_map.game_tile_rows[map_tile_row][map_tile].entity_group[self.food_type]
                     nearby_food_list.extend(food_at_this_tile)
@@ -68,7 +69,7 @@ class Entity(pygame.sprite.Sprite):
     def select_closest_target(self, list_of_targets):
         targets_to_sort = []
         for target in list_of_targets:
-            dist = utilities.distance(target.tile_x, target.tile_y, self.tile_x, self.tile_y)
+            dist = navigate.distance(target.tile_x, target.tile_y, self.tile_x, self.tile_y)
             targets_to_sort.append((dist, target))
 
         possible_targets = sorted(targets_to_sort)

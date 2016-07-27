@@ -16,8 +16,6 @@ class Herd(object):
                 self.migration_target = self.choose_random_migration_target(self.current_map, (self.alpha.tile_x, self.alpha.tile_y))
         else:
             self.migration_target = (self.alpha.tile_x, self.alpha.tile_y)
-        assert self.migration_target
-        assert self.migration_target != (self.alpha.tile_x, self.alpha.tile_y)
 
     def choose_new_alpha(self):
         herd_rankings = []
