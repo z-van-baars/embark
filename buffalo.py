@@ -11,7 +11,7 @@ from wall import Wall
 class Buffalo(entity.Entity):
     def __init__(self, x, y, current_map, herd=None):
         super().__init__(x, y, utilities.colors.red, 6, 6, current_map, Wheat)
-        self.speed = 1
+        self.speed = 10
         self.time_since_last_move = 0
         self.age = 0
         self.ticks_without_food = 0
@@ -60,17 +60,15 @@ class Buffalo(entity.Entity):
         if self.time_since_last_move == self.speed:
             self.time_since_last_move = 0
             self.move()
-        self.eat()
+
         self.starvation_check()
 
     def solve_hunger(self, my_position, target_object, target_coordinates, herd_migration_target_coordinates, alpha):
         '''because of what I have in mind, it could end up doing activities that are a bit abstracted from gathering food
         but bottomline is: the end result will be different than if it started from a position of no hunger'''
-        
+        self.eat()
         if not self.target_object or not self.target_object.is_valid:
-            target_object, target_coordinates = self.choose_target()
-        assert target_coordinates
-        assert target_coordinates != my_position
+            target_object, target_coordinates = self.choose_target(my_position)
         if not self.path or len(self.path.tiles) < 1:
             self.path = navigate.get_path(my_position, self.current_map, target_coordinates, self.incompatible_objects)
         assert self.path
@@ -94,7 +92,7 @@ class Buffalo(entity.Entity):
             return True
         return False
 
-    def choose_target(self):
+    def choose_target(self, my_position):
         nearby_food = self.find_local_food()
         if nearby_food:
             target_object = self.select_closest_target(nearby_food)
@@ -102,6 +100,7 @@ class Buffalo(entity.Entity):
         else:
             target_object = None
             target_coordinates = self.herd.migration_target
+        assert my_position != target_coordinates
         return target_object, target_coordinates
 
     def eat(self):

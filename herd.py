@@ -11,6 +11,7 @@ class Herd(object):
 
     def check_food_supply(self):
         local_food_supply = self.alpha.find_local_food()
+        print(len(local_food_supply))
         if len(local_food_supply) < (len(self.members) / 4):
             if not self.migration_target or self.migration_target == (self.alpha.tile_x, self.alpha.tile_y):
                 self.migration_target = self.choose_random_migration_target(self.current_map, (self.alpha.tile_x, self.alpha.tile_y))

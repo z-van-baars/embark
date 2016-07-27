@@ -62,8 +62,9 @@ class Entity(pygame.sprite.Sprite):
         for map_tile_row in range(initial_y, (initial_y + ((self.vertical_sight * 2) + 1))):
             for map_tile in range(initial_x, (initial_x + ((self.horizontal_sight * 2) + 1))):
                 if utilities.within_map(map_tile, map_tile_row, self.current_map):
-                    food_at_this_tile = self.current_map.game_tile_rows[map_tile_row][map_tile].entity_group[self.food_type]
-                    nearby_food_list.extend(food_at_this_tile)
+                    if not self.current_map.game_tile_rows[map_tile_row][map_tile] == self.current_tile:
+                        food_at_this_tile = self.current_map.game_tile_rows[map_tile_row][map_tile].entity_group[self.food_type]
+                        nearby_food_list.extend(food_at_this_tile)
         return nearby_food_list
 
     def select_closest_target(self, list_of_targets):
