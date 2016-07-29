@@ -40,6 +40,17 @@ class Path(object):
         self.steps = []
 
 
+def get_nearby_tiles(current_map, center, radius):
+    nearby_tiles = []
+    x = center[0]
+    y = center[1]
+    for row in range((y - radius), (radius * 2 + 1)):
+        for column in range((x - radius), (radius * 2 + 1)):
+            if within_map(column, row, current_map):
+                nearby_tiles.append(current_map.game_tile_rows[column][row])
+    return nearby_tiles
+
+
 def within_map(x, y, current_map):
     return 0 <= x <= len(current_map.game_tile_rows[0]) - 1 and 0 <= y <= len(current_map.game_tile_rows) - 1
 

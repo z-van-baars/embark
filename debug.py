@@ -47,17 +47,14 @@ class FoodSearchRadius(pygame.sprite.Sprite):
         super().__init__()
         self.current_map = current_map
         self.entity = entity
+        self.center = (entity.rect.x, entity.rect.y)
+        self.radius = (self.entity.sight_range * 10)
 
-        self.update_image()
+        self.update_stats()
 
-    def update_image(self):
-        top = self.entity.tile_y * 10 - self.entity.vertical_sight * 10
-        top += self.current_map.y_shift
-        left = self.entity.tile_x * 10 - self.entity.horizontal_sight * 10
-        left += self.current_map.x_shift
-        width = self.entity.horizontal_sight * 20
-        height = self.entity.vertical_sight * 20
-        self.image = pygame.Rect(left, top, width, height)
+    def update_stats(self):
+        self.center = (self.entity.rect.x + 5, self.entity.rect.y + 5)
+        self.radius = (self.entity.sight_range * 10)
 
 
 def event_processing(current_map, global_variables, event_key):
@@ -262,7 +259,9 @@ class DebugStatus(object):
                 self.global_variables.screen.blit(self.stamps[4][1], self.stamps[4][0])
         if self.global_variables.debug_status.draw_search_areas:
             for each in self.current_map.entity_group[Buffalo]:
-                pygame.draw.rect(self.global_variables.screen, (0, 0, 0), each.search_area_graphic.image, 1)
+                new_search_area_graphic = FoodSearchRadius(self.current_map, each)
+                new_search_area_graphic.update_stats()
+                pygame.draw.circle(self.global_variables.screen, (0, 0, 0), new_search_area_graphic.center, new_search_area_graphic.radius, 1)
         if self.global_variables.debug_status.draw_paths:
             self.global_variables.screen.blit(self.path_stamp, [10, 40])
             for each in self.current_map.entity_group[Buffalo]:

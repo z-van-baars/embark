@@ -2,6 +2,7 @@ from buffalo import Buffalo
 from manure import Manure
 from wheat import Wheat
 from wall import Wall
+from tree import Tree
 
 
 class GameTile(object):
@@ -13,7 +14,8 @@ class GameTile(object):
                             Buffalo: [],
                             Wheat: [],
                             Manure: [],
-                            Wall: []
+                            Wall: [],
+                            Tree: []
                             }
     def __lt__(self, other):
         return False

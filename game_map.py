@@ -8,6 +8,8 @@ from wheat import Wheat
 from game_tile import GameTile
 from herd import Herd
 from wall import Wall
+from tree import Tree
+import navigate
 
 
 class Map(object):
@@ -25,9 +27,12 @@ class Map(object):
         self.entity_group[Wheat] = pygame.sprite.Group()
         self.entity_group[Buffalo] = pygame.sprite.Group()
         self.entity_group[Wall] = pygame.sprite.Group()
+        self.entity_group[Tree] = pygame.sprite.Group()
         self.herds = []
 
+        self.number_of_buffalo = 10
         self.number_of_buffalo_herds = 0
+        self.number_of_forests = 0
         self.number_of_wheat_clusters = 0
 
         grass_1 = ("Grass 1", (utilities.colors.light_green))
@@ -51,8 +56,21 @@ class Map(object):
 
         for new_herd in range(self.number_of_buffalo_herds):
             self.generate_buffalo_herd(Buffalo)
+        for new_buffalo in range(self.number_of_buffalo):
+            buffalo_placed = False
+            while not buffalo_placed:
+                space_occupied = False
+                coordinates = self.get_random_coordinates(0, self.number_of_columns - 1, 0, self.number_of_rows - 1)
+                tile = self.game_tile_rows[coordinates[1]][coordinates[0]]
+                if tile.entity_group[Buffalo] or tile.entity_group[Tree] or tile.entity_group[Wall]:
+                    space_occupied = True
+                if not space_occupied:
+                    Buffalo(coordinates[0], coordinates[1], self)
+                    buffalo_placed = True
 
     def generate_vegetation(self):
+        for forests in range(self.number_of_forests):
+            self.generate_forest()
         for wheat_clusters in range(self.number_of_wheat_clusters):
             self.generate_wheat_cluster()
 
@@ -121,6 +139,33 @@ class Map(object):
                     space_occupied = True
                 if not space_occupied:
                     Wheat(coordinates[0], coordinates[1], self)
+                    neighbor_placed = True
+
+    def generate_forest(self):
+        forest_placed = False
+        while not forest_placed:
+            space_occupied = False
+            coordinates = self.get_random_coordinates(0, self.number_of_columns - 1, 0, self.number_of_rows - 1)
+            if self.game_tile_rows[coordinates[1]][coordinates[0]].entity_group[Tree]:
+                space_occupied = True
+            if not space_occupied:
+                # needed to make neighbors
+                forest_center_tree = Tree(coordinates[0], coordinates[1], self)
+                forest_placed = True
+        self.entity_group[Tree].add(forest_center_tree)
+        number_of_neighbors = random.randint(30, 90)
+        for new_tree in range(number_of_neighbors):
+            neighbor_placed = False
+            while not neighbor_placed:
+                space_occupied = False
+                distance_from_center = 9999
+                while distance_from_center > forest_center_tree.group_generation_max_distance:
+                    coordinates = self.get_random_coordinates(0, self.number_of_columns - 1, 0, self.number_of_rows - 1)
+                    distance_from_center = navigate.distance(coordinates[0], coordinates[1], forest_center_tree.tile_x, forest_center_tree.tile_y)
+                if self.game_tile_rows[coordinates[1]][coordinates[0]].entity_group[Tree]:
+                    space_occupied = True
+                if not space_occupied:
+                    Tree(coordinates[0], coordinates[1], self)
                     neighbor_placed = True
 
 

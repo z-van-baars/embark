@@ -6,11 +6,18 @@ import navigate
 from wheat import Wheat
 from herd import Herd
 from wall import Wall
+from tree import Tree
+
+pygame.init()
+pygame.display.set_mode([0, 0])
+
+buffalo_image_1 = pygame.image.load("art/buffalo/buffalo_1.png").convert()
+buffalo_image_1.set_colorkey(utilities.colors.key)
 
 
 class Buffalo(entity.Entity):
     def __init__(self, x, y, current_map, herd=None):
-        super().__init__(x, y, utilities.colors.red, 6, 6, current_map, Wheat)
+        super().__init__(x, y, utilities.colors.red, 10, 10, current_map, Wheat)
         self.speed = 10
         self.time_since_last_move = 0
         self.age = 0
@@ -22,6 +29,7 @@ class Buffalo(entity.Entity):
         self.max_hunger_saturation = 400
         self.horizontal_sight = 6
         self.vertical_sight = 6
+        self.sight_range = 6
         self.herd_radius = 5
         self.herd = herd
         self.is_alpha = False
@@ -36,7 +44,8 @@ class Buffalo(entity.Entity):
         self.min_initial_herd_size = 5
         self.max_initial_herd_size = 10
 
-        self.incompatible_objects = [Buffalo, Wall]
+        self.incompatible_objects = [Buffalo, Wall, Tree]
+        self.image = buffalo_image_1
 
         if not self.herd:
             self.herd = Herd(self.current_map)
@@ -68,14 +77,16 @@ class Buffalo(entity.Entity):
         but bottomline is: the end result will be different than if it started from a position of no hunger'''
         self.eat()
         if not self.target_object or not self.target_object.is_valid:
-            target_object, target_coordinates = self.choose_target(my_position)
+            target_object, target_coordinates = self.choose_target(self.current_map, my_position)
         if not self.path or len(self.path.tiles) < 1:
-            self.path = navigate.get_path(my_position, self.current_map, target_coordinates, self.incompatible_objects)
-        assert self.path
-        assert len(self.path.tiles) > 0
+            self.path, target_coordinates = navigate.get_path(my_position, self.current_map, target_coordinates, self.incompatible_objects)
+            if len(self.path.tiles) < 1:
+                target_object, target_coordinates = self.choose_target(self.current_map, my_position)
+                self.path, target_coordinates = navigate.get_path(my_position, self.current_map, target_coordinates, self.incompatible_objects)
+
         change_x, change_y = navigate.calculate_step(my_position, self.path.tiles[0])
         if not utilities.tile_is_valid(self.current_map, my_position[0] + change_x, my_position[1] + change_y, self.incompatible_objects):
-            self.path = navigate.get_path(my_position, self.current_map, target_coordinates, self.incompatible_objects)
+            self.path, target_coordinates = navigate.get_path(my_position, self.current_map, target_coordinates, self.incompatible_objects)
             change_x, change_y = navigate.calculate_step(my_position, self.path.tiles[0])
         return change_x, change_y
 
@@ -92,10 +103,10 @@ class Buffalo(entity.Entity):
             return True
         return False
 
-    def choose_target(self, my_position):
-        nearby_food = self.find_local_food()
+    def choose_target(self, current_map, my_position):
+        nearby_food = self.find_local_food(current_map)
         if nearby_food:
-            target_object = self.select_closest_target(nearby_food)
+            target_object = random.choice(nearby_food)
             target_coordinates = (target_object.tile_x, target_object.tile_y)
         else:
             target_object = None

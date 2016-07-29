@@ -38,7 +38,7 @@ def calculate_step(my_position, next_tile):
     return change_x, change_y
 
 
-def explore_frontier_to_target(game_map, visited, target_tile, frontier, incompatible_objects):
+def explore_frontier_to_target(game_map, visited, target_tile, closest_tile, frontier, incompatible_objects):
     while not frontier.empty():
         priority, current_tile, previous_tile = frontier.get()
 
@@ -50,39 +50,41 @@ def explore_frontier_to_target(game_map, visited, target_tile, frontier, incompa
                     distance_to_target = distance(each.column, each.row, target_tile.column, target_tile.row)
                     priority = distance_to_target + new_steps
                     frontier.put((priority, each, current_tile))
+                distance_to_target = distance(current_tile.column, current_tile.row, target_tile.column, target_tile.row)
+                if distance_to_target < closest_tile[0]:
+                    closest_tile = [distance_to_target, current_tile]
                 visited[current_tile] = (new_steps, previous_tile)
         if target_tile in visited:
             break
-    return visited
+    return visited, closest_tile
 
 
 def get_path(my_position, game_map, target_coordinates, incompatible_objects):
+    target_tile = game_map.game_tile_rows[target_coordinates[1]][target_coordinates[0]]
+    start_tile = game_map.game_tile_rows[my_position[1]][my_position[0]]
+    visited = {start_tile: (0, start_tile)}
+    tile_neighbors = utilities.get_adjacent_tiles(start_tile, game_map)
+    frontier = queue.PriorityQueue()
+    closest_tile = [99999, start_tile]
+    for each in tile_neighbors:
+        frontier.put((0, each, start_tile))
 
-        target_tile = game_map.game_tile_rows[target_coordinates[1]][target_coordinates[0]]
-        start_tile = game_map.game_tile_rows[my_position[1]][my_position[0]]
-        visited = {start_tile: (0, start_tile)}
+    visited, closest_tile = explore_frontier_to_target(game_map, visited, target_tile, closest_tile, frontier, incompatible_objects)
 
-        tile_neighbors = utilities.get_adjacent_tiles(start_tile, game_map)
-        frontier = queue.PriorityQueue()
-        for each in tile_neighbors:
-            frontier.put((0, each, start_tile))
+    new_path = utilities.Path()
+    new_path.tiles.append(closest_tile[1])
+    new_path.steps.append(visited[closest_tile[1]][1])
 
-        visited = explore_frontier_to_target(game_map, visited, target_tile, frontier, incompatible_objects)
+    while start_tile not in new_path.tiles:
+        next_tile = new_path.steps[-1]
+        if next_tile != start_tile:
+            new_path.steps.append(visited[next_tile][1])
+        new_path.tiles.append(next_tile)
+    new_path.tiles.reverse()
+    # removes the start tile from the tiles list and the steps list in the path object
+    new_path.tiles.pop(0)
+    new_path.steps.reverse()
+    new_path.steps.pop(0)
 
-        new_path = utilities.Path()
-        new_path.tiles.append(target_tile)
-        new_path.steps.append(visited[target_tile][1])
-
-        while start_tile not in new_path.tiles:
-            next_tile = new_path.steps[-1]
-            if next_tile != start_tile:
-                new_path.steps.append(visited[next_tile][1])
-            new_path.tiles.append(next_tile)
-        new_path.tiles.reverse()
-        # removes the start tile from the tiles list and the steps list in the path object
-        new_path.tiles.pop(0)
-        new_path.steps.reverse()
-        new_path.steps.pop(0)
-
-        return new_path
+    return new_path, (closest_tile[1].column, closest_tile[1].row)
 

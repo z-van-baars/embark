@@ -1,36 +1,69 @@
 import pygame
 import utilities
-import entity
 import random
 from manure import Manure
 from wall import Wall
+from tree import Tree
+import vegetation
+
+pygame.init()
+pygame.display.set_mode([0, 0])
+
+wheat_seedling_image = pygame.image.load("art/wheat/wheat_seedling.png").convert()
+wheat_seedling_image.set_colorkey(utilities.colors.key)
+
+wheat_young_image = pygame.image.load("art/wheat/wheat_young.png")
+wheat_young_image.set_colorkey(utilities.colors.key)
+
+wheat_mature_image_1 = pygame.image.load("art/wheat/wheat_mature_1.png")
+wheat_mature_image_1.set_colorkey(utilities.colors.key)
+
+wheat_mature_image_2 = pygame.image.load("art/wheat/wheat_mature_2.png")
+wheat_mature_image_2.set_colorkey(utilities.colors.key)
+
+wheat_mature_image_3 = pygame.image.load("art/wheat/wheat_mature_3.png")
+wheat_mature_image_3.set_colorkey(utilities.colors.key)
+wheat_mature_images = [wheat_mature_image_1, wheat_mature_image_2, wheat_mature_image_3]
+
+wheat_withered_image = pygame.image.load("art/wheat/wheat_withered.png")
+wheat_withered_image.set_colorkey(utilities.colors.key)
+
+wheat_dead_image = pygame.image.load("art/wheat/wheat_dead.png")
+wheat_dead_image.set_colorkey(utilities.colors.key)
 
 
-class Wheat(entity.Entity):
+class Wheat(vegetation.Vegetation):
     def __init__(self, x, y, current_map):
-        super().__init__(x, y, (201, 227, 73), 6, 6, current_map, None)
+        super().__init__(x, y, (201, 227, 73), 10, 10, current_map)
         self.age = random.randint(0, 40)
         self.food_value = 25
         self.growth_stages = []
         self.growth_stage = 0
-        seedling = (100, (201, 227, 73))
-        young = (250, (227, 196, 73))
-        mature = (400, (189, 158, 30))
-        withered = (700, (133, 107, 7))
-        dead = (9999, (0, 0, 0))
-        self.growth_stages = [seedling, young, mature, withered, dead]
+        seedling = (100)
+        young = (250)
+        mature = (400)
+        withered = (700)
+        dead = (9999)
+
+        self.growth_stages = [(seedling, wheat_seedling_image),
+                                (young, wheat_young_image),
+                                (mature, random.choice(wheat_mature_images)),
+                                (withered, wheat_withered_image),
+                                (dead, wheat_dead_image)]
         # the higher the more babbys
         self.likelihood_of_reproducing = 5
         # max and min number of babies possible in a single run of reproduce()
         self.minimum_number_of_babies = 1
         self.max_number_of_babies = 2
-        self.incompatible_objects = [Wheat, Wall]
+        self.incompatible_objects = [Wheat, Wall, Tree]
+        self.group_generation_max_distance = 8
+        self.image = wheat_seedling_image
 
     def tick_cycle(self):
         self.age += 1
         if self.age > self.growth_stages[self.growth_stage][0]:
             self.growth_stage += 1
-            self.image.fill(self.growth_stages[self.growth_stage][1])
+            self.image = self.growth_stages[self.growth_stage][1]
         if self.growth_stage == 2:
             self.baby_roll()
         elif self.growth_stage == 4:
@@ -51,9 +84,11 @@ class Wheat(entity.Entity):
         for map_tile_row in range(3):
             for map_tile in range(3):
                 if utilities.within_map(tile_x, tile_y, self.current_map):
-                    wheat_at_this_tile = self.current_map.game_tile_rows[tile_y][tile_x].entity_group[Wheat]
-                    wall_at_this_tile = self.current_map.game_tile_rows[tile_y][tile_x].entity_group[Wall]
-                    if not wheat_at_this_tile and not wall_at_this_tile:
+                    this_tile = self.current_map.game_tile_rows[tile_y][tile_x]
+                    wheat_at_this_tile = this_tile.entity_group[Wheat]
+                    wall_at_this_tile = this_tile.entity_group[Wall]
+                    tree_at_this_tile = this_tile.entity_group[Tree]
+                    if not wheat_at_this_tile and not wall_at_this_tile and not tree_at_this_tile:
                         growth_candidates.append((tile_x, tile_y))
                 tile_x += 1
             tile_x = self.tile_x - 1

@@ -55,16 +55,13 @@ class Entity(pygame.sprite.Sprite):
     def leave_tile(self):
         self.current_tile.entity_group[type(self)].remove(self)
 
-    def find_local_food(self):
+    def find_local_food(self, current_map, accessable_tiles=None):
         nearby_food_list = []
-        initial_x = self.tile_x - (self.horizontal_sight)
-        initial_y = self.tile_y - (self.vertical_sight)
-        for map_tile_row in range(initial_y, (initial_y + ((self.vertical_sight * 2) + 1))):
-            for map_tile in range(initial_x, (initial_x + ((self.horizontal_sight * 2) + 1))):
-                if utilities.within_map(map_tile, map_tile_row, self.current_map):
-                    if not self.current_map.game_tile_rows[map_tile_row][map_tile] == self.current_tile:
-                        food_at_this_tile = self.current_map.game_tile_rows[map_tile_row][map_tile].entity_group[self.food_type]
-                        nearby_food_list.extend(food_at_this_tile)
+        nearby_tiles = utilities.get_nearby_tiles(current_map, (self.tile_x, self.tile_y), self.sight_range)
+        for each in nearby_tiles:
+            if not each == self.current_tile:
+                food_at_this_tile = each.entity_group[self.food_type]
+                nearby_food_list.extend(food_at_this_tile)
         return nearby_food_list
 
     def select_closest_target(self, list_of_targets):
