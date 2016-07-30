@@ -41,21 +41,21 @@ def calculate_step(my_position, next_tile):
 def explore_frontier_to_target(game_map, visited, target_tile, closest_tile, frontier, incompatible_objects):
     while not frontier.empty():
         priority, current_tile, previous_tile = frontier.get()
-
-        if utilities.tile_is_valid(game_map, current_tile.column, current_tile.row, incompatible_objects):
-            new_steps = visited[previous_tile][0] + 1
-            if current_tile not in visited or new_steps < visited[current_tile][0]:
-                tile_neighbors = utilities.get_adjacent_tiles(current_tile, game_map)
-                for each in tile_neighbors:
+        new_steps = visited[previous_tile][0] + 1
+        if current_tile not in visited or new_steps < visited[current_tile][0]:
+            tile_neighbors = utilities.get_adjacent_tiles(current_tile, game_map)
+            for each in tile_neighbors:
+                if utilities.tile_is_valid(game_map, each.column, each.row, incompatible_objects):
                     distance_to_target = distance(each.column, each.row, target_tile.column, target_tile.row)
                     priority = distance_to_target + new_steps
                     frontier.put((priority, each, current_tile))
-                distance_to_target = distance(current_tile.column, current_tile.row, target_tile.column, target_tile.row)
-                if distance_to_target < closest_tile[0]:
-                    closest_tile = [distance_to_target, current_tile]
-                visited[current_tile] = (new_steps, previous_tile)
+            distance_to_target = distance(current_tile.column, current_tile.row, target_tile.column, target_tile.row)
+            if distance_to_target < closest_tile[0]:
+                closest_tile = [distance_to_target, current_tile]
+            visited[current_tile] = (new_steps, previous_tile)
         if target_tile in visited:
             break
+    print("explored as far as I can")
     return visited, closest_tile
 
 
@@ -74,7 +74,6 @@ def get_path(my_position, game_map, target_coordinates, incompatible_objects):
     new_path = utilities.Path()
     new_path.tiles.append(closest_tile[1])
     new_path.steps.append(visited[closest_tile[1]][1])
-
     while start_tile not in new_path.tiles:
         next_tile = new_path.steps[-1]
         if next_tile != start_tile:

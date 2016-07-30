@@ -40,14 +40,29 @@ class Path(object):
         self.steps = []
 
 
+def on_screen(screen_width, screen_height, x_position, y_position, x_shift, y_shift):
+    if 0 <= x_position + x_shift <= screen_width and 0 <= y_position + y_shift <= screen_height:
+        return True
+    else:
+        return False
+
+def distance(a, b, x, y):
+    a1 = abs(a - x)
+    b1 = abs(b - y)
+    c = math.sqrt((a1 * a1) + (b1 * b1))
+    return c
+
+
 def get_nearby_tiles(current_map, center, radius):
     nearby_tiles = []
     x = center[0]
     y = center[1]
-    for row in range((y - radius), (radius * 2 + 1)):
-        for column in range((x - radius), (radius * 2 + 1)):
-            if within_map(column, row, current_map):
-                nearby_tiles.append(current_map.game_tile_rows[column][row])
+    for tile_y in range((y - radius), (y + radius)):
+        for tile_x in range((x - radius), (x + radius)):
+            if within_map(tile_x, tile_y, current_map):
+                distance_from_center = distance(tile_x, tile_y, center[0], center[1])
+                if distance_from_center <= radius:
+                    nearby_tiles.append(current_map.game_tile_rows[tile_y][tile_x])
     return nearby_tiles
 
 

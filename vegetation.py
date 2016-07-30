@@ -3,8 +3,8 @@ import entity
 
 
 class Vegetation(entity.Entity):
-    def __init__(self, x, y, color, width, height, current_map):
-        super().__init__(x, y, color, width, height, current_map, None)
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
         self.age = 0
         self.group_generation_max_distance = 0
 

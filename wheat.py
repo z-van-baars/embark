@@ -5,6 +5,7 @@ from manure import Manure
 from wall import Wall
 from tree import Tree
 import vegetation
+import buffalo
 
 pygame.init()
 pygame.display.set_mode([0, 0])
@@ -34,22 +35,22 @@ wheat_dead_image.set_colorkey(utilities.colors.key)
 
 class Wheat(vegetation.Vegetation):
     def __init__(self, x, y, current_map):
-        super().__init__(x, y, (201, 227, 73), 10, 10, current_map)
+        super().__init__(x, y, current_map)
         self.age = random.randint(0, 40)
-        self.food_value = 25
+        self.food_value = 0
         self.growth_stages = []
         self.growth_stage = 0
-        seedling = (100)
-        young = (250)
-        mature = (400)
-        withered = (700)
+        seedling = (1000)
+        young = (3000)
+        mature = (4000)
+        withered = (7000)
         dead = (9999)
 
-        self.growth_stages = [(seedling, wheat_seedling_image),
-                                (young, wheat_young_image),
-                                (mature, random.choice(wheat_mature_images)),
-                                (withered, wheat_withered_image),
-                                (dead, wheat_dead_image)]
+        self.growth_stages = [(seedling, wheat_seedling_image, 5),
+                                (young, wheat_young_image, 20),
+                                (mature, random.choice(wheat_mature_images), 50),
+                                (withered, wheat_withered_image, 5),
+                                (dead, wheat_dead_image, 0)]
         # the higher the more babbys
         self.likelihood_of_reproducing = 5
         # max and min number of babies possible in a single run of reproduce()
@@ -58,12 +59,16 @@ class Wheat(vegetation.Vegetation):
         self.incompatible_objects = [Wheat, Wall, Tree]
         self.group_generation_max_distance = 8
         self.image = wheat_seedling_image
+        self.rect = self.image.get_rect()
+        self.rect.x = self.tile_x * 10
+        self.rect.y = self.tile_y * 10
 
     def tick_cycle(self):
         self.age += 1
         if self.age > self.growth_stages[self.growth_stage][0]:
             self.growth_stage += 1
             self.image = self.growth_stages[self.growth_stage][1]
+            self.food_value = self.growth_stages[self.growth_stage][2]
         if self.growth_stage == 2:
             self.baby_roll()
         elif self.growth_stage == 4:

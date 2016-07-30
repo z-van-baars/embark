@@ -4,10 +4,11 @@ import utilities
 from buffalo import Buffalo
 from wheat import Wheat
 from wall import Wall
+from tree import Tree
 
 
 animal_types = [Buffalo]
-vegetation_types = [Wheat]
+vegetation_types = [Wheat, Tree]
 terrain_types = [Wall]
 
 
@@ -53,115 +54,123 @@ class FoodSearchRadius(pygame.sprite.Sprite):
         self.update_stats()
 
     def update_stats(self):
-        self.center = (self.entity.rect.x + 5, self.entity.rect.y + 5)
+        self.center = (self.entity.rect.x + 5 + self.current_map.x_shift, self.entity.rect.y + 5 + self.current_map.y_shift)
         self.radius = (self.entity.sight_range * 10)
 
 
-def event_processing(current_map, global_variables, event_key):
+def event_processing(current_map, debug_status, event_key):
     if event_key == pygame.K_c:
-        if global_variables.debug_status.remove:
-            global_variables.debug_status.remove = False
-            global_variables.debug_status.current_removal_entity_number = 0
-        if global_variables.debug_status.clear:
-            global_variables.debug_status.clear = False
+        if debug_status.remove:
+            debug_status.remove = False
+            debug_status.current_removal_entity_number = 0
+        if debug_status.clear:
+            debug_status.clear = False
         else:
-            global_variables.debug_status.clear = True
-            global_variables.debug_status.entity_to_place = None
+            debug_status.clear = True
+            debug_status.entity_to_place = None
     elif event_key == pygame.K_s:
-        if not global_variables.debug_status.draw_search_areas:
-            global_variables.debug_status.draw_search_areas = True
+        if not debug_status.draw_search_areas:
+            debug_status.draw_search_areas = True
         else:
-            global_variables.debug_status.draw_search_areas = False
+            debug_status.draw_search_areas = False
     elif event_key == pygame.K_p:
-        if not global_variables.debug_status.draw_paths:
-            global_variables.debug_status.draw_paths = True
+        if not debug_status.draw_paths:
+            debug_status.draw_paths = True
         else:
-            global_variables.debug_status.draw_paths = False
+            debug_status.draw_paths = False
 
-    elif event_key == pygame.K_a and global_variables.debug_status.clear:
-        clear_all_animals(current_map, global_variables)
-    elif event_key == pygame.K_a and global_variables.debug_status.remove:
-        global_variables.debug_status.current_removal_entity_number = 1
+    elif event_key == pygame.K_a and debug_status.clear:
+        clear_all_animals(current_map)
+    elif event_key == pygame.K_a and debug_status.remove:
+        debug_status.current_removal_entity_number = 1
 
-    elif event_key == pygame.K_v and global_variables.debug_status.clear:
-        clear_all_vegetation(current_map, global_variables)
-    elif event_key == pygame.K_v and global_variables.debug_status.remove:
-        global_variables.debug_status.current_removal_entity_number = 2
+    elif event_key == pygame.K_v and debug_status.clear:
+        clear_all_vegetation(current_map)
+    elif event_key == pygame.K_v and debug_status.remove:
+        debug_status.current_removal_entity_number = 2
 
-    elif event_key == pygame.K_e and global_variables.debug_status.clear:
-        clear_all_entities(current_map, global_variables)
-    elif event_key == pygame.K_e and global_variables.debug_status.remove:
-        global_variables.debug_status.current_removal_entity_number = 4
+    elif event_key == pygame.K_e and debug_status.clear:
+        clear_all_entities(current_map)
+    elif event_key == pygame.K_e and debug_status.remove:
+        debug_status.current_removal_entity_number = 4
 
-    elif event_key == pygame.K_t and global_variables.debug_status.clear:
-        clear_all_terrain(current_map, global_variables)
-    elif event_key == pygame.K_t and global_variables.debug_status.remove:
-        global_variables.debug_status.current_removal_entity_number = 3
+    elif event_key == pygame.K_t and debug_status.clear:
+        clear_all_terrain(current_map)
+    elif event_key == pygame.K_t and debug_status.remove:
+        debug_status.current_removal_entity_number = 3
 
     elif event_key == pygame.K_r:
-        if global_variables.debug_status.remove:
-            global_variables.debug_status.remove = False
-            global_variables.debug_status.current_removal_entity_number = 0
+        if debug_status.remove:
+            debug_status.remove = False
+            debug_status.current_removal_entity_number = 0
         else:
-            if global_variables.debug_status.clear:
-                global_variables.debug_status.clear = False
-            if global_variables.debug_status.entity_to_place:
-                global_variables.debug_status.entity_to_place = None
-            global_variables.debug_status.remove = True
+            if debug_status.clear:
+                debug_status.clear = False
+            if debug_status.entity_to_place:
+                debug_status.entity_to_place = None
+            debug_status.remove = True
     elif event_key == pygame.K_b:
-        if global_variables.debug_status.clear:
-            global_variables.debug_status.clear = False
-        if global_variables.debug_status.remove:
-            global_variables.debug_status.remove = False
-            global_variables.debug_status.current_removal_entity_number = 0
-        global_variables.debug_status.entity_to_place = Buffalo
-        global_variables.debug_status.current_placement_entity_number = 2
+        if debug_status.clear:
+            debug_status.clear = False
+        if debug_status.remove:
+            debug_status.remove = False
+            debug_status.current_removal_entity_number = 0
+        debug_status.entity_to_place = Buffalo
+        debug_status.current_placement_entity_number = 2
     elif event_key == pygame.K_w:
-        if global_variables.debug_status.clear:
-            global_variables.debug_status.clear = False
-        if global_variables.debug_status.remove:
-            global_variables.debug_status.remove = False
-            global_variables.debug_status.current_removal_entity_number = 0
-        global_variables.debug_status.entity_to_place = Wheat
-        global_variables.debug_status.current_placement_entity_number = 1
+        if debug_status.clear:
+            debug_status.clear = False
+        if debug_status.remove:
+            debug_status.remove = False
+            debug_status.current_removal_entity_number = 0
+        debug_status.entity_to_place = Wheat
+        debug_status.current_placement_entity_number = 1
     elif event_key == pygame.K_l:
-        if global_variables.debug_status.clear:
-            global_variables.debug_status.clear = False
-        if global_variables.debug_status.remove:
-            global_variables.debug_status.remove = False
-            global_variables.debug_status.current_removal_entity_number = 0
-        global_variables.debug_status.entity_to_place = Wall
-        global_variables.debug_status.current_placement_entity_number = 3
+        if debug_status.clear:
+            debug_status.clear = False
+        if debug_status.remove:
+            debug_status.remove = False
+            debug_status.current_removal_entity_number = 0
+        debug_status.entity_to_place = Wall
+        debug_status.current_placement_entity_number = 3
+    elif event_key == pygame.K_n:
+        if debug_status.clear:
+            debug_status.clear = False
+        if debug_status.remove:
+            debug_status.remove = False
+            debug_status.current_removal_entity_number = 0
+        debug_status.entity_to_place = Tree
+        debug_status.current_placement_entity_number = 4
 
 
-def mouse_processing(current_map, global_variables, mouse_pos, event):
+def mouse_processing(current_map, debug_status, mouse_pos, event):
     tile_x = int((mouse_pos[0] + current_map.x_shift) / 10)
     tile_y = int((mouse_pos[1] + current_map.y_shift) / 10)
     selected_tile = current_map.game_tile_rows[tile_y][tile_x]
-    if global_variables.debug_status.entity_to_place:
+    if debug_status.entity_to_place:
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if len(selected_tile.entity_group[global_variables.debug_status.entity_to_place]) == 0:
-                new_entity = global_variables.debug_status.entity_to_place(selected_tile.column, selected_tile.row, current_map)
-                current_map.entity_group[global_variables.debug_status.entity_to_place].add(new_entity)
-    if global_variables.debug_status.current_removal_entity_number != 0:
+            debug_status.entity_to_place(selected_tile.column, selected_tile.row, current_map)
+            # if not utilities.tile_is_valid(current_map, selected_tile.column, selected_tile.row, new_entity.incompatible_objects):
+                # new_entity.expire()
+    if debug_status.current_removal_entity_number != 0:
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if global_variables.debug_status.current_removal_entity_number == 1:
-                remove_animals_at_tile(current_map, global_variables, selected_tile)
-            elif global_variables.debug_status.current_removal_entity_number == 2:
-                remove_vegetation_at_tile(current_map, global_variables, selected_tile)
-            elif global_variables.debug_status.current_removal_entity_number == 4:
-                remove_animals_at_tile(current_map, global_variables, selected_tile)
-                remove_vegetation_at_tile(current_map, global_variables, selected_tile)
-            elif global_variables.debug_status.current_removal_entity_number == 3:
-                remove_terrain_at_tile(current_map, global_variables, selected_tile)
+            if debug_status.current_removal_entity_number == 1:
+                remove_animals_at_tile(current_map, selected_tile)
+            elif debug_status.current_removal_entity_number == 2:
+                remove_vegetation_at_tile(current_map, selected_tile)
+            elif debug_status.current_removal_entity_number == 4:
+                remove_animals_at_tile(current_map, selected_tile)
+                remove_vegetation_at_tile(current_map, selected_tile)
+            elif debug_status.current_removal_entity_number == 3:
+                remove_terrain_at_tile(current_map, selected_tile)
 
 
-def clear_all_entities(current_map, global_variables):
-    clear_all_animals(current_map, global_variables)
-    clear_all_vegetation(current_map, global_variables)
+def clear_all_entities(current_map):
+    clear_all_animals(current_map)
+    clear_all_vegetation(current_map)
 
 
-def clear_all_animals(current_map, global_variables):
+def clear_all_animals(current_map):
     for animal in animal_types:
         for each in current_map.entity_group[animal]:
             each.current_tile.entity_group[animal].remove(each)
@@ -169,35 +178,35 @@ def clear_all_animals(current_map, global_variables):
     current_map.herds = []
 
 
-def clear_all_terrain(current_map, global_variables):
+def clear_all_terrain(current_map):
     for terrain in terrain_types:
         for each in current_map.entity_group[terrain]:
             each.current_tile.entity_group[terrain].remove(each)
         current_map.entity_group[terrain] = pygame.sprite.Group()
 
 
-def clear_all_vegetation(current_map, global_variables):
+def clear_all_vegetation(current_map):
     for vegetation in vegetation_types:
         for each in current_map.entity_group[vegetation]:
             each.current_tile.entity_group[vegetation].remove(each)
         current_map.entity_group[vegetation] = pygame.sprite.Group()
 
 
-def remove_vegetation_at_tile(current_map, global_variables, current_tile):
+def remove_vegetation_at_tile(current_map, current_tile):
     for vegetation in vegetation_types:
         for each in current_tile.entity_group[vegetation]:
             current_tile.entity_group[vegetation].remove(each)
             current_map.entity_group[vegetation].remove(each)
 
 
-def remove_terrain_at_tile(current_map, global_variables, current_tile):
+def remove_terrain_at_tile(current_map, current_tile):
     for terrain in terrain_types:
         for each in current_tile.entity_group[terrain]:
             current_tile.entity_group[terrain].remove(each)
             current_map.entity_group[terrain].remove(each)
 
 
-def remove_animals_at_tile(current_map, global_variables, current_tile):
+def remove_animals_at_tile(current_map, current_tile):
     for animal in animal_types:
         for each in current_tile.entity_group[animal]:
             current_tile.entity_group[animal].remove(each)
@@ -215,7 +224,7 @@ class DebugStatus(object):
         self.entity_to_place = None
         self.draw_search_areas = False
         self.draw_paths = False
-        self.entity_strings = ["None", "Wheat", "Buffalo", "Wall"]
+        self.entity_strings = ["None", "Wheat", "Buffalo", "Wall", "Tree"]
         self.current_placement_entity_number = 0
         self.path_stamp = self.font.render("Drawing Paths", True, utilities.colors.black)
 
@@ -224,7 +233,7 @@ class DebugStatus(object):
 
         debug = self.font.render("Debug Mode", True, utilities.colors.black)
         item_to_place = self.font.render("Placing Item: ", True, utilities.colors.black)
-        clear_stamp = self.font.render("Clear Items: All [E]ntities / All [A]nimals / All [V]egetation", True, utilities.colors.black)
+        clear_stamp = self.font.render("Clear Items: All [E]ntities / All [A]nimals / All [V]egetation / All [T]errain", True, utilities.colors.black)
         removal_stamp = self.font.render("Click to remove from tile at cursor: ", True, utilities.colors.black)
         removal_types_stamp = self.font.render("[A]nimals / [V]egetation / All [E]ntities", True, utilities.colors.black)
         self.stamps = [

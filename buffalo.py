@@ -1,8 +1,8 @@
 import pygame
 import utilities
-import entity
 import random
 import navigate
+import animal
 from wheat import Wheat
 from herd import Herd
 from wall import Wall
@@ -15,37 +15,24 @@ buffalo_image_1 = pygame.image.load("art/buffalo/buffalo_1.png").convert()
 buffalo_image_1.set_colorkey(utilities.colors.key)
 
 
-class Buffalo(entity.Entity):
+class Buffalo(animal.Animal):
     def __init__(self, x, y, current_map, herd=None):
-        super().__init__(x, y, utilities.colors.red, 10, 10, current_map, Wheat)
-        self.speed = 10
-        self.time_since_last_move = 0
-        self.age = 0
-        self.ticks_without_food = 0
-        self.change_x = 0
-        self.change_y = 0
-        self.current_hunger_saturation = 200
-        self.hunger_threshold = 400
-        self.max_hunger_saturation = 400
+        super().__init__(x, y, current_map, Wheat)
+        self.speed = 100
+        self.current_hunger_saturation = 20000
+        self.hunger_threshold = 35000
+        self.max_hunger_saturation = 40000
         self.horizontal_sight = 6
         self.vertical_sight = 6
-        self.sight_range = 6
+        self.sight_range = 10
         self.herd_radius = 5
         self.herd = herd
-        self.is_alpha = False
-        self.alpha_color = (215, 0, 0)
-
-        self.target_coordinates = None
-        self.target_object = None
-        self.path = None
-
-        self.search_area_graphic = None
-
+        self.bite_size = 5
+        self.ticks_without_eating = 0
+        self.time_since_last_move = 0
         self.min_initial_herd_size = 5
         self.max_initial_herd_size = 10
-
         self.incompatible_objects = [Buffalo, Wall, Tree]
-        self.image = buffalo_image_1
 
         if not self.herd:
             self.herd = Herd(self.current_map)
@@ -55,10 +42,15 @@ class Buffalo(entity.Entity):
         else:
             self.herd.members.append(self)
 
+        self.image = buffalo_image_1
+        self.rect = self.image.get_rect()
+        self.rect.x = self.tile_x * 10
+        self.rect.y = self.tile_y * 10
+
     def tick_cycle(self):
+        print("start of tick")
         self.age += 1
-        self.ticks_without_food += 1
-        self.current_hunger_saturation -= 0.01
+        self.current_hunger_saturation -= 1
         self.time_since_last_move += 1
 
         if self.current_hunger_saturation < self.hunger_threshold:
@@ -66,32 +58,39 @@ class Buffalo(entity.Entity):
         else:
             self.secondary_behavior()
 
-        if self.time_since_last_move == self.speed:
-            self.time_since_last_move = 0
-            self.move()
-
+        if not self.eating:
+            if self.time_since_last_move >= self.speed:
+                self.time_since_last_move = 0
+                self.move()
+        print("end of tick cycle")
         self.starvation_check()
 
     def solve_hunger(self, my_position, target_object, target_coordinates, herd_migration_target_coordinates, alpha):
         '''because of what I have in mind, it could end up doing activities that are a bit abstracted from gathering food
         but bottomline is: the end result will be different than if it started from a position of no hunger'''
-        self.eat()
-        if not self.target_object or not self.target_object.is_valid:
-            target_object, target_coordinates = self.choose_target(self.current_map, my_position)
-        if not self.path or len(self.path.tiles) < 1:
-            self.path, target_coordinates = navigate.get_path(my_position, self.current_map, target_coordinates, self.incompatible_objects)
-            if len(self.path.tiles) < 1:
+        self.eating = False
+        self.ticks_without_eating += 1
+        if self.current_tile.entity_group[Wheat] and self.ticks_without_eating > 30:
+            self.eat()
+            return 0, 0
+        else:
+            if not self.target_object or not self.target_object.is_valid:
                 target_object, target_coordinates = self.choose_target(self.current_map, my_position)
-                self.path, target_coordinates = navigate.get_path(my_position, self.current_map, target_coordinates, self.incompatible_objects)
 
-        change_x, change_y = navigate.calculate_step(my_position, self.path.tiles[0])
-        if not utilities.tile_is_valid(self.current_map, my_position[0] + change_x, my_position[1] + change_y, self.incompatible_objects):
-            self.path, target_coordinates = navigate.get_path(my_position, self.current_map, target_coordinates, self.incompatible_objects)
+            if not self.path or len(self.path.tiles) < 1:
+                self.path, target_coordinates = navigate.get_path(my_position, self.current_map, target_coordinates, self.incompatible_objects)
+                if len(self.path.tiles) < 1:
+                    self.path, target_coordinates = navigate.get_path(my_position, self.current_map, target_coordinates, self.incompatible_objects)
+
             change_x, change_y = navigate.calculate_step(my_position, self.path.tiles[0])
-        return change_x, change_y
+            if not utilities.tile_is_valid(self.current_map, my_position[0] + change_x, my_position[1] + change_y, self.incompatible_objects):
+                self.path, target_coordinates = navigate.get_path(my_position, self.current_map, target_coordinates, self.incompatible_objects)
+                print("recalculating path...")
+                change_x, change_y = navigate.calculate_step(my_position, self.path.tiles[0])
+            return change_x, change_y
 
     def secondary_behavior(self):
-        if self.within_herd_range(self.tile_x, self.tile_y, self.herd_radius, self.herd.alpha):
+        if self.within_herd_range((self.tile_x, self.tile_y), self.herd_radius, self.herd.alpha):
             self.idle()
         else:
             self.target_coordinates = (self.herd.alpha.tile_x, self.herd.alpha.tile_y)
@@ -110,42 +109,13 @@ class Buffalo(entity.Entity):
             target_coordinates = (target_object.tile_x, target_object.tile_y)
         else:
             target_object = None
-            target_coordinates = self.herd.migration_target
+            target_coordinates = my_position
+            while target_coordinates == my_position:
+                acceptable_targets = utilities.get_nearby_tiles(self.current_map, self.herd.migration_target, self.herd_radius)
+                target_tile = random.choice(acceptable_targets)
+                target_coordinates = (target_tile.column, target_tile.row)
         assert my_position != target_coordinates
         return target_object, target_coordinates
-
-    def eat(self):
-        if self.current_tile.entity_group[Wheat]:
-            for wheat_object in self.current_tile.entity_group[Wheat]:
-                self.current_hunger_saturation += wheat_object.food_value
-                self.ticks_without_food = 0
-                wheat_object.expire()
-                if self.current_hunger_saturation > self.max_hunger_saturation:
-                    self.current_hunger_saturation = self.max_hunger_saturation
-            self.target_object = None
-
-    def move(self):
-        self.tile_x += self.change_x
-        if self.tile_x < 0:
-            self.tile_x = 0
-        elif self.tile_x >= self.current_map.number_of_columns:
-            self.tile_x = self.current_map.number_of_columns - 1
-        self.tile_y += self.change_y
-        if self.tile_y < 0:
-            self.tile_y = 0
-        elif self.tile_y >= self.current_map.number_of_rows:
-            self.tile_y = self.current_map.number_of_rows - 1
-
-        self.assign_tile()
-        self.rect.x = self.tile_x * 10 + ((10 - self.width) / 2)
-        self.rect.y = self.tile_y * 10 + ((10 - self.height) / 2)
-        self.change_x = 0
-        self.change_y = 0
-        self.path.tiles.pop(0)
-
-    def starvation_check(self):
-        if self.current_hunger_saturation < 1:
-            self.expire()
 
     def idle(self):
         action = random.randint(0, 900)

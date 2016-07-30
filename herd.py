@@ -12,10 +12,12 @@ class Herd(object):
     def check_food_supply(self):
         local_food_supply = self.alpha.find_local_food(self.alpha.current_map, None)
         if len(local_food_supply) < (len(self.members) / 4):
-            if not self.migration_target or self.migration_target == (self.alpha.tile_x, self.alpha.tile_y):
-                self.migration_target = self.choose_random_migration_target(self.current_map, (self.alpha.tile_x, self.alpha.tile_y))
+            if not self.migration_target:
+                self.migration_target = self.alpha.choose_random_target(self.alpha.current_map, (self.alpha.tile_x, self.alpha.tile_y))
+            else:
+                self.alpha_near_target(self.alpha.current_tile, self.migration_target)
         else:
-            self.migration_target = None
+            self.migration_target = self.alpha.tile_x, self.alpha.tile_y
 
     def choose_new_alpha(self):
         herd_rankings = []
@@ -25,10 +27,8 @@ class Herd(object):
         self.alpha = herd_rankings[0][1]
         self.alpha.is_alpha = True
 
-    def choose_random_migration_target(self, game_map, alpha_coordinates):
-        target_x, target_y = alpha_coordinates
-        while alpha_coordinates == (target_x, target_y):
-            target_x = random.randint(0, game_map.number_of_columns - 1)
-            target_y = random.randint(0, game_map.number_of_rows - 1)
-        return (target_x, target_y)
+    def alpha_near_target(self, alpha_tile, migration_target):
+        nearby_tiles = utilities.get_nearby_tiles(self.current_map, migration_target, self.alpha.herd_radius)
+        if alpha_tile in nearby_tiles:
+            self.migration_target = self.alpha.choose_random_target(self.alpha.current_map, (self.alpha.tile_x, self.alpha.tile_y))
 

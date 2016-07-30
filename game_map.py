@@ -30,9 +30,9 @@ class Map(object):
         self.entity_group[Tree] = pygame.sprite.Group()
         self.herds = []
 
-        self.number_of_buffalo = 10
+        self.number_of_buffalo = 1
         self.number_of_buffalo_herds = 0
-        self.number_of_forests = 0
+        self.number_of_forests = 1
         self.number_of_wheat_clusters = 0
 
         grass_1 = ("Grass 1", (utilities.colors.light_green))
@@ -93,23 +93,20 @@ class Map(object):
                 new_herd_alpha = animal_type(coordinates[0], coordinates[1], self, new_herd)
                 new_herd.alpha = new_herd_alpha
                 new_herd_alpha.is_alpha = True
-                new_herd_alpha.image.fill(new_herd_alpha.alpha_color)
                 alpha_placed = True
         self.entity_group[animal_type].add(new_herd_alpha)
-        cluster_left_edge = max(new_herd_alpha.tile_x - new_herd_alpha.herd_radius, 0)
-        cluster_right_edge = min(new_herd_alpha.tile_x + new_herd_alpha.herd_radius, (self.number_of_columns - 1))
-        cluster_top_edge = max(new_herd_alpha.tile_y - new_herd_alpha.herd_radius, 0)
-        cluster_bottom_edge = min(new_herd_alpha.tile_y + new_herd_alpha.herd_radius, (self.number_of_rows - 1))
+        nearby_tiles = utilities.get_nearby_tiles(self, (new_herd_alpha.tile_x, new_herd_alpha.tile_y), new_herd_alpha.herd_radius)
         number_of_herd_members = random.randint(new_herd_alpha.min_initial_herd_size, new_herd_alpha.max_initial_herd_size)
         for beast in range(number_of_herd_members):
             beast_placed = False
             while not beast_placed:
                 space_occupied = False
-                coordinates = self.get_random_coordinates(cluster_left_edge, cluster_right_edge, cluster_top_edge, cluster_bottom_edge)
-                if self.game_tile_rows[coordinates[1]][coordinates[0]].entity_group[animal_type]:
-                    space_occupied = True
+                tile = random.choice(nearby_tiles)
+                for entity in new_herd_alpha.incompatible_objects:
+                    if tile.entity_group[entity]:
+                        space_occupied = True
                 if not space_occupied:
-                    animal_type(coordinates[0], coordinates[1], self, new_herd)
+                    self.entity_group[Buffalo].add(Buffalo(tile.column, tile.row, self, new_herd))
                     beast_placed = True
         self.herds.append(new_herd)
 
@@ -125,18 +122,16 @@ class Map(object):
                 cluster_center_wheat = Wheat(coordinates[0], coordinates[1], self)
                 wheat_cluster_placed = True
         self.entity_group[Wheat].add(cluster_center_wheat)
-        cluster_left_edge = max(cluster_center_wheat.tile_x - 7, 0)
-        cluster_right_edge = min(cluster_center_wheat.tile_x + 7, (self.number_of_columns - 1))
-        cluster_top_edge = max(cluster_center_wheat.tile_y - 7, 0)
-        cluster_bottom_edge = min(cluster_center_wheat.tile_y + 7, (self.number_of_rows - 1))
+        nearby_tiles = utilities.get_nearby_tiles(self, (cluster_center_wheat.tile_x, cluster_center_wheat.tile_y), 8)
         number_of_neighbors = random.randint(3, 9)
         for wheat in range(number_of_neighbors):
             neighbor_placed = False
             while not neighbor_placed:
                 space_occupied = False
-                coordinates = self.get_random_coordinates(cluster_left_edge, cluster_right_edge, cluster_top_edge, cluster_bottom_edge)
-                if self.game_tile_rows[coordinates[1]][coordinates[0]].entity_group[Wheat]:
-                    space_occupied = True
+                tile = random.choice(nearby_tiles)
+                for entity in cluster_center_wheat.incompatible_objects:
+                    if tile.entity_group[entity]:
+                        space_occupied = True
                 if not space_occupied:
                     Wheat(coordinates[0], coordinates[1], self)
                     neighbor_placed = True
@@ -153,7 +148,7 @@ class Map(object):
                 forest_center_tree = Tree(coordinates[0], coordinates[1], self)
                 forest_placed = True
         self.entity_group[Tree].add(forest_center_tree)
-        number_of_neighbors = random.randint(30, 90)
+        number_of_neighbors = random.randint(9, 19)
         for new_tree in range(number_of_neighbors):
             neighbor_placed = False
             while not neighbor_placed:
