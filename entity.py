@@ -3,6 +3,8 @@ import utilities
 
 
 class Entity(object):
+    occupies_tile = False
+
     def __init__(self, x, y, current_map):
         super().__init__()
         self.tile_x = x

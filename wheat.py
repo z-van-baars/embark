@@ -58,7 +58,6 @@ class Wheat(vegetation.Vegetation):
         # max and min number of babies possible in a single run of reproduce()
         self.minimum_number_of_babies = 1
         self.max_number_of_babies = 2
-        self.incompatible_objects = [Wheat, Wall, Tree]
         self.group_generation_max_distance = 8
         self.sprite.image = wheat_seedling_image
         self.sprite.rect = self.sprite.image.get_rect()

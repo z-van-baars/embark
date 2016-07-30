@@ -55,7 +55,8 @@ class Animal(entity.Entity):
         while my_position == (target_x, target_y):
             target_x = random.randint(0, game_map.number_of_columns - 1)
             target_y = random.randint(0, game_map.number_of_rows - 1)
-            if not utilities.tile_is_valid(game_map, target_x, target_y, self.incompatible_objects):
+            tile = game_map.game_tile_rows[target_y][target_x]
+            if not tile.is_occupied():
                 target_x, target_y = my_position
         return (target_x, target_y)
 

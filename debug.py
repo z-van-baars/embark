@@ -149,7 +149,9 @@ def mouse_processing(current_map, debug_status, mouse_pos, event):
     selected_tile = current_map.game_tile_rows[tile_y][tile_x]
     if debug_status.entity_to_place:
         if event.type == pygame.MOUSEBUTTONDOWN:
+            print("Debug A")
             debug_status.entity_to_place(selected_tile.column, selected_tile.row, current_map)
+            print("Debug C")
             # if not utilities.tile_is_valid(current_map, selected_tile.column, selected_tile.row, new_entity.incompatible_objects):
                 # new_entity.expire()
     if debug_status.current_removal_entity_number != 0:

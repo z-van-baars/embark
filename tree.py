@@ -25,7 +25,6 @@ class Tree(vegetation.Vegetation):
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
         self.age = random.randint(0, 40)
-        self.incompatible_objects = [Tree, Wall]
         self.group_generation_max_distance = 20
 
         self.sprite.image = random.choice(possible_tree_images)

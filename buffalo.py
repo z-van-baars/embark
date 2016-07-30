@@ -17,7 +17,7 @@ buffalo_image_1.set_colorkey(utilities.colors.key)
 
 class Buffalo(animal.Animal):
     occupies_tile = True
-    
+
     def __init__(self, x, y, current_map, herd=None):
         super().__init__(x, y, current_map, Wheat)
         self.speed = 100
@@ -34,7 +34,8 @@ class Buffalo(animal.Animal):
         self.time_since_last_move = 0
         self.min_initial_herd_size = 5
         self.max_initial_herd_size = 10
-        self.incompatible_objects = [Buffalo, Wall, Tree]
+
+        print("debug B")
 
         if not self.herd:
             self.herd = Herd(self.current_map)

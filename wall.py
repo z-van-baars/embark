@@ -7,7 +7,6 @@ class Wall(entity.Entity):
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.incompatible_objects = [Wall]
         
         self.sprite.image = pygame.Surface([10, 10])
         self.sprite.image.fill((180, 210, 217))
