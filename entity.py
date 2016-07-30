@@ -2,7 +2,7 @@ import pygame
 import utilities
 
 
-class Entity(pygame.sprite.Sprite):
+class Entity(object):
     def __init__(self, x, y, current_map):
         super().__init__()
         self.tile_x = x
@@ -12,9 +12,9 @@ class Entity(pygame.sprite.Sprite):
         self.is_valid = True
         self.incompatible_objects = None
         self.age = 0
-        self.blocks_movement = False
+        self.sprite = pygame.sprite.Sprite()
 
-        self.current_map.entity_group[type(self)].add(self)
+        self.current_map.entity_group[type(self)].append(self)
         self.assign_tile()
 
     def __lt__(self, other):

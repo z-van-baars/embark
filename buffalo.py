@@ -16,6 +16,8 @@ buffalo_image_1.set_colorkey(utilities.colors.key)
 
 
 class Buffalo(animal.Animal):
+    occupies_tile = True
+    
     def __init__(self, x, y, current_map, herd=None):
         super().__init__(x, y, current_map, Wheat)
         self.speed = 100
@@ -33,7 +35,6 @@ class Buffalo(animal.Animal):
         self.min_initial_herd_size = 5
         self.max_initial_herd_size = 10
         self.incompatible_objects = [Buffalo, Wall, Tree]
-        self.blocks_movement = True
 
         if not self.herd:
             self.herd = Herd(self.current_map)
@@ -43,10 +44,10 @@ class Buffalo(animal.Animal):
         else:
             self.herd.members.append(self)
 
-        self.image = buffalo_image_1
-        self.rect = self.image.get_rect()
-        self.rect.x = self.tile_x * 10
-        self.rect.y = self.tile_y * 10
+        self.sprite.image = buffalo_image_1
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 10
+        self.sprite.rect.y = self.tile_y * 10
 
     def tick_cycle(self):
         self.age += 1
@@ -82,7 +83,7 @@ class Buffalo(animal.Animal):
                     self.path, target_coordinates = navigate.get_path(my_position, self.current_map, target_coordinates, self.incompatible_objects)
 
             change_x, change_y = navigate.calculate_step(my_position, self.path.tiles[0])
-            if not utilities.tile_is_valid(self.current_map, my_position[0] + change_x, my_position[1] + change_y, self.incompatible_objects):
+            if self.path.tiles[0].is_occupied():
                 self.path, target_coordinates = navigate.get_path(my_position, self.current_map, target_coordinates, self.incompatible_objects)
                 change_x, change_y = navigate.calculate_step(my_position, self.path.tiles[0])
             return change_x, change_y

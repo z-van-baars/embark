@@ -34,6 +34,8 @@ wheat_dead_image.set_colorkey(utilities.colors.key)
 
 
 class Wheat(vegetation.Vegetation):
+    occupies_tile = False
+
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
         self.age = random.randint(0, 40)
@@ -58,16 +60,16 @@ class Wheat(vegetation.Vegetation):
         self.max_number_of_babies = 2
         self.incompatible_objects = [Wheat, Wall, Tree]
         self.group_generation_max_distance = 8
-        self.image = wheat_seedling_image
-        self.rect = self.image.get_rect()
-        self.rect.x = self.tile_x * 10
-        self.rect.y = self.tile_y * 10
+        self.sprite.image = wheat_seedling_image
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 10
+        self.sprite.rect.y = self.tile_y * 10
 
     def tick_cycle(self):
         self.age += 1
         if self.age > self.growth_stages[self.growth_stage][0]:
             self.growth_stage += 1
-            self.image = self.growth_stages[self.growth_stage][1]
+            self.sprite.image = self.growth_stages[self.growth_stage][1]
             self.food_value = self.growth_stages[self.growth_stage][2]
         if self.growth_stage == 2:
             self.baby_roll()

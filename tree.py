@@ -20,12 +20,16 @@ possible_tree_images = [tree_image_1, tree_image_2, tree_image_3]
 
 
 class Tree(vegetation.Vegetation):
+    occupies_tile = True
+
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
         self.age = random.randint(0, 40)
-        self.image = random.choice(possible_tree_images)
         self.incompatible_objects = [Tree, Wall]
         self.group_generation_max_distance = 20
-        self.rect = self.image.get_rect()
-        self.rect.x = self.tile_x * 10
-        self.rect.y = self.tile_y * 10 - 10
+
+        self.sprite.image = random.choice(possible_tree_images)
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 10
+        self.sprite.rect.y = self.tile_y * 10 - 10
+        

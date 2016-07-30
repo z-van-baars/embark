@@ -20,3 +20,9 @@ class GameTile(object):
     def __lt__(self, other):
         return False
 
+    def is_occupied(self):
+        for entity_type in self.entity_group:
+            if entity_type.occupies_tile:
+                if self.entity_group[entity_type]:
+                    return True
+            return False

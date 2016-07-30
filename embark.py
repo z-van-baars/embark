@@ -95,31 +95,31 @@ def main(global_variables, map_dimensions):
             if utilities.on_screen(global_variables.screen_width, global_variables.screen_height, tile.rect.x, tile.rect.y, new_map.x_shift, new_map.y_shift):
                 global_variables.screen.blit(tile.image, [(tile.rect.x + new_map.x_shift), (tile.rect.y + new_map.y_shift)])
         for terrain in new_map.entity_group[Wall]:
-            if utilities.on_screen(global_variables.screen_width, global_variables.screen_height, terrain.rect.x, terrain.rect.y, new_map.x_shift, new_map.y_shift):
-                global_variables.screen.blit(terrain.image, [(terrain.rect.x + new_map.x_shift), (terrain.rect.y + new_map.y_shift)])
+            if utilities.on_screen(global_variables.screen_width, global_variables.screen_height, terrain.sprite.rect.x, terrain.sprite.rect.y, new_map.x_shift, new_map.y_shift):
+                global_variables.screen.blit(terrain.sprite.image, [(terrain.sprite.rect.x + new_map.x_shift), (terrain.sprite.rect.y + new_map.y_shift)])
 
         for wheat in new_map.entity_group[Wheat]:
             wheat.tick_cycle()
             if utilities.on_screen(global_variables.screen_width, global_variables.screen_height, wheat.rect.x, wheat.rect.y, new_map.x_shift, new_map.y_shift):
                 global_variables.screen.blit(
-                    wheat.image,
-                    [(wheat.rect.x + new_map.x_shift),
-                        (wheat.rect.y + new_map.y_shift)])
+                    wheat.sprite.image,
+                    [(wheat.sprite.rect.x + new_map.x_shift),
+                        (wheat.sprite.rect.y + new_map.y_shift)])
         for herd in new_map.herds:
             herd.check_food_supply()
 
         for animal in new_map.entity_group[Buffalo]:
             animal.tick_cycle()
-            if utilities.on_screen(global_variables.screen_width, global_variables.screen_height, animal.rect.x, animal.rect.y, new_map.x_shift, new_map.y_shift):
-                global_variables.screen.blit(animal.image, [(animal.rect.x + new_map.x_shift), (animal.rect.y + new_map.y_shift)])
+            if utilities.on_screen(global_variables.screen_width, global_variables.screen_height, animal.sprite.rect.x, animal.sprite.rect.y, new_map.x_shift, new_map.y_shift):
+                global_variables.screen.blit(animal.sprite.image, [(animal.sprite.rect.x + new_map.x_shift), (animal.sprite.rect.y + new_map.y_shift)])
 
         for tree in new_map.entity_group[Tree]:
             tree.tick_cycle()
-            if utilities.on_screen(global_variables.screen_width, global_variables.screen_height, tree.rect.x, tree.rect.y, new_map.x_shift, new_map.y_shift):
+            if utilities.on_screen(global_variables.screen_width, global_variables.screen_height, tree.sprite.rect.x, tree.sprite.rect.y, new_map.x_shift, new_map.y_shift):
                 global_variables.screen.blit(
-                    tree.image,
-                    [(tree.rect.x + new_map.x_shift),
-                        (tree.rect.y + new_map.y_shift)])
+                    tree.sprite.image,
+                    [(tree.sprite.rect.x + new_map.x_shift),
+                        (tree.sprite.rect.y + new_map.y_shift)])
 
         if debug_stats.debug:
             for each in new_map.entity_group[Buffalo]:

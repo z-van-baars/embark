@@ -91,8 +91,8 @@ class Animal(entity.Entity):
             self.tile_y = self.current_map.number_of_rows - 1
 
         self.assign_tile()
-        self.rect.x = self.tile_x * 10
-        self.rect.y = self.tile_y * 10
+        self.sprite.rect.x = self.tile_x * 10
+        self.sprite.rect.y = self.tile_y * 10
         self.change_x = 0
         self.change_y = 0
         self.path.tiles.pop(0)

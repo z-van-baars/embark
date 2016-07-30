@@ -48,13 +48,13 @@ class FoodSearchRadius(pygame.sprite.Sprite):
         super().__init__()
         self.current_map = current_map
         self.entity = entity
-        self.center = (entity.rect.x, entity.rect.y)
+        self.center = (entity.sprite.rect.x, entity.sprite.rect.y)
         self.radius = (self.entity.sight_range * 10)
 
         self.update_stats()
 
     def update_stats(self):
-        self.center = (self.entity.rect.x + 5 + self.current_map.x_shift, self.entity.rect.y + 5 + self.current_map.y_shift)
+        self.center = (self.entity.sprite.rect.x + 5 + self.current_map.x_shift, self.entity.sprite.rect.y + 5 + self.current_map.y_shift)
         self.radius = (self.entity.sight_range * 10)
 
 
