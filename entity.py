@@ -12,6 +12,7 @@ class Entity(pygame.sprite.Sprite):
         self.is_valid = True
         self.incompatible_objects = None
         self.age = 0
+        self.blocks_movement = False
 
         self.current_map.entity_group[type(self)].add(self)
         self.assign_tile()

@@ -125,7 +125,7 @@ def main(global_variables, map_dimensions):
             for each in new_map.entity_group[Buffalo]:
                 each.search_area_graphic = debug.FoodSearchRadius(new_map, each)
             debug_stats.tile_selector_graphic.update_image(mouse_pos)
-            debug_stats.print_to_screen()
+            debug_stats.print_to_screen(global_variables.screen)
             if debug_stats.remove or debug_stats.entity_to_place:
                 pygame.draw.rect(global_variables.screen, (255, 255, 255), debug_stats.tile_selector_graphic.image, 1)
 

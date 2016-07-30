@@ -33,6 +33,7 @@ class Buffalo(animal.Animal):
         self.min_initial_herd_size = 5
         self.max_initial_herd_size = 10
         self.incompatible_objects = [Buffalo, Wall, Tree]
+        self.blocks_movement = True
 
         if not self.herd:
             self.herd = Herd(self.current_map)
@@ -48,7 +49,6 @@ class Buffalo(animal.Animal):
         self.rect.y = self.tile_y * 10
 
     def tick_cycle(self):
-        print("start of tick")
         self.age += 1
         self.current_hunger_saturation -= 1
         self.time_since_last_move += 1
@@ -62,7 +62,6 @@ class Buffalo(animal.Animal):
             if self.time_since_last_move >= self.speed:
                 self.time_since_last_move = 0
                 self.move()
-        print("end of tick cycle")
         self.starvation_check()
 
     def solve_hunger(self, my_position, target_object, target_coordinates, herd_migration_target_coordinates, alpha):
@@ -85,7 +84,6 @@ class Buffalo(animal.Animal):
             change_x, change_y = navigate.calculate_step(my_position, self.path.tiles[0])
             if not utilities.tile_is_valid(self.current_map, my_position[0] + change_x, my_position[1] + change_y, self.incompatible_objects):
                 self.path, target_coordinates = navigate.get_path(my_position, self.current_map, target_coordinates, self.incompatible_objects)
-                print("recalculating path...")
                 change_x, change_y = navigate.calculate_step(my_position, self.path.tiles[0])
             return change_x, change_y
 

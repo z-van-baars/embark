@@ -251,34 +251,34 @@ class DebugStatus(object):
     def update_item_removal_stamp(self):
         self.item_removal_stamp = self.font.render(self.entity_type_strings[self.current_removal_entity_number], True, utilities.colors.black)
 
-    def print_to_screen(self):
-        self.global_variables.screen.blit(self.stamps[0][1], self.stamps[0][0])
+    def print_to_screen(self, screen):
+        screen.blit(self.stamps[0][1], self.stamps[0][0])
         if self.clear:
-            self.global_variables.screen.blit(self.stamps[2][1], self.stamps[2][0])
+            screen.blit(self.stamps[2][1], self.stamps[2][0])
         if self.entity_to_place:
             self.update_entity_stamp()
-            self.global_variables.screen.blit(self.stamps[1][1], self.stamps[1][0])
-            self.global_variables.screen.blit(self.entity_stamp, [115, 25])
+            screen.blit(self.stamps[1][1], self.stamps[1][0])
+            screen.blit(self.entity_stamp, [115, 25])
         if self.remove:
             self.update_item_removal_stamp()
-            self.global_variables.screen.blit(self.stamps[3][1], self.stamps[3][0])
+            screen.blit(self.stamps[3][1], self.stamps[3][0])
             if self.current_removal_entity_number != 0:
-                self.global_variables.screen.blit(self.item_removal_stamp, [280, 25])
+                screen.blit(self.item_removal_stamp, [280, 25])
             else:
-                self.global_variables.screen.blit(self.stamps[4][1], self.stamps[4][0])
+                screen.blit(self.stamps[4][1], self.stamps[4][0])
         if self.global_variables.debug_status.draw_search_areas:
             for each in self.current_map.entity_group[Buffalo]:
                 new_search_area_graphic = FoodSearchRadius(self.current_map, each)
                 new_search_area_graphic.update_stats()
-                pygame.draw.circle(self.global_variables.screen, (0, 0, 0), new_search_area_graphic.center, new_search_area_graphic.radius, 1)
+                pygame.draw.circle(screen, (0, 0, 0), new_search_area_graphic.center, new_search_area_graphic.radius, 1)
         if self.global_variables.debug_status.draw_paths:
-            self.global_variables.screen.blit(self.path_stamp, [10, 40])
+            screen.blit(self.path_stamp, [10, 40])
             for each in self.current_map.entity_group[Buffalo]:
                 if each.path:
                     for tile in each.path.tiles:
                         marker = TileMarker(tile.column, tile.row, self.current_map)
                         marker.update_image()
-                        pygame.draw.rect(self.global_variables.screen, (255, 0, 255), marker.image, 1)
+                        pygame.draw.rect(screen, (255, 0, 255), marker.image, 1)
 
 
 

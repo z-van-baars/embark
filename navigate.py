@@ -55,7 +55,6 @@ def explore_frontier_to_target(game_map, visited, target_tile, closest_tile, fro
             visited[current_tile] = (new_steps, previous_tile)
         if target_tile in visited:
             break
-    print("explored as far as I can")
     return visited, closest_tile
 
 
