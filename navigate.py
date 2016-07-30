@@ -61,12 +61,13 @@ def explore_frontier_to_target(game_map, visited, target_tile, closest_tile, fro
 def get_path(my_position, game_map, target_coordinates, incompatible_objects):
     target_tile = game_map.game_tile_rows[target_coordinates[1]][target_coordinates[0]]
     start_tile = game_map.game_tile_rows[my_position[1]][my_position[0]]
-    visited = {start_tile: (0, start_tile)}
+    visited = {start_tile: (0, None)}
     tile_neighbors = utilities.get_adjacent_tiles(start_tile, game_map)
     frontier = queue.PriorityQueue()
     closest_tile = [99999, start_tile]
     for each in tile_neighbors:
-        frontier.put((0, each, start_tile))
+        if not each.is_occupied():
+            frontier.put((0, each, start_tile))
 
     visited, closest_tile = explore_frontier_to_target(game_map, visited, target_tile, closest_tile, frontier, incompatible_objects)
 
