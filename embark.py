@@ -90,14 +90,12 @@ def main(global_variables, map_dimensions):
                     super_scroll = 1
                 elif event.key == pygame.K_LCTRL:
                     control_on = False
-
         for tile in new_map.display_tiles:
             if utilities.on_screen(global_variables.screen_width, global_variables.screen_height, tile.rect.x, tile.rect.y, new_map.x_shift, new_map.y_shift):
                 global_variables.screen.blit(tile.image, [(tile.rect.x + new_map.x_shift), (tile.rect.y + new_map.y_shift)])
         for terrain in new_map.entity_group[Wall]:
             if utilities.on_screen(global_variables.screen_width, global_variables.screen_height, terrain.sprite.rect.x, terrain.sprite.rect.y, new_map.x_shift, new_map.y_shift):
                 global_variables.screen.blit(terrain.sprite.image, [(terrain.sprite.rect.x + new_map.x_shift), (terrain.sprite.rect.y + new_map.y_shift)])
-
         for wheat in new_map.entity_group[Wheat]:
             wheat.tick_cycle()
             if utilities.on_screen(global_variables.screen_width, global_variables.screen_height, wheat.rect.x, wheat.rect.y, new_map.x_shift, new_map.y_shift):

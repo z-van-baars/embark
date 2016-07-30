@@ -35,8 +35,6 @@ class Buffalo(animal.Animal):
         self.min_initial_herd_size = 5
         self.max_initial_herd_size = 10
 
-        print("debug B")
-
         if not self.herd:
             self.herd = Herd(self.current_map)
             self.herd.members.append(self)
