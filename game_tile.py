@@ -25,4 +25,4 @@ class GameTile(object):
             if entity_type.occupies_tile:
                 if self.entity_group[entity_type]:
                     return True
-            return False
+        return False

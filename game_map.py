@@ -27,10 +27,7 @@ class Map(object):
         self.entity_group[Buffalo] = []
         self.entity_group[Wall] = []
         self.entity_group[Tree] = []
-        self.herds = []
-
         self.number_of_buffalo = 0
-        self.number_of_buffalo_herds = 0
         self.number_of_forests = 1
         self.number_of_wheat_clusters = 0
 
@@ -53,8 +50,6 @@ class Map(object):
 
         self.generate_vegetation()
 
-        for new_herd in range(self.number_of_buffalo_herds):
-            self.generate_buffalo_herd(Buffalo)
         for new_buffalo in range(self.number_of_buffalo):
             buffalo_placed = False
             while not buffalo_placed:
@@ -75,29 +70,6 @@ class Map(object):
         y_position = random.randint(y_lower, y_upper)
 
         return (x_position, y_position)
-
-    def generate_buffalo_herd(self, animal_type):
-        alpha_placed = False
-        new_herd = Herd(self)
-        while not alpha_placed:
-            coordinates = self.get_random_coordinates(0, self.number_of_columns - 1, 0, self.number_of_rows - 1)
-            tile = self.game_tile_rows[coordinates[1]][coordinates[0]]
-            if not tile.is_occupied():
-                # needed to make neighbors
-                new_herd_alpha = animal_type(coordinates[0], coordinates[1], self, new_herd)
-                new_herd.alpha = new_herd_alpha
-                new_herd_alpha.is_alpha = True
-                alpha_placed = True
-        nearby_tiles = utilities.get_nearby_tiles(self, (new_herd_alpha.tile_x, new_herd_alpha.tile_y), new_herd_alpha.herd_radius)
-        number_of_herd_members = random.randint(new_herd_alpha.min_initial_herd_size, new_herd_alpha.max_initial_herd_size)
-        for beast in range(number_of_herd_members):
-            beast_placed = False
-            while not beast_placed:
-                tile = random.choice(nearby_tiles)
-                if not tile.is_occupied():
-                    Buffalo(tile.column, tile.row, self, new_herd)
-                    beast_placed = True
-        self.herds.append(new_herd)
 
     def generate_wheat_cluster(self):
         wheat_cluster_placed = False

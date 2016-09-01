@@ -12,7 +12,6 @@ class Entity(object):
         self.current_map = current_map
         self.current_tile = None
         self.is_valid = True
-        self.incompatible_objects = None
         self.age = 0
         self.sprite = pygame.sprite.Sprite()
 

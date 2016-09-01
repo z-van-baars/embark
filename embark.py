@@ -103,8 +103,6 @@ def main(global_variables, map_dimensions):
                     wheat.sprite.image,
                     [(wheat.sprite.rect.x + new_map.x_shift),
                         (wheat.sprite.rect.y + new_map.y_shift)])
-        for herd in new_map.herds:
-            herd.check_food_supply()
 
         for animal in new_map.entity_group[Buffalo]:
             animal.tick_cycle()

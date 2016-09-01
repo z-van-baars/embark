@@ -22,9 +22,6 @@ class Animal(entity.Entity):
         self.is_valid = False
         self.current_tile.entity_group[type(self)].remove(self)
         self.current_map.entity_group[type(self)].remove(self)
-        if self.is_alpha and self.herd:
-            self.herd.members.remove(self)
-            self.herd.choose_new_alpha()
 
     def leave_tile(self):
         self.current_tile.entity_group[type(self)].remove(self)

@@ -90,11 +90,3 @@ def get_adjacent_movement_tiles(tile, current_map):
             if within_map(tile_x, tile_y, current_map):
                 adjacent_tiles.append(current_map.game_tile_rows[tile_y][tile_x])
     return adjacent_tiles
-
-
-def tile_is_valid(game_map, next_tile_x, next_tile_y, incompatible_objects):
-    tile = game_map.game_tile_rows[next_tile_y][next_tile_x]
-    for object_type in incompatible_objects:
-        if len(tile.entity_group[object_type]) > 0:
-            return False
-    return True

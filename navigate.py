@@ -38,7 +38,7 @@ def calculate_step(my_position, next_tile):
     return change_x, change_y
 
 
-def explore_frontier_to_target(game_map, visited, target_tile, closest_tile, frontier, incompatible_objects):
+def explore_frontier_to_target(game_map, visited, target_tile, closest_tile, frontier):
     while not frontier.empty():
         priority, current_tile, previous_tile = frontier.get()
         new_steps = visited[previous_tile][0] + 1
@@ -58,7 +58,7 @@ def explore_frontier_to_target(game_map, visited, target_tile, closest_tile, fro
     return visited, closest_tile
 
 
-def get_path(my_position, game_map, target_coordinates, incompatible_objects):
+def get_path(my_position, game_map, target_coordinates):
     target_tile = game_map.game_tile_rows[target_coordinates[1]][target_coordinates[0]]
     start_tile = game_map.game_tile_rows[my_position[1]][my_position[0]]
     visited = {start_tile: (0, None)}
@@ -68,8 +68,9 @@ def get_path(my_position, game_map, target_coordinates, incompatible_objects):
     for each in tile_neighbors:
         if not each.is_occupied():
             frontier.put((0, each, start_tile))
-
-    visited, closest_tile = explore_frontier_to_target(game_map, visited, target_tile, closest_tile, frontier, incompatible_objects)
+    print(target_coordinates)
+    visited, closest_tile = explore_frontier_to_target(game_map, visited, target_tile, closest_tile, frontier)
+    print(target_coordinates)
 
     new_path = utilities.Path()
     new_path.tiles.append(closest_tile[1])
@@ -84,6 +85,8 @@ def get_path(my_position, game_map, target_coordinates, incompatible_objects):
     new_path.tiles.pop(0)
     new_path.steps.reverse()
     new_path.steps.pop(0)
+    print(target_coordinates)
+    print("Done pathing")
 
     return new_path, (closest_tile[1].column, closest_tile[1].row)
 
