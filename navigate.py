@@ -68,9 +68,7 @@ def get_path(my_position, game_map, target_coordinates):
     for each in tile_neighbors:
         if not each.is_occupied():
             frontier.put((0, each, start_tile))
-    print(target_coordinates)
     visited, closest_tile = explore_frontier_to_target(game_map, visited, target_tile, closest_tile, frontier)
-    print(target_coordinates)
 
     new_path = utilities.Path()
     new_path.tiles.append(closest_tile[1])
@@ -85,8 +83,5 @@ def get_path(my_position, game_map, target_coordinates):
     new_path.tiles.pop(0)
     new_path.steps.reverse()
     new_path.steps.pop(0)
-    print(target_coordinates)
-    print("Done pathing")
-
     return new_path, (closest_tile[1].column, closest_tile[1].row)
 

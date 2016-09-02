@@ -146,23 +146,24 @@ def event_processing(current_map, debug_status, event_key):
 def mouse_processing(current_map, debug_status, mouse_pos, event):
     tile_x = int((mouse_pos[0] + current_map.x_shift) / 10)
     tile_y = int((mouse_pos[1] + current_map.y_shift) / 10)
-    selected_tile = current_map.game_tile_rows[tile_y][tile_x]
-    if debug_status.entity_to_place:
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            debug_status.entity_to_place(selected_tile.column, selected_tile.row, current_map)
-            # if not utilities.tile_is_valid(current_map, selected_tile.column, selected_tile.row, new_entity.incompatible_objects):
-                # new_entity.expire()
-    if debug_status.current_removal_entity_number != 0:
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if debug_status.current_removal_entity_number == 1:
-                remove_animals_at_tile(current_map, selected_tile)
-            elif debug_status.current_removal_entity_number == 2:
-                remove_vegetation_at_tile(current_map, selected_tile)
-            elif debug_status.current_removal_entity_number == 4:
-                remove_animals_at_tile(current_map, selected_tile)
-                remove_vegetation_at_tile(current_map, selected_tile)
-            elif debug_status.current_removal_entity_number == 3:
-                remove_terrain_at_tile(current_map, selected_tile)
+    if utilities.within_map(tile_x, tile_y, current_map):
+        selected_tile = current_map.game_tile_rows[tile_y][tile_x]
+        if debug_status.entity_to_place:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                debug_status.entity_to_place(selected_tile.column, selected_tile.row, current_map)
+                # if not utilities.tile_is_valid(current_map, selected_tile.column, selected_tile.row, new_entity.incompatible_objects):
+                    # new_entity.expire()
+        if debug_status.current_removal_entity_number != 0:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if debug_status.current_removal_entity_number == 1:
+                    remove_animals_at_tile(current_map, selected_tile)
+                elif debug_status.current_removal_entity_number == 2:
+                    remove_vegetation_at_tile(current_map, selected_tile)
+                elif debug_status.current_removal_entity_number == 4:
+                    remove_animals_at_tile(current_map, selected_tile)
+                    remove_vegetation_at_tile(current_map, selected_tile)
+                elif debug_status.current_removal_entity_number == 3:
+                    remove_terrain_at_tile(current_map, selected_tile)
 
 
 def clear_all_entities(current_map):
@@ -174,22 +175,21 @@ def clear_all_animals(current_map):
     for animal in animal_types:
         for each in current_map.entity_group[animal]:
             each.current_tile.entity_group[animal].remove(each)
-        current_map.entity_group[animal] = pygame.sprite.Group()
-    current_map.herds = []
+        current_map.entity_group[animal] = []
 
 
 def clear_all_terrain(current_map):
     for terrain in terrain_types:
         for each in current_map.entity_group[terrain]:
             each.current_tile.entity_group[terrain].remove(each)
-        current_map.entity_group[terrain] = pygame.sprite.Group()
+        current_map.entity_group[terrain] = []
 
 
 def clear_all_vegetation(current_map):
     for vegetation in vegetation_types:
         for each in current_map.entity_group[vegetation]:
             each.current_tile.entity_group[vegetation].remove(each)
-        current_map.entity_group[vegetation] = pygame.sprite.Group()
+        current_map.entity_group[vegetation] = []
 
 
 def remove_vegetation_at_tile(current_map, current_tile):
@@ -237,11 +237,11 @@ class DebugStatus(object):
         removal_stamp = self.font.render("Click to remove from tile at cursor: ", True, utilities.colors.black)
         removal_types_stamp = self.font.render("[A]nimals / [V]egetation / All [E]ntities", True, utilities.colors.black)
         self.stamps = [
-                        ((10, 10), debug),
-                        ((10, 25), item_to_place),
-                        ((10, 25), clear_stamp),
-                        ((10, 25), removal_stamp),
-                        ((280, 25), removal_types_stamp)
+                        ((210, self.global_variables.screen_height - 70), debug),
+                        ((210, self.global_variables.screen_height - 55), item_to_place),
+                        ((210, self.global_variables.screen_height - 55), clear_stamp),
+                        ((210, self.global_variables.screen_height - 55), removal_stamp),
+                        ((480, self.global_variables.screen_height - 55), removal_types_stamp)
                     ]
         self.update_entity_stamp()
 
@@ -258,12 +258,12 @@ class DebugStatus(object):
         if self.entity_to_place:
             self.update_entity_stamp()
             screen.blit(self.stamps[1][1], self.stamps[1][0])
-            screen.blit(self.entity_stamp, [115, 25])
+            screen.blit(self.entity_stamp, [315, self.global_variables.screen_height - 55])
         if self.remove:
             self.update_item_removal_stamp()
             screen.blit(self.stamps[3][1], self.stamps[3][0])
             if self.current_removal_entity_number != 0:
-                screen.blit(self.item_removal_stamp, [280, 25])
+                screen.blit(self.item_removal_stamp, [280, self.global_variables.screen_height - 55])
             else:
                 screen.blit(self.stamps[4][1], self.stamps[4][0])
         if self.global_variables.debug_status.draw_search_areas:
@@ -272,7 +272,7 @@ class DebugStatus(object):
                 new_search_area_graphic.update_stats()
                 pygame.draw.circle(screen, (0, 0, 0), new_search_area_graphic.center, new_search_area_graphic.radius, 1)
         if self.global_variables.debug_status.draw_paths:
-            screen.blit(self.path_stamp, [10, 40])
+            screen.blit(self.path_stamp, [210, self.global_variables.screen_height - 40])
             for each in self.current_map.entity_group[Buffalo]:
                 if each.path:
                     for tile in each.path.tiles:

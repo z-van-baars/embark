@@ -31,4 +31,5 @@ class Tree(vegetation.Vegetation):
         self.sprite.rect = self.sprite.image.get_rect()
         self.sprite.rect.x = self.tile_x * 10
         self.sprite.rect.y = self.tile_y * 10 - 10
+        self.display_name = "Tree"
         

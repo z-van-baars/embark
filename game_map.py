@@ -1,14 +1,13 @@
 import pygame
 import random
 import utilities
-from utilities import GlobalVariables
 from tile import DisplayTile
 from buffalo import Buffalo
 from wheat import Wheat
 from game_tile import GameTile
-from herd import Herd
 from wall import Wall
 from tree import Tree
+from avatar import Avatar
 
 
 class Map(object):
@@ -27,6 +26,7 @@ class Map(object):
         self.entity_group[Buffalo] = []
         self.entity_group[Wall] = []
         self.entity_group[Tree] = []
+        self.entity_group[Avatar] = []
         self.number_of_buffalo = 0
         self.number_of_forests = 1
         self.number_of_wheat_clusters = 0
@@ -49,6 +49,8 @@ class Map(object):
             self.game_tile_rows.append(this_row)
 
         self.generate_vegetation()
+
+        Avatar(1, 1, self)
 
         for new_buffalo in range(self.number_of_buffalo):
             buffalo_placed = False

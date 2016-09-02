@@ -14,6 +14,7 @@ class Entity(object):
         self.is_valid = True
         self.age = 0
         self.sprite = pygame.sprite.Sprite()
+        self.display_name = "-N/A-"
 
         self.current_map.entity_group[type(self)].append(self)
         self.assign_tile()

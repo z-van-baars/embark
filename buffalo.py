@@ -20,6 +20,7 @@ class Buffalo(animal.Animal):
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map, Wheat)
+        self.display_name = "Buffalo"
         self.speed = 10
         self.current_hunger_saturation = 20000
         self.hunger_threshold = 35000
@@ -30,7 +31,6 @@ class Buffalo(animal.Animal):
         self.bite_size = 5
         self.ticks_without_eating = 0
         self.time_since_last_move = 0
-
         self.sprite.image = buffalo_image_1
         self.sprite.rect = self.sprite.image.get_rect()
         self.sprite.rect.x = self.tile_x * 10
@@ -81,7 +81,6 @@ class Buffalo(animal.Animal):
         self.idle()
 
     def choose_target(self, current_map, my_position):
-        print("choosing target")
         nearby_food = self.find_local_food(current_map)
         if nearby_food:
             target_object = random.choice(nearby_food)
