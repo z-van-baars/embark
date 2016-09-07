@@ -8,6 +8,6 @@ class DisplayTile(pygame.sprite.Sprite):
         super().__init__()
         self.name = terrain_type[0]
         self.color = terrain_type[1]
-        self.image = pygame.Surface([10, 10])
+        self.image = pygame.Surface([20, 20])
         self.image.fill(self.color)
         self.rect = self.image.get_rect()

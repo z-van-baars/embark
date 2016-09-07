@@ -1,9 +1,3 @@
-from buffalo import Buffalo
-from manure import Manure
-from wheat import Wheat
-from wall import Wall
-from tree import Tree
-from avatar import Avatar
 
 
 class GameTile(object):
@@ -12,19 +6,19 @@ class GameTile(object):
         self.column = column
         self.terrain_type = terrain_type
         self.entity_group = {
-                            Buffalo: [],
-                            Wheat: [],
-                            Manure: [],
-                            Wall: [],
-                            Tree: [],
-                            Avatar: []
+                            "Terrain": [],
+                            "Structure":[],
+                            "Flora": [],
+                            "Creature": [],
+                            "Npc": [],
+                            "Avatar": []
                             }
     def __lt__(self, other):
         return False
 
     def is_occupied(self):
         for entity_type in self.entity_group:
-            if entity_type.occupies_tile:
-                if self.entity_group[entity_type]:
+            if self.entity_group[entity_type]:
+                if self.entity_group[entity_type][0].occupies_tile:
                     return True
         return False

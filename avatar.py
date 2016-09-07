@@ -12,17 +12,19 @@ avatar_image.set_colorkey(utilities.colors.key)
 
 class Avatar(entity.Entity):
     occupies_tile = True
+    my_type = "Avatar"
 
     def __init__(self, x, y, current_map):
-        super().__init__(x, y, current_map)
+        super().__init__(x, y + 1, current_map)
         self.display_name = "PLAYER"
         self.sprite.image = avatar_image
         self.sprite.rect = self.sprite.image.get_rect()
-        self.sprite.rect.x = self.tile_x * 10
-        self.sprite.rect.y = self.tile_y * 10
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - 1) * 20
         self.change_x = 0
         self.change_y = 0
         self.target_coordinates = None
+        self.target_object = None
         self.path = None
         self.speed = 10
         self.time_since_last_move = 0
@@ -30,42 +32,91 @@ class Avatar(entity.Entity):
         self.health = 100
         self.max_health = 100
         self.gold = 10
+        self.actions = [
+                    "None",
+                    "Move",
+                    "Attack",
+                    "Use"]
+        self.action = 0
 
     def tick_cycle(self):
+        my_position = (self.tile_x, self.tile_y)
         self.age += 1
         self.time_since_last_move += 1
-        if self.target_coordinates:
-            # print(self.change_x, self.change_y, self.tile_x. self.tile_y)
-            self.change_x, self.change_y = self.calculate_step((self.tile_x, self.tile_y))
-            if self.path and len(self.path.tiles) > 0:
-                if self.time_since_last_move >= self.speed:
-                    self.time_since_last_move = 0
-                    self.move()
+        if self.action == 0:
+            pass
+        elif self.action == 1:
+            if self.time_since_last_move >= self.speed:
+                self.time_since_last_move = 0
+                self.change_x, self.change_y = self.calculate_step(my_position, self.target_object, self.target_coordinates)
+                self.move()
+        elif self.action == 2:
+            pass
+        elif self.action == 3:
+            if len(self.path.tiles) == 1:
+                # is the target still there?
+                if self.target_object.tile_x == self.target_coordinates[0] and self.target_object.tile_y == self.target_coordinates[1]:
+                    self.use(self.target_object)
+                    self.path = None
+                    self.action = 0
+                    self.target_coordinates = None
+                    return 0, 0
+                # path to it's new position
+                else:
+                    self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
+                    self.calculate_step(my_position, self.target_object, self.target_coordinates)
+            else:
+                self.calculate_step(my_position, self.target_object, self.target_coordinates)
+
+    def use(self, target_object):
+        statement = "used " + target_object.display_name
+        for time in range(100):
+            screen.blit(self.font.render(statement, True, (0,0,0)), [210, global_variables.screen_height - 60])
+        target_object.dialogue()
 
     def assign_target(self, current_map, mouse_pos):
         my_position = (self.tile_x, self.tile_y)
-        tile_x = int((mouse_pos[0] + current_map.x_shift) / 10)
-        tile_y = int((mouse_pos[1] + current_map.y_shift) / 10)
-        if utilities.within_map(tile_x, tile_y, current_map):
+        tile_x = int((mouse_pos[0] + current_map.x_shift) / 20)
+        tile_y = int((mouse_pos[1] + current_map.y_shift) / 20)
+        # 0 == invalid (cant move there and wont process the click)
+        # 1 == empty space, will move to this spot
+        # 2 == interactible thing, door, chest, creature, npc - will path to this object and then interact
+        target_type = None
+        if not utilities.within_map(tile_x, tile_y, current_map):
+            target_type = 0
+        else:
+
+            if current_map.game_tile_rows[tile_y][tile_x].is_occupied():
+                    target_type = 0
+            else:
+                if current_map.game_tile_rows[tile_y][tile_x].entity_group["Npc"]:
+                    self.target_object = current_map.game_tile_rows[tile_y][tile_x].entity_group["Npc"][0]
+                    target_type = 2
+                else:
+                    target_type = 1
+
+        self.get_path_behavior(current_map, my_position, tile_x, tile_y, target_type)
+
+
+    def get_path_behavior(self, current_map, my_position, tile_x, tile_y, target_type):
+        if target_type == 0:
+            print('Invalid target, cannot path')
+        elif target_type == 1:
             self.target_coordinates = tile_x, tile_y
             self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
-
-    def calculate_step(self, my_position):
-        # I have a target but no path to it
-        if not self.path:
+            self.action = 1
+        elif target_type == 2:
+            self.target_coordinates = tile_x, tile_y
             self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
-        # I am at my target
-        if len(self.path.tiles) < 1:
-            self.target_object, self.target_coordinates = None, None
-            self.path = None
-            return (0, 0)
-        # I have a target and a path that is at least 1 tile long
-        else:
+            self.action = 3
+
+
+    def calculate_step(self, my_position, target_object, target_coordinates):
+        change_x, change_y = navigate.calculate_step(my_position, self.path.tiles[0])
+        if self.path.tiles[0].is_occupied():
+            self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
             change_x, change_y = navigate.calculate_step(my_position, self.path.tiles[0])
-            if self.path.tiles[0].is_occupied():
-                self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
-                change_x, change_y = navigate.calculate_step(my_position, self.path.tiles[0])
-            return change_x, change_y
+        return change_x, change_y
 
     def check_tile(self, x_change, y_change):
         x = self.tile_x
@@ -96,8 +147,15 @@ class Avatar(entity.Entity):
             self.tile_y = self.current_map.number_of_rows - 1
 
         self.assign_tile()
-        self.sprite.rect.x = self.tile_x * 10
-        self.sprite.rect.y = self.tile_y * 10
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - 1) * 20
         self.change_x = 0
         self.change_y = 0
-        self.path.tiles.pop(0)
+
+        # am I at my target?
+        if len(self.path.tiles) < 2:
+            self.target_object, self.target_coordinates = (None, None)
+            self.path = None
+            self.action = 0
+        else:
+            self.path.tiles.pop(0)

@@ -1,15 +1,5 @@
 import pygame
-import random
 import utilities
-from buffalo import Buffalo
-from wheat import Wheat
-from wall import Wall
-from tree import Tree
-
-
-animal_types = [Buffalo]
-vegetation_types = [Wheat, Tree]
-terrain_types = [Wall]
 
 
 class TileSelectorGraphic(pygame.sprite.Sprite):
@@ -22,9 +12,9 @@ class TileSelectorGraphic(pygame.sprite.Sprite):
         self.update_image((0, 0))
 
     def update_image(self, mouse_pos):
-        self.tile_x = int(mouse_pos[0] + self.current_map.x_shift) / 10
-        self.tile_y = int(mouse_pos[1] + self.current_map.y_shift) / 10
-        self.image = pygame.Rect((int(mouse_pos[0] / 10) * 10), (int(mouse_pos[1] / 10) * 10), 10, 10)
+        self.tile_x = int(mouse_pos[0] + self.current_map.x_shift) / 20
+        self.tile_y = int(mouse_pos[1] + self.current_map.y_shift) / 20
+        self.image = pygame.Rect((int(mouse_pos[0] / 20) * 20), (int(mouse_pos[1] / 20) * 20), 20, 20)
 
 
 class TileMarker(pygame.sprite.Sprite):
@@ -38,9 +28,9 @@ class TileMarker(pygame.sprite.Sprite):
 
     def update_image(self):
 
-        top = int(self.tile_y * 10) + self.current_map.y_shift
-        left = int(self.tile_x * 10) + self.current_map.x_shift
-        self.image = pygame.Rect(left, top, 10, 10)
+        top = int(self.tile_y * 20) + self.current_map.y_shift
+        left = int(self.tile_x * 20) + self.current_map.x_shift
+        self.image = pygame.Rect(left, top, 20, 20)
 
 
 class FoodSearchRadius(pygame.sprite.Sprite):
@@ -49,103 +39,34 @@ class FoodSearchRadius(pygame.sprite.Sprite):
         self.current_map = current_map
         self.entity = entity
         self.center = (entity.sprite.rect.x, entity.sprite.rect.y)
-        self.radius = (self.entity.sight_range * 10)
+        self.radius = (self.entity.sight_range * 20)
 
         self.update_stats()
 
     def update_stats(self):
         self.center = (self.entity.sprite.rect.x + 5 + self.current_map.x_shift, self.entity.sprite.rect.y + 5 + self.current_map.y_shift)
-        self.radius = (self.entity.sight_range * 10)
+        self.radius = (self.entity.sight_range * 20)
 
 
 def event_processing(current_map, debug_status, event_key):
     if event_key == pygame.K_c:
         if debug_status.remove:
             debug_status.remove = False
-            debug_status.current_removal_entity_number = 0
-        if debug_status.clear:
-            debug_status.clear = False
-        else:
-            debug_status.clear = True
-            debug_status.entity_to_place = None
-    elif event_key == pygame.K_s:
-        if not debug_status.draw_search_areas:
-            debug_status.draw_search_areas = True
-        else:
-            debug_status.draw_search_areas = False
-    elif event_key == pygame.K_p:
-        if not debug_status.draw_paths:
-            debug_status.draw_paths = True
-        else:
-            debug_status.draw_paths = False
-
-    elif event_key == pygame.K_a and debug_status.clear:
-        clear_all_animals(current_map)
-    elif event_key == pygame.K_a and debug_status.remove:
-        debug_status.current_removal_entity_number = 1
-
-    elif event_key == pygame.K_v and debug_status.clear:
-        clear_all_vegetation(current_map)
-    elif event_key == pygame.K_v and debug_status.remove:
-        debug_status.current_removal_entity_number = 2
-
-    elif event_key == pygame.K_e and debug_status.clear:
-        clear_all_entities(current_map)
-    elif event_key == pygame.K_e and debug_status.remove:
-        debug_status.current_removal_entity_number = 4
-
-    elif event_key == pygame.K_t and debug_status.clear:
-        clear_all_terrain(current_map)
-    elif event_key == pygame.K_t and debug_status.remove:
-        debug_status.current_removal_entity_number = 3
-
+        debug_status.clear = not debug_status.clear
     elif event_key == pygame.K_r:
-        if debug_status.remove:
-            debug_status.remove = False
-            debug_status.current_removal_entity_number = 0
-        else:
-            if debug_status.clear:
-                debug_status.clear = False
-            if debug_status.entity_to_place:
-                debug_status.entity_to_place = None
-            debug_status.remove = True
-    elif event_key == pygame.K_b:
         if debug_status.clear:
             debug_status.clear = False
-        if debug_status.remove:
-            debug_status.remove = False
-            debug_status.current_removal_entity_number = 0
-        debug_status.entity_to_place = Buffalo
-        debug_status.current_placement_entity_number = 2
-    elif event_key == pygame.K_w:
-        if debug_status.clear:
-            debug_status.clear = False
-        if debug_status.remove:
-            debug_status.remove = False
-            debug_status.current_removal_entity_number = 0
-        debug_status.entity_to_place = Wheat
-        debug_status.current_placement_entity_number = 1
-    elif event_key == pygame.K_l:
-        if debug_status.clear:
-            debug_status.clear = False
-        if debug_status.remove:
-            debug_status.remove = False
-            debug_status.current_removal_entity_number = 0
-        debug_status.entity_to_place = Wall
-        debug_status.current_placement_entity_number = 3
-    elif event_key == pygame.K_n:
-        if debug_status.clear:
-            debug_status.clear = False
-        if debug_status.remove:
-            debug_status.remove = False
-            debug_status.current_removal_entity_number = 0
-        debug_status.entity_to_place = Tree
-        debug_status.current_placement_entity_number = 4
+        debug_status.remove = not debug_status.remove
+
+    elif event_key == pygame.K_s:
+        debug_status.draw_search_areas = not debug_status.draw_paths
+    elif event_key == pygame.K_p:
+        debug_status.draw_paths = not debug_status.draw_paths
 
 
 def mouse_processing(current_map, debug_status, mouse_pos, event):
-    tile_x = int((mouse_pos[0] + current_map.x_shift) / 10)
-    tile_y = int((mouse_pos[1] + current_map.y_shift) / 10)
+    tile_x = int((mouse_pos[0] + current_map.x_shift) / 20)
+    tile_y = int((mouse_pos[1] + current_map.y_shift) / 20)
     if utilities.within_map(tile_x, tile_y, current_map):
         selected_tile = current_map.game_tile_rows[tile_y][tile_x]
         if debug_status.entity_to_place:
@@ -156,61 +77,21 @@ def mouse_processing(current_map, debug_status, mouse_pos, event):
         if debug_status.current_removal_entity_number != 0:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if debug_status.current_removal_entity_number == 1:
-                    remove_animals_at_tile(current_map, selected_tile)
-                elif debug_status.current_removal_entity_number == 2:
-                    remove_vegetation_at_tile(current_map, selected_tile)
-                elif debug_status.current_removal_entity_number == 4:
-                    remove_animals_at_tile(current_map, selected_tile)
-                    remove_vegetation_at_tile(current_map, selected_tile)
-                elif debug_status.current_removal_entity_number == 3:
-                    remove_terrain_at_tile(current_map, selected_tile)
+                    remove_animals_at_tile(current_map, selected_tile, debug_status.entity_type)
 
 
-def clear_all_entities(current_map):
-    clear_all_animals(current_map)
-    clear_all_vegetation(current_map)
+def clear_entity_type(current_map, entity_type):
+    for row in current_map.game_tile_rows:
+        for tile in row:
+            tile.entity_group[entity_type] = []
+    current_map.entity_group[entity_type] = []
 
 
-def clear_all_animals(current_map):
-    for animal in animal_types:
-        for each in current_map.entity_group[animal]:
-            each.current_tile.entity_group[animal].remove(each)
-        current_map.entity_group[animal] = []
 
-
-def clear_all_terrain(current_map):
-    for terrain in terrain_types:
-        for each in current_map.entity_group[terrain]:
-            each.current_tile.entity_group[terrain].remove(each)
-        current_map.entity_group[terrain] = []
-
-
-def clear_all_vegetation(current_map):
-    for vegetation in vegetation_types:
-        for each in current_map.entity_group[vegetation]:
-            each.current_tile.entity_group[vegetation].remove(each)
-        current_map.entity_group[vegetation] = []
-
-
-def remove_vegetation_at_tile(current_map, current_tile):
-    for vegetation in vegetation_types:
-        for each in current_tile.entity_group[vegetation]:
-            current_tile.entity_group[vegetation].remove(each)
-            current_map.entity_group[vegetation].remove(each)
-
-
-def remove_terrain_at_tile(current_map, current_tile):
-    for terrain in terrain_types:
-        for each in current_tile.entity_group[terrain]:
-            current_tile.entity_group[terrain].remove(each)
-            current_map.entity_group[terrain].remove(each)
-
-
-def remove_animals_at_tile(current_map, current_tile):
-    for animal in animal_types:
-        for each in current_tile.entity_group[animal]:
-            current_tile.entity_group[animal].remove(each)
-            current_map.entity_group[animal].remove(each)
+def remove_entity_at_tile(current_map, current_tile, entity_type):
+    for each in current_tile.entity_group[entity_type]:
+        current_tile.entity_group[entity_type].remove(each)
+    current_map.entity_group[entity_type].remove(each)
 
 
 class DebugStatus(object):
@@ -221,24 +102,19 @@ class DebugStatus(object):
         self.debug = False
         self.clear = False
         self.remove = False
-        self.entity_to_place = None
+        self.entity_type = 0
         self.draw_search_areas = False
         self.draw_paths = False
-        self.entity_strings = ["None", "Wheat", "Buffalo", "Wall", "Tree"]
-        self.current_placement_entity_number = 0
+        self.entity_strings = ["None"]
         self.path_stamp = self.font.render("Drawing Paths", True, utilities.colors.black)
-
-        self.entity_type_strings = ["None", "Animals", "Vegetation", "Terrain", "All"]
-        self.current_removal_entity_number = 0
-
-        debug = self.font.render("Debug Mode", True, utilities.colors.black)
-        item_to_place = self.font.render("Placing Item: ", True, utilities.colors.black)
+        debug_mode_stamp = self.font.render("Debug Mode", True, utilities.colors.black)
+        entity_type_stamp = self.font.render("Placing Item: ", True, utilities.colors.black)
         clear_stamp = self.font.render("Clear Items: All [E]ntities / All [A]nimals / All [V]egetation / All [T]errain", True, utilities.colors.black)
         removal_stamp = self.font.render("Click to remove from tile at cursor: ", True, utilities.colors.black)
-        removal_types_stamp = self.font.render("[A]nimals / [V]egetation / All [E]ntities", True, utilities.colors.black)
+        removal_types_stamp = self.font.render("[A]Creatures / [F]lora / [N]PCs / [E]ntities", True, utilities.colors.black)
         self.stamps = [
-                        ((210, self.global_variables.screen_height - 70), debug),
-                        ((210, self.global_variables.screen_height - 55), item_to_place),
+                        ((210, self.global_variables.screen_height - 70), debug_mode_stamp),
+                        ((210, self.global_variables.screen_height - 55), entity_type_stamp),
                         ((210, self.global_variables.screen_height - 55), clear_stamp),
                         ((210, self.global_variables.screen_height - 55), removal_stamp),
                         ((480, self.global_variables.screen_height - 55), removal_types_stamp)
@@ -246,34 +122,26 @@ class DebugStatus(object):
         self.update_entity_stamp()
 
     def update_entity_stamp(self):
-        self.entity_stamp = self.font.render(self.entity_strings[self.current_placement_entity_number], True, utilities.colors.black)
-
-    def update_item_removal_stamp(self):
-        self.item_removal_stamp = self.font.render(self.entity_type_strings[self.current_removal_entity_number], True, utilities.colors.black)
+        self.entity_stamp = self.font.render(self.entity_strings[self.entity_type], True, utilities.colors.black)
 
     def print_to_screen(self, screen):
         screen.blit(self.stamps[0][1], self.stamps[0][0])
         if self.clear:
             screen.blit(self.stamps[2][1], self.stamps[2][0])
-        if self.entity_to_place:
+        if self.entity_type != 0:
             self.update_entity_stamp()
             screen.blit(self.stamps[1][1], self.stamps[1][0])
             screen.blit(self.entity_stamp, [315, self.global_variables.screen_height - 55])
         if self.remove:
-            self.update_item_removal_stamp()
             screen.blit(self.stamps[3][1], self.stamps[3][0])
-            if self.current_removal_entity_number != 0:
-                screen.blit(self.item_removal_stamp, [280, self.global_variables.screen_height - 55])
-            else:
-                screen.blit(self.stamps[4][1], self.stamps[4][0])
         if self.global_variables.debug_status.draw_search_areas:
-            for each in self.current_map.entity_group[Buffalo]:
+            for each in self.current_map.entity_group["Creatures"]:
                 new_search_area_graphic = FoodSearchRadius(self.current_map, each)
                 new_search_area_graphic.update_stats()
                 pygame.draw.circle(screen, (0, 0, 0), new_search_area_graphic.center, new_search_area_graphic.radius, 1)
         if self.global_variables.debug_status.draw_paths:
             screen.blit(self.path_stamp, [210, self.global_variables.screen_height - 40])
-            for each in self.current_map.entity_group[Buffalo]:
+            for each in self.current_map.entity_group["Creatures"]:
                 if each.path:
                     for tile in each.path.tiles:
                         marker = TileMarker(tile.column, tile.row, self.current_map)

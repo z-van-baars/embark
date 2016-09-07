@@ -2,11 +2,8 @@ import pygame
 import utilities
 import random
 import navigate
-import animal
+import creature
 from wheat import Wheat
-from herd import Herd
-from wall import Wall
-from tree import Tree
 
 pygame.init()
 pygame.display.set_mode([0, 0])
@@ -15,7 +12,7 @@ buffalo_image_1 = pygame.image.load("art/buffalo/buffalo_1.png").convert()
 buffalo_image_1.set_colorkey(utilities.colors.key)
 
 
-class Buffalo(animal.Animal):
+class Buffalo(creature.Creature):
     occupies_tile = True
 
     def __init__(self, x, y, current_map):
@@ -33,8 +30,8 @@ class Buffalo(animal.Animal):
         self.time_since_last_move = 0
         self.sprite.image = buffalo_image_1
         self.sprite.rect = self.sprite.image.get_rect()
-        self.sprite.rect.x = self.tile_x * 10
-        self.sprite.rect.y = self.tile_y * 10
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = self.tile_y * 20
 
     def tick_cycle(self):
         self.age += 1

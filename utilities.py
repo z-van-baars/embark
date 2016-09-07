@@ -7,7 +7,7 @@ pygame.display.set_caption("Embark v 0.21")
 
 
 class GlobalVariables(object):
-    def __init__(self, screen_width, screen_height):
+    def __init__(self, screen_width, screen_height, tile_size):
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.screen = pygame.display.set_mode([self.screen_width, self.screen_height])
@@ -15,6 +15,7 @@ class GlobalVariables(object):
         self.time = 0
         self.font = pygame.font.SysFont('Calibri', 18, True, False)
         self.debug_status = None
+        self.tile_size = tile_size
 
 
 class Colors(object):
