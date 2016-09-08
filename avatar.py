@@ -28,6 +28,7 @@ class Avatar(entity.Entity):
         self.path = None
         self.speed = 10
         self.time_since_last_move = 0
+        self.bag = None
 
         self.health = 100
         self.max_health = 100
@@ -61,12 +62,9 @@ class Avatar(entity.Entity):
                 self.move()
             if not self.path:
                 # is the target still there?
-                self.use(self.target_object)
-
-    def use(self, target_object):
-        statement = "used " + target_object.display_name
-        print(statement)
-        target_object.dialogue()
+                statement = "used " + self.target_object.display_name
+                print(statement)
+                self.target_object.activated = True
 
     def assign_target(self, current_map, mouse_pos):
         my_position = (self.tile_x, self.tile_y)

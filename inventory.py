@@ -1,4 +1,5 @@
 import pygame
+import item
 
 
 class Inventory(object):
@@ -37,19 +38,7 @@ class Inventory(object):
 
         self.font = pygame.font.SysFont('Calibri', 24, True, False)
 
-        self.items_list = [
-                    "Iron Dagger", 
-                    "Gold Coin", 
-                    "Ye Flaske", 
-                    "ye flaske 2", 
-                    "ye flaske 3", 
-                    "ye flaske 4", 
-                    "ye flaske 5", 
-                    "ye flaske 6",
-                    "ye flaske 7",
-                    "ye flaske 8",
-                    "ye flaske 9",
-                    "ye flaske 10"]
+        self.items_list = []
         self.open = False 
 
 

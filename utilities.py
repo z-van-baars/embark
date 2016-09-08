@@ -91,3 +91,10 @@ def get_adjacent_movement_tiles(tile, current_map):
             if within_map(tile_x, tile_y, current_map):
                 adjacent_tiles.append(current_map.game_tile_rows[tile_y][tile_x])
     return adjacent_tiles
+
+
+def check_if_inside(x1, x2, y1, y2, pos):
+    return x1 < pos[0] < x2 and y1 < pos[1] < y2
+
+
+

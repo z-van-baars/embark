@@ -52,8 +52,9 @@ class Map(object):
         self.generate_vegetation()
 
         npc.Guard(15, 15, self)
+        npc.Merchant(20, 20, self)
 
-        Avatar(1, 1, self)
+        Avatar(17, 20, self)
 
         for new_buffalo in range(self.number_of_buffalo):
             buffalo_placed = False

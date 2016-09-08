@@ -58,7 +58,6 @@ class Tree(Flora):
         for tile_y in range(initial_y, initial_y + 2):
             for tile_x in range(initial_x, initial_x + 2):
                 if utilities.within_map(tile_x, tile_y, self.current_map):
-                    print("adding")
                     self.current_map.game_tile_rows[tile_y][tile_x].entity_group["Flora"].append(self)
 
 

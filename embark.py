@@ -4,6 +4,7 @@ from utilities import GlobalVariables
 from game_map import Map
 import debug
 import inventory
+import item
 
 pygame.init()
 pygame.display.set_mode([0, 0])
@@ -17,7 +18,6 @@ def set_bottom_pane_stamp(current_map, mouse_pos):
     font = pygame.font.SysFont('Calibri', 18, True, False)
     tile_x = int((mouse_pos[0] - current_map.x_shift) / 20)
     tile_y = int((mouse_pos[1] - current_map.y_shift) / 20)
-    
 
     if utilities.within_map(tile_x, tile_y, current_map):
         selected_tile = current_map.game_tile_rows[tile_y][tile_x]
@@ -44,7 +44,18 @@ def main(global_variables, map_dimensions):
     bottom_pane.image = pygame.Surface([global_variables.screen_width - 280, 80])
     bottom_pane.image.fill((171, 171, 171))
     control_on = False
-    bag = inventory.Inventory(global_variables.screen_width, global_variables.screen_height)
+    new_map.entity_group["Avatar"][0].bag = inventory.Inventory(global_variables.screen_width, global_variables.screen_height)
+    for each in item.rubbish:
+        new_item = item.Item(each[0], each[1], each[2])
+        new_map.entity_group["Avatar"][0].bag.items_list.append(new_item)
+    for each in item.weapons:
+        new_item = item.Item(each[0], each[1], each[2])
+        new_map.entity_group["Avatar"][0].bag.items_list.append(new_item)
+    for iteration in range(9):
+        for each in item.treasures:
+            new_item = item.Item(each[0], each[1], each[2])
+            new_map.entity_group["Avatar"][0].bag.items_list.append(new_item)
+
     while not done:
         mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
@@ -93,7 +104,7 @@ def main(global_variables, map_dimensions):
                     debug.mouse_processing(new_map, global_variables.debug_status, mouse_pos, event)
                 else:
                     if mouse_pos[0] > global_variables.screen_width - 80 and mouse_pos[1] > global_variables.screen_height - 80:
-                        bag.open = True
+                        new_map.entity_group["Avatar"][0].bag.open = True
                     else:
                         new_map.entity_group["Avatar"][0].assign_target(new_map, mouse_pos)
 
@@ -150,13 +161,17 @@ def main(global_variables, map_dimensions):
             debug_stats.tile_selector_graphic.update_image(mouse_pos)
             debug_stats.print_to_screen(global_variables.screen)
             pygame.draw.rect(global_variables.screen, (255, 255, 255), debug_stats.tile_selector_graphic.image, 1)
-        if bag.open:
-            done = bag.draw_to_screen(global_variables.screen, [global_variables.screen_width, global_variables.screen_height])
+        if new_map.entity_group["Avatar"][0].bag.open:
+            done = new_map.entity_group["Avatar"][0].bag.draw_to_screen(global_variables.screen, [global_variables.screen_width, global_variables.screen_height])
+
+        for each in new_map.entity_group["Npc"]:
+            if each.activated:
+                each.use(global_variables)
         pygame.display.flip()
         global_variables.clock.tick(60)
         global_variables.time += 1
 
-global_variables = GlobalVariables(1000, 900 + 80, 20)
+global_variables = GlobalVariables(1000, 800 + 80, 20)
 
 world_dimensions = (60, 60)
 
