@@ -15,8 +15,9 @@ bag_icon_selected = pygame.image.load("art/ui_elements/bag_highlight.png").conve
 
 def set_bottom_pane_stamp(current_map, mouse_pos):
     font = pygame.font.SysFont('Calibri', 18, True, False)
-    tile_x = int((mouse_pos[0] + current_map.x_shift) / 20)
-    tile_y = int((mouse_pos[1] + current_map.y_shift) / 20)
+    tile_x = int((mouse_pos[0] - current_map.x_shift) / 20)
+    tile_y = int((mouse_pos[1] - current_map.y_shift) / 20)
+    
 
     if utilities.within_map(tile_x, tile_y, current_map):
         selected_tile = current_map.game_tile_rows[tile_y][tile_x]
@@ -27,11 +28,6 @@ def set_bottom_pane_stamp(current_map, mouse_pos):
                         entity = selected_tile.entity_group[entity_type][0]
                         stamp = font.render(entity.display_name, True, utilities.colors.black)
             return stamp
-        else:
-            if selected_tile.entity_group["Npc"]:
-                npc = selected_tile.entity_group["Npc"][0]
-                stamp = font.render(npc.display_name, True, utilities.colors.black)
-                return stamp
     else:
         return None
 
@@ -64,7 +60,7 @@ def main(global_variables, map_dimensions):
                 elif event.key == pygame.K_RIGHT:
                     new_map.world_scroll((-20 * super_scroll), 0, global_variables.screen_width, global_variables.screen_height)
                 elif event.key == pygame.K_LSHIFT:
-                    super_scroll = 20
+                    super_scroll = 10
                 elif event.key == pygame.K_LCTRL:
                     control_on = True
 
@@ -149,14 +145,13 @@ def main(global_variables, map_dimensions):
             global_variables.screen.blit(bottom_pane_stamp, [210, global_variables.screen_height - 60])
 
         if debug_stats.debug:
-            for each in new_map.entity_group[Buffalo]:
+            for each in new_map.entity_group["Creature"]:
                 each.search_area_graphic = debug.FoodSearchRadius(new_map, each)
             debug_stats.tile_selector_graphic.update_image(mouse_pos)
             debug_stats.print_to_screen(global_variables.screen)
-            if debug_stats.remove or debug_stats.entity_to_place:
-                pygame.draw.rect(global_variables.screen, (255, 255, 255), debug_stats.tile_selector_graphic.image, 1)
+            pygame.draw.rect(global_variables.screen, (255, 255, 255), debug_stats.tile_selector_graphic.image, 1)
         if bag.open:
-            bag.draw_to_screen(global_variables.screen, [global_variables.screen_width, global_variables.screen_height])
+            done = bag.draw_to_screen(global_variables.screen, [global_variables.screen_width, global_variables.screen_height])
         pygame.display.flip()
         global_variables.clock.tick(60)
         global_variables.time += 1

@@ -51,7 +51,7 @@ class Map(object):
 
         self.generate_vegetation()
 
-        npc.Guard(20, 20, self)
+        npc.Guard(15, 15, self)
 
         Avatar(1, 1, self)
 

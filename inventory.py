@@ -55,6 +55,7 @@ class Inventory(object):
 
     def draw_to_screen(self, screen, screen_dimensions):
         start = 0
+        quit = False
         while self.open:
             self.up_arrow.image = self.up_arrow_regular
             self.down_arrow.image = self.down_arrow_regular
@@ -62,6 +63,7 @@ class Inventory(object):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.open = False
+                    quit = True
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     self.open, start = self.click_handler(mouse_pos, screen_dimensions, start)
             if self.inventory_pane.rect.x + 5 < mouse_pos[0] < self.inventory_pane.rect.x + 37:
@@ -81,6 +83,7 @@ class Inventory(object):
                 slot += slot_spacer
 
             pygame.display.flip()
+        return quit
 
     def click_handler(self, pos, screen_dimensions, start):
         if pos[0] > screen_dimensions[0] - 80 and pos[1] > screen_dimensions[1] - 80:

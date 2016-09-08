@@ -53,31 +53,25 @@ class Avatar(entity.Entity):
         elif self.action == 2:
             pass
         elif self.action == 3:
-            if len(self.path.tiles) == 1:
+            if not self.target_object.tile_x == self.target_coordinates[0] or not self.target_object.tile_y == self.target_coordinates[1]:
+                self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
+            if self.time_since_last_move >= self.speed:
+                self.time_since_last_move = 0
+                self.change_x, self.change_y = self.calculate_step(my_position, self.target_object, self.target_coordinates)
+                self.move()
+            if not self.path:
                 # is the target still there?
-                if self.target_object.tile_x == self.target_coordinates[0] and self.target_object.tile_y == self.target_coordinates[1]:
-                    self.use(self.target_object)
-                    self.path = None
-                    self.action = 0
-                    self.target_coordinates = None
-                    return 0, 0
-                # path to it's new position
-                else:
-                    self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
-                    self.calculate_step(my_position, self.target_object, self.target_coordinates)
-            else:
-                self.calculate_step(my_position, self.target_object, self.target_coordinates)
+                self.use(self.target_object)
 
     def use(self, target_object):
         statement = "used " + target_object.display_name
-        for time in range(100):
-            screen.blit(self.font.render(statement, True, (0,0,0)), [210, global_variables.screen_height - 60])
+        print(statement)
         target_object.dialogue()
 
     def assign_target(self, current_map, mouse_pos):
         my_position = (self.tile_x, self.tile_y)
-        tile_x = int((mouse_pos[0] + current_map.x_shift) / 20)
-        tile_y = int((mouse_pos[1] + current_map.y_shift) / 20)
+        tile_x = int((mouse_pos[0] - current_map.x_shift) / 20)
+        tile_y = int((mouse_pos[1] - current_map.y_shift) / 20)
         # 0 == invalid (cant move there and wont process the click)
         # 1 == empty space, will move to this spot
         # 2 == interactible thing, door, chest, creature, npc - will path to this object and then interact
@@ -85,18 +79,16 @@ class Avatar(entity.Entity):
         if not utilities.within_map(tile_x, tile_y, current_map):
             target_type = 0
         else:
-
             if current_map.game_tile_rows[tile_y][tile_x].is_occupied():
-                    target_type = 0
-            else:
                 if current_map.game_tile_rows[tile_y][tile_x].entity_group["Npc"]:
                     self.target_object = current_map.game_tile_rows[tile_y][tile_x].entity_group["Npc"][0]
                     target_type = 2
                 else:
-                    target_type = 1
+                    target_type = 0
+            else:
+                target_type = 1
 
         self.get_path_behavior(current_map, my_position, tile_x, tile_y, target_type)
-
 
     def get_path_behavior(self, current_map, my_position, tile_x, tile_y, target_type):
         if target_type == 0:
@@ -108,8 +100,10 @@ class Avatar(entity.Entity):
         elif target_type == 2:
             self.target_coordinates = tile_x, tile_y
             self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
+            self.target_coordinates = tile_x, tile_y
+            target_tile = current_map.game_tile_rows[self.target_coordinates[1]][self.target_coordinates[0]]
+            self.path.tiles.insert(0, target_tile)
             self.action = 3
-
 
     def calculate_step(self, my_position, target_object, target_coordinates):
         change_x, change_y = navigate.calculate_step(my_position, self.path.tiles[0])
@@ -154,7 +148,7 @@ class Avatar(entity.Entity):
 
         # am I at my target?
         if len(self.path.tiles) < 2:
-            self.target_object, self.target_coordinates = (None, None)
+            self.target_coordinates = None
             self.path = None
             self.action = 0
         else:
