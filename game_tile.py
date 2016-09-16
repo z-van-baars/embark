@@ -1,10 +1,9 @@
 
 
 class GameTile(object):
-    def __init__(self, terrain_type, column, row):
+    def __init__(self, column, row):
         self.row = row
         self.column = column
-        self.terrain_type = terrain_type
         self.entity_group = {
                             "Terrain": [],
                             "Structure":[],

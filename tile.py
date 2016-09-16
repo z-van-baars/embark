@@ -11,3 +11,10 @@ class DisplayTile(pygame.sprite.Sprite):
         self.image = pygame.Surface([20, 20])
         self.image.fill(self.color)
         self.rect = self.image.get_rect()
+
+
+class ImageTile(pygame.sprite.Sprite):
+	def __init__(self, image):
+		super().__init__()
+		self.image = image
+		self.rect = self.image.get_rect()

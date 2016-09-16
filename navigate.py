@@ -45,7 +45,7 @@ def explore_frontier_to_target(game_map, visited, target_tile, closest_tile, fro
         if current_tile not in visited or new_steps < visited[current_tile][0]:
             tile_neighbors = utilities.get_adjacent_tiles(current_tile, game_map)
             for each in tile_neighbors:
-                if not each.is_occupied():
+                if each == target_tile or not each.is_occupied():
                     distance_to_target = distance(each.column, each.row, target_tile.column, target_tile.row)
                     priority = distance_to_target + new_steps
                     frontier.put((priority, each, current_tile))

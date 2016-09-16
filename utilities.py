@@ -1,5 +1,7 @@
 import pygame
 import math
+import random
+import pickle
 
 pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.init()
@@ -16,6 +18,9 @@ class GlobalVariables(object):
         self.font = pygame.font.SysFont('Calibri', 18, True, False)
         self.debug_status = None
         self.tile_size = tile_size
+        self.player = None
+        self.maps = []
+        self.active_map = None
 
 
 class Colors(object):
@@ -26,6 +31,7 @@ class Colors(object):
         self.dark_green = (0, 200, 0)
         self.red = (255, 0, 0)
         self.blue = (0, 0, 255)
+        self.bright_blue = (8, 248, 252)
         self.blue_grey = (180, 210, 217)
         self.purple = (255, 0, 255)
         self.wheat_gold = (220, 187, 0)
@@ -42,16 +48,76 @@ class Path(object):
 
 
 def on_screen(screen_width, screen_height, x_position, y_position, x_shift, y_shift):
-    if 0 <= x_position + x_shift <= screen_width and 0 <= y_position + y_shift <= screen_height:
+    if 0 <= x_position + x_shift <= screen_width and 0 <= y_position + y_shift <= screen_height - 80:
         return True
     else:
         return False
+
+def any_tile_visible(screen_width, screen_height, x_shift, y_shift, entity):
+    initial_x = entity.tile_x
+    initial_y = entity.tile_y - (entity.footprint[1] - 1)
+    for tile_y in range(initial_y, initial_y + (entity.footprint[1])):
+        for tile_x in range(initial_x, initial_x + entity.footprint[0]):
+            if on_screen(screen_width, screen_height, tile_x * 20, tile_y * 20, x_shift, y_shift):
+                return True
+    return False
+    
+
+def export_map(active_map):
+    #for each in active_map.entity_group:
+        #for entity in active_map.entity_group[each]:
+            #print("{0}({1}, {2}),".format(str(type(entity)), entity.tile_x, entity.tile_y))
+
+    pickle.dump(active_map, open("maps/map_1.p", "wb"))
+
+def import_map(global_variables):
+    imported_map = pickle.load(open("maps/map_1.p", "rb"))
+    restore_surfaces(imported_map)
+    global_variables.active_map = imported_map
+
+def restore_surfaces(imported_map):
+    print(imported_map.width / 20, imported_map.height / 20)
+    imported_map.map_generation()
+    for entity_list in imported_map.entity_group:
+        for entity in imported_map.entity_group[entity_list]:
+            entity.set_images()
+            entity.current_tile = None
+            entity.assign_tile()
+
+
+def any_tile_blocked(tile, active_map, entity):
+    initial_x = tile.column
+    initial_y = tile.row - (entity.footprint[1] - 1)
+    for tile_y in range(initial_y, initial_y + (entity.footprint[1])):
+        for tile_x in range(initial_x, initial_x + entity.footprint[0]):
+            if active_map.game_tile_rows[tile_y][tile_x].is_occupied():
+                return True
+    return False
+
+def footprint_visible(screen, active_map, entity):
+    initial_x = tile.column
+    initial_y = tile.row - (entity.footprint[1] - 1)
+    for tile_y in range(initial_y, initial_y + (entity.footprint[1])):
+        for tile_x in range(initial_x, initial_x + entity.footprint[0]):
+            if active_map.game_tile_rows[tile_y][tile_x].is_occupied():
+                return True
+    return False
+
+
 
 def distance(a, b, x, y):
     a1 = abs(a - x)
     b1 = abs(b - y)
     c = math.sqrt((a1 * a1) + (b1 * b1))
     return c
+
+
+def roll_dice(number_of_dice, sides):
+    # Sum of N dice each of which goes from 0 to sides
+    value = 0
+    for i in range(number_of_dice):
+        value += random.randint(1, sides)
+    return value
 
 
 def get_nearby_tiles(current_map, center, radius):

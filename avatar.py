@@ -2,48 +2,117 @@ import pygame
 import entity
 import utilities
 import navigate
+import ui
+import spritesheet
 
 pygame.init()
 pygame.display.set_mode([0, 0])
 
-avatar_image = pygame.image.load("art/avatar/avatar.png").convert()
-avatar_image.set_colorkey(utilities.colors.key)
+
 
 
 class Avatar(entity.Entity):
     occupies_tile = True
+    interactable = False
     my_type = "Avatar"
+    footprint = (1, 1)
+    height = 2
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y + 1, current_map)
         self.display_name = "PLAYER"
-        self.sprite.image = avatar_image
-        self.sprite.rect = self.sprite.image.get_rect()
-        self.sprite.rect.x = self.tile_x * 20
-        self.sprite.rect.y = (self.tile_y - 1) * 20
+
         self.change_x = 0
         self.change_y = 0
         self.target_coordinates = None
         self.target_object = None
         self.path = None
-        self.speed = 10
         self.time_since_last_move = 0
-        self.bag = None
+        self.time_since_last_attack = 0
+        self.healthbar = None
 
+        self.speed = 10
+        self.bag = None
+        self.accuracy = 60
+        self.attack = 10
         self.health = 100
         self.max_health = 100
-        self.gold = 10
+        self.gold = 100
         self.actions = [
                     "None",
                     "Move",
                     "Attack",
                     "Use"]
         self.action = 0
+        self.target_type = 0
+        self.fighting = False
+        self.walk_frame_number = 0
+
+        self.set_images()
+
+    def expire(self):
+        self.current_tile.entity_group["Avatar"].remove(self)
+        self.current_map.entity_group["Avatar"].remove(self)
+
+    def set_frame(self, action):
+        if action == 0:
+            self.walk_frame_number = 0
+            self.sprite.image = self.rest_frame
+        elif action == 1:
+            self.walk_frame_number += 1
+            if self.walk_frame_number > len(self.walking_frames) - 1:
+                self.walk_frame_number = 0
+            self.sprite.image = self.walking_frames[self.walk_frame_number]
+        else:
+            self.walk_frame_number += 1
+            if self.walk_frame_number > len(self.walking_frames) - 1:
+                self.walk_frame_number = 0
+            self.sprite.image = self.walking_frames[self.walk_frame_number]
+
+    def set_images(self):
+        avatar_spritesheet = spritesheet.Spritesheet("art/avatar/avatar.png")
+        self.rest_frame = avatar_spritesheet.get_image(0, 0, 20, 40)
+        self.walking_frames = [
+                        avatar_spritesheet.get_image(20, 0, 20, 40),
+                        avatar_spritesheet.get_image(20, 0, 20, 40),
+                        avatar_spritesheet.get_image(20, 0, 20, 40),
+                        avatar_spritesheet.get_image(20, 0, 20, 40),
+                        avatar_spritesheet.get_image(20, 0, 20, 40),
+                        avatar_spritesheet.get_image(40, 0, 20, 40),
+                        avatar_spritesheet.get_image(40, 0, 20, 40),
+                        avatar_spritesheet.get_image(40, 0, 20, 40),
+                        avatar_spritesheet.get_image(40, 0, 20, 40),
+                        avatar_spritesheet.get_image(40, 0, 20, 40),
+                        avatar_spritesheet.get_image(60, 0, 20, 40),
+                        avatar_spritesheet.get_image(60, 0, 20, 40),
+                        avatar_spritesheet.get_image(60, 0, 20, 40),
+                        avatar_spritesheet.get_image(60, 0, 20, 40),
+                        avatar_spritesheet.get_image(60, 0, 20, 40),
+                        avatar_spritesheet.get_image(80, 0, 20, 40),
+                        avatar_spritesheet.get_image(80, 0, 20, 40),
+                        avatar_spritesheet.get_image(80, 0, 20, 40),
+                        avatar_spritesheet.get_image(80, 0, 20, 40),
+                        avatar_spritesheet.get_image(80, 0, 20, 40)
+                                ]
+        self.sprite.image = avatar_spritesheet.get_image(0, 0, 20, 40)
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+
 
     def tick_cycle(self):
+        self.set_frame(self.action)
         my_position = (self.tile_x, self.tile_y)
         self.age += 1
         self.time_since_last_move += 1
+        health_roll_1 = utilities.roll_dice(1, 10)
+        health_roll_2 = utilities.roll_dice(1, 10)
+        health_roll_2 = utilities.roll_dice(1, 10)
+        health_roll = min(health_roll_1, health_roll_2, health_roll_2)
+        if health_roll > 9:
+            self.health += 1
+        if self.health > self.max_health:
+            self.health = self.max_health
         if self.action == 0:
             pass
         elif self.action == 1:
@@ -66,31 +135,37 @@ class Avatar(entity.Entity):
                 print(statement)
                 self.target_object.activated = True
 
-    def assign_target(self, current_map, mouse_pos):
+    def assign_target(self, global_variables, current_map, mouse_pos):
         my_position = (self.tile_x, self.tile_y)
         tile_x = int((mouse_pos[0] - current_map.x_shift) / 20)
         tile_y = int((mouse_pos[1] - current_map.y_shift) / 20)
         # 0 == invalid (cant move there and wont process the click)
         # 1 == empty space, will move to this spot
         # 2 == interactible thing, door, chest, creature, npc - will path to this object and then interact
-        target_type = None
-        if not utilities.within_map(tile_x, tile_y, current_map):
-            target_type = 0
-        else:
+        self.target_type = 0
+        if utilities.within_map(tile_x, tile_y, current_map):
             if current_map.game_tile_rows[tile_y][tile_x].is_occupied():
-                if current_map.game_tile_rows[tile_y][tile_x].entity_group["Npc"]:
-                    self.target_object = current_map.game_tile_rows[tile_y][tile_x].entity_group["Npc"][0]
-                    target_type = 2
-                else:
-                    target_type = 0
-            else:
-                target_type = 1
+                for group in current_map.game_tile_rows[tile_y][tile_x].entity_group:
+                    if current_map.game_tile_rows[tile_y][tile_x].entity_group[group]:
+                        for each in current_map.game_tile_rows[tile_y][tile_x].entity_group[group]:
+                            if each.interactable:
+                                new_context_menu = ui.ContextMenu(global_variables, mouse_pos, each)
+                                pygame.draw.rect(new_context_menu.screen, (255, 255, 255), new_context_menu.tile_selector_graphic.image, 1)
+                                new_context_menu.menu_onscreen()
 
-        self.get_path_behavior(current_map, my_position, tile_x, tile_y, target_type)
+            else:
+
+                new_context_menu = ui.ContextMenu(global_variables, mouse_pos)
+                pygame.draw.rect(new_context_menu.screen, (255, 255, 255), new_context_menu.tile_selector_graphic.image, 1)
+                new_context_menu.menu_onscreen()
+
+        self.get_path_behavior(current_map, my_position, tile_x, tile_y, self.target_type)
 
     def get_path_behavior(self, current_map, my_position, tile_x, tile_y, target_type):
+        ## target_type can be (0) blocked tile (1) empty tile and (2) interactible tile
+
         if target_type == 0:
-            print('Invalid target, cannot path')
+            pass
         elif target_type == 1:
             self.target_coordinates = tile_x, tile_y
             self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
@@ -100,7 +175,7 @@ class Avatar(entity.Entity):
             self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
             self.target_coordinates = tile_x, tile_y
             target_tile = current_map.game_tile_rows[self.target_coordinates[1]][self.target_coordinates[0]]
-            self.path.tiles.insert(0, target_tile)
+            # self.path.tiles.insert(0, target_tile)
             self.action = 3
 
     def calculate_step(self, my_position, target_object, target_coordinates):
@@ -140,14 +215,20 @@ class Avatar(entity.Entity):
 
         self.assign_tile()
         self.sprite.rect.x = self.tile_x * 20
-        self.sprite.rect.y = (self.tile_y - 1) * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
         self.change_x = 0
         self.change_y = 0
 
         # am I at my target?
-        if len(self.path.tiles) < 2:
+        if len(self.path.tiles) == 2 and self.action == 3:
+           self.target_coordinates = None
+           self.path = None
+           self.action = 0
+        elif len(self.path.tiles) < 2 and self.action == 1:
             self.target_coordinates = None
             self.path = None
             self.action = 0
         else:
             self.path.tiles.pop(0)
+
+        self.current_map.scroll_check(self.sprite.rect.x, self.sprite.rect.y)

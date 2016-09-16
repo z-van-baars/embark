@@ -3,42 +3,47 @@ import utilities
 import navigate
 import random
 import pygame
+import ui
 
 pygame.init()
 pygame.display.set_mode([0, 0])
 
 
 class Creature(entity.Entity):
-    def __init__(self, x, y, current_map, food_type):
+    my_type = "Creature"
+
+    def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.type = "Creature"
-        self.food_type = food_type
         self.local_food_supply = []
         self.eating = False
-        self.is_alpha = False
         self.change_x = 0
         self.change_y = 0
         self.target_coordinates = None
         self.target_object = None
         self.path = None
         self.search_area_graphic = None
+        self.activated = False
+        self.fighting = False
+        self.time_since_last_move = 0
 
     def expire(self):
         self.is_valid = False
-        self.current_tile.entity_group[type(self)].remove(self)
-        self.current_map.entity_group[type(self)].remove(self)
-
-    def leave_tile(self):
-        self.current_tile.entity_group[type(self)].remove(self)
+        self.current_tile.entity_group["Creature"].remove(self)
+        self.current_map.entity_group["Creature"].remove(self)
 
     def find_local_food(self, current_map, accessable_tiles=None):
-        nearby_food_list = []
         nearby_tiles = utilities.get_nearby_tiles(current_map, (self.tile_x, self.tile_y), self.sight_range)
         for each in nearby_tiles:
             if not each == self.current_tile:
                 food_at_this_tile = each.entity_group[self.food_type]
                 nearby_food_list.extend(food_at_this_tile)
         return nearby_food_list
+
+    def choose_random_target_tile(self, current_map):
+        nearby_tiles = utilities.get_nearby_tiles(current_map, self.post, self.sight_range)
+        target_tile = random.choice(nearby_tiles)
+        target_xy = (target_tile.column, target_tile.row)
+        return target_xy
 
     def select_closest_target(self, list_of_targets):
         targets_to_sort = []
@@ -95,17 +100,90 @@ class Creature(entity.Entity):
 
         self.assign_tile()
         self.sprite.rect.x = self.tile_x * 20
-        self.sprite.rect.y = self.tile_y * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
         self.change_x = 0
         self.change_y = 0
-        self.path.tiles.pop(0)
+        if len(self.path.tiles) < 2:
+            self.target_coordinates = None
+            self.path = None
+        else:
+            self.path.tiles.pop(0)
+
+
+class Skeleton(Creature):
+    occupies_tile = True
+    interactable = True
+    footprint = (1, 1)
+    height = 2
+
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        
+        self.speed = 10
+        self.accuracy = 40
+        self.attack = 10
+        self.health = 50
+        self.max_health = 50
+        self.sight_range = 10
+
+        self.time_since_last_attack = 0
+        self.healthbar = None
+        self.post = (self.tile_x, self.tile_y)
+        self.display_name = "Spoopy Skellington"
+        self.set_images()
+
+
+    def set_images(self):
+        skeleton_image = pygame.image.load("art/creatures/skeleton.png").convert()
+        skeleton_image.set_colorkey(utilities.colors.key)
+        self.sprite.image = skeleton_image
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+
+
+    def tick_cycle(self):
+        self.age += 1
+        self.time_since_last_move += 1
+        #if not self.fighting:
+            #self.idle()
+           
+
+    def idle(self):
+        my_position = (self.tile_x, self.tile_y)
+        if not self.target_coordinates:
+            action = random.randint(0, 1000)
+            if action >= 100:
+                self.target_coordinates = self.choose_random_target_tile(self.current_map)
+                self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
+        else:
+            if self.time_since_last_move >= self.speed:
+                self.time_since_last_move = 0
+                self.change_x, self.change_y = navigate.calculate_step(my_position, self.path.tiles[0])
+                if self.path.tiles[0].is_occupied():
+                    print("occupado")
+                    self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
+                    self.change_x, self.change_y = navigate.calculate_step(my_position, self.path.tiles[0])
+                self.move()
+
+
+    def use(self, global_variables):
+        self.fighting = True
+        player = self.current_map.entity_group["Avatar"][0]
+        player.fighting = True
+        player.healthbar = ui.HealthBar(player.current_map, player.tile_x, player.tile_y, player.health, player.max_health)
+        self.healthbar = ui.HealthBar(self.current_map, self.tile_x, self.tile_y, self.health, self.max_health)
+        self.activated = False
 
 
 class Buffalo(Creature):
     occupies_tile = True
+    footprint = (1, 1)
+    height = 1
 
     def __init__(self, x, y, current_map):
-        super().__init__(x, y, current_map, "Wheat")
+        super().__init__(x, y, current_map)
 
         buffalo_image_1 = pygame.image.load("art/buffalo/buffalo_1.png").convert()
         buffalo_image_1.set_colorkey(utilities.colors.key)
@@ -115,16 +193,13 @@ class Buffalo(Creature):
         self.current_hunger_saturation = 20000
         self.hunger_threshold = 35000
         self.max_hunger_saturation = 40000
-        self.horizontal_sight = 6
-        self.vertical_sight = 6
         self.sight_range = 10
         self.bite_size = 5
         self.ticks_without_eating = 0
-        self.time_since_last_move = 0
         self.sprite.image = buffalo_image_1
         self.sprite.rect = self.sprite.image.get_rect()
         self.sprite.rect.x = self.tile_x * 20
-        self.sprite.rect.y = self.tile_y * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
 
     def tick_cycle(self):
         self.age += 1

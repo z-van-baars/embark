@@ -6,35 +6,35 @@ class Inventory(object):
     def __init__(self, screen_height, screen_width):
         super().__init__()
 
-        self.up_arrow_regular = pygame.image.load("art/ui_elements/up_arrow.png").convert()
-        self.up_arrow_selected = pygame.image.load("art/ui_elements/up_arrow_highlight.png").convert()
-        self.down_arrow_regular = pygame.image.load("art/ui_elements/down_arrow.png").convert()
-        self.down_arrow_selected = pygame.image.load("art/ui_elements/down_arrow_highlight.png").convert()
+        #self.up_arrow_regular = pygame.image.load("art/ui_elements/up_arrow.png").convert()
+        #self.up_arrow_selected = pygame.image.load("art/ui_elements/up_arrow_highlight.png").convert()
+        #self.down_arrow_regular = pygame.image.load("art/ui_elements/down_arrow.png").convert()
+        #self.down_arrow_selected = pygame.image.load("art/ui_elements/down_arrow_highlight.png").convert()
         
-        self.inventory_pane = pygame.sprite.Sprite()
-        self.inventory_pane.image = pygame.image.load("art/ui_elements/inventory_pane.png").convert()
-        self.inventory_pane.rect = self.inventory_pane.image.get_rect()
+        #self.inventory_pane = pygame.sprite.Sprite()
+        #self.inventory_pane.image = pygame.image.load("art/ui_elements/inventory_pane.png").convert()
+        #self.inventory_pane.rect = self.inventory_pane.image.get_rect()
         
-        self.inventory_pane.rect.x = screen_width / 2 - 200
-        self.inventory_pane.rect.y = screen_height / 2 - 200
+        #self.inventory_pane.rect.x = screen_width / 2 - 200
+        #self.inventory_pane.rect.y = screen_height / 2 - 200
 
-        self.up_arrow = pygame.sprite.Sprite()
-        self.up_arrow.image = self.up_arrow_regular
-        self.up_arrow.rect = self.up_arrow.image.get_rect()
-        self.up_arrow.rect.x = self.inventory_pane.rect.x + 5
-        self.up_arrow.rect.y = self.inventory_pane.rect.y + 43
+        #self.up_arrow = pygame.sprite.Sprite()
+        #self.up_arrow.image = self.up_arrow_regular
+        #self.up_arrow.rect = self.up_arrow.image.get_rect()
+        #self.up_arrow.rect.x = self.inventory_pane.rect.x + 5
+        #self.up_arrow.rect.y = self.inventory_pane.rect.y + 43
 
-        self.down_arrow = pygame.sprite.Sprite()
-        self.down_arrow.image = self.down_arrow_regular
-        self.down_arrow.rect = self.down_arrow.image.get_rect()
-        self.down_arrow.rect.x = self.inventory_pane.rect.x + 5
-        self.down_arrow.rect.y = self.inventory_pane.rect.y + 323
+        #self.down_arrow = pygame.sprite.Sprite()
+        #self.down_arrow.image = self.down_arrow_regular
+        #self.down_arrow.rect = self.down_arrow.image.get_rect()
+        #self.down_arrow.rect.x = self.inventory_pane.rect.x + 5
+        #self.down_arrow.rect.y = self.inventory_pane.rect.y + 323
 
-        self.scroll_marker = pygame.sprite.Sprite()
-        self.scroll_marker.image = pygame.image.load("art/ui_elements/scroll_marker.png").convert()
-        self.scroll_marker.rect = self.scroll_marker.image.get_rect()
-        self.scroll_marker.rect.x = self.inventory_pane.rect.x + 5
-        self.scroll_marker.rect.y = self.inventory_pane.rect.y + 76
+        #self.scroll_marker = pygame.sprite.Sprite()
+        #self.scroll_marker.image = pygame.image.load("art/ui_elements/scroll_marker.png").convert()
+        #self.scroll_marker.rect = self.scroll_marker.image.get_rect()
+        #self.scroll_marker.rect.x = self.inventory_pane.rect.x + 5
+        #self.scroll_marker.rect.y = self.inventory_pane.rect.y + 76
 
         self.font = pygame.font.SysFont('Calibri', 24, True, False)
 
@@ -68,7 +68,7 @@ class Inventory(object):
             slot_spacer = 30
             visible_items = self.items_list[start:start + 9]
             for each in visible_items:
-                screen.blit(self.font.render(each, True, (0, 0, 0)), (self.inventory_pane.rect.x + 45, self.inventory_pane.rect.y + 40 + slot))
+                screen.blit(self.font.render(each.name, True, (0, 0, 0)), (self.inventory_pane.rect.x + 45, self.inventory_pane.rect.y + 40 + slot))
                 slot += slot_spacer
 
             pygame.display.flip()

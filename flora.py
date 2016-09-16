@@ -6,23 +6,13 @@ import entity
 pygame.init()
 pygame.display.set_mode([0, 0])
 
-tree_image_1 = pygame.image.load("art/tree/large_tree_1.png")
-tree_image_1.set_colorkey(utilities.colors.key)
-tree_image_2 = pygame.image.load("art/tree/large_tree_2.png")
-tree_image_2.set_colorkey(utilities.colors.key)
-tree_image_3 = pygame.image.load("art/tree/large_tree_3.png")
-tree_image_3.set_colorkey(utilities.colors.key)
-tree_image_4 = pygame.image.load("art/tree/large_tree_4.png")
-tree_image_4.set_colorkey(utilities.colors.key)
-tree_image_5 = pygame.image.load("art/tree/large_tree_5.png")
-tree_image_5.set_colorkey(utilities.colors.key)
-tree_image_6 = pygame.image.load("art/tree/large_tree_6.png")
-tree_image_6.set_colorkey(utilities.colors.key)
-possible_tree_images = [tree_image_1, tree_image_2, tree_image_3, tree_image_4, tree_image_5, tree_image_6]
+
 
 
 class Flora(entity.Entity):
     my_type = "Flora"
+    interactable = False
+    occupies_tile = False
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
@@ -35,34 +25,41 @@ class Flora(entity.Entity):
 
 class Tree(Flora):
     occupies_tile = True
+    footprint = (2, 2)
+    height = 4
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
 
         self.age = random.randint(0, 40)
         self.group_generation_max_distance = 20
+        self.set_images()
+        self.display_name = "Tree"
 
+    def set_images(self):
+        tree_image_1 = pygame.image.load("art/tree/large_tree_1.png")
+        tree_image_2 = pygame.image.load("art/tree/large_tree_2.png")
+        tree_image_3 = pygame.image.load("art/tree/large_tree_3.png")
+        tree_image_4 = pygame.image.load("art/tree/large_tree_4.png")
+        tree_image_5 = pygame.image.load("art/tree/large_tree_5.png")
+        tree_image_6 = pygame.image.load("art/tree/large_tree_6.png")
+        tree_image_1.set_colorkey(utilities.colors.key)
+        tree_image_2.set_colorkey(utilities.colors.key)
+        tree_image_3.set_colorkey(utilities.colors.key)
+        tree_image_4.set_colorkey(utilities.colors.key)
+        tree_image_5.set_colorkey(utilities.colors.key)
+        tree_image_6.set_colorkey(utilities.colors.key)
+        possible_tree_images = [tree_image_1, tree_image_2, tree_image_3, tree_image_4, tree_image_5, tree_image_6]
         self.sprite.image = random.choice(possible_tree_images)
         self.sprite.rect = self.sprite.image.get_rect()
         self.sprite.rect.x = self.tile_x * 20
-        self.sprite.rect.y = (self.tile_y - 2) * 20
-        self.display_name = "Tree"
-
-    def assign_tile(self):
-        if self.current_tile:
-            self.current_tile.entity_group[self.my_type].remove(self)
-            self.current_tile = None
-        self.current_tile = self.current_map.game_tile_rows[self.tile_y][self.tile_x]
-        initial_x = self.current_tile.column
-        initial_y = self.current_tile.row
-        for tile_y in range(initial_y, initial_y + 2):
-            for tile_x in range(initial_x, initial_x + 2):
-                if utilities.within_map(tile_x, tile_y, self.current_map):
-                    self.current_map.game_tile_rows[tile_y][tile_x].entity_group["Flora"].append(self)
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
 
 
 class Wheat(Flora):
     occupies_tile = False
+    footprint = (1, 1)
+    height = 1
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
