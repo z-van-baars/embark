@@ -235,6 +235,7 @@ class DialogueEditor(Menu):
 
     def menu_onscreen(self):
         small_font = pygame.font.SysFont('Calibri', 18, True, False)
+        cursor = small_font.render("<", True, utilities.colors.red)
         while self.open:
             click = False
             mouse_pos = pygame.mouse.get_pos()
@@ -245,15 +246,10 @@ class DialogueEditor(Menu):
                     click = True
                 if self.editing:
                     if event.type == pygame.KEYDOWN:
-                        # if event.unicode.isalpha():
-                            # self.entity.dialogue_pages[self.dialogue_page][self.dialogue_line] += event.unicode
-                        # elif event.key == pygame.K_SPACE:
-                            # self.entity.dialogue_pages[self.dialogue_page][self.dialogue_line] += "  "                       
                         if event.key == pygame.K_BACKSPACE:
                             line = self.entity.dialogue_pages[self.dialogue_page][self.dialogue_line]
                             line = line[:-1]
                             self.entity.dialogue_pages[self.dialogue_page][self.dialogue_line] = line
-                            # self.entity.dialogue_pages[self.dialogue_page][self.dialogue_line] = self.entity.dialogue_pages[self.dialogue_page][self.dialogue_line][:-1]
                         elif event.key == pygame.K_RETURN:
                             self.entity.dialogue_pages.append([''])
                         elif event.key == pygame.K_UP:
@@ -291,6 +287,10 @@ class DialogueEditor(Menu):
                 counter += 1
                 self.screen.blit(small_font.render(dialogue_line, True, utilities.colors.black),
                                  [self.background_pane.rect.left + 25, self.background_pane.rect.top + counter * 20 + 20])
+            active_dialogue_line = small_font.render(self.entity.dialogue_pages[self.dialogue_page][self.dialogue_line], True, utilities.colors.black)
+            if self.editing:
+                self.screen.blit(cursor, [active_dialogue_line.get_width() + self.background_pane.rect.left + 27,
+                                          self.background_pane.rect.top + (self.dialogue_line + 1) * 20 + 20])
 
             for button in self.buttons:
                 self.screen.blit(button.sprite.image, [button.sprite.rect.x, button.sprite.rect.y])
@@ -522,6 +522,7 @@ class SignpostEditor(Menu):
 
     def menu_onscreen(self):
         small_font = pygame.font.SysFont('Calibri', 18, True, False)
+        cursor = small_font.render("<", True, utilities.colors.red)
         while self.open:
             click = False
             mouse_pos = pygame.mouse.get_pos()
@@ -573,6 +574,10 @@ class SignpostEditor(Menu):
                 counter += 1
                 self.screen.blit(small_font.render(dialogue_line, True, utilities.colors.black),
                                  [self.background_pane.rect.left + 25, self.background_pane.rect.top + counter * 20 + 20])
+            active_dialogue_line = small_font.render(self.entity.dialogue_pages[self.dialogue_page][self.dialogue_line], True, utilities.colors.black)
+            if self.editing:
+                self.screen.blit(cursor, [active_dialogue_line.get_width() + self.background_pane.rect.left + 27,
+                                          self.background_pane.rect.top + (self.dialogue_line + 1) * 20 + 20])
 
             for button in self.buttons:
                 self.screen.blit(button.sprite.image, [button.sprite.rect.x, button.sprite.rect.y])

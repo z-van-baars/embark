@@ -215,14 +215,16 @@ def place_click(debug_status, current_map, selected_tile):
 
 def edit_click(game_state, debug_status, selected_tile, mouse_pos):
     if selected_tile.entity_group["Npc"]:
-        new_dialogue_edit_menu = ui.DialogueEditor(game_state, mouse_pos, selected_tile.entity_group["Npc"][0])
+        new_dialogue_edit_menu = ui.DialogueEditor(game_state,
+                                                   mouse_pos,
+                                                   selected_tile.entity_group["Npc"][0])
         new_dialogue_edit_menu.menu_onscreen()
-    if selected_tile.entity_group["Structures"]:
-        for each in selected_tile.entity_group["Structures"]:
+    if selected_tile.entity_group["Structure"]:
+        for each in selected_tile.entity_group["Structure"]:
             if each.display_name == "Signpost":
                 new_dialogue_edit_menu = ui.SignpostEditor(game_state,
                                                            mouse_pos,
-                                                           selected_tile.entity_group["Npc"][0])
+                                                           selected_tile.entity_group["Structure"][0])
                 new_dialogue_edit_menu.menu_onscreen()
 
 
