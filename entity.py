@@ -31,6 +31,7 @@ class Entity(object):
         self.is_valid = False
         self.current_map.entity_group[self.my_type].remove(self)
 
+
     def assign_tile(self):        
         if self.current_tile:
             self.leave_tile()

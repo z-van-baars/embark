@@ -1,19 +1,13 @@
 import pygame
 import utilities
-from utilities import GlobalVariables
+from utilities import GameState
 from game_map import Map
 import debug
 import inventory
-import item
 import combat
-from npc import Guard
-from npc import Merchant
-import structure
 from avatar import Avatar
-from creature import Skeleton
-from flora import Tree
 import ui
-import pickle
+import weapon
 
 pygame.init()
 pygame.display.set_mode([0, 0])
@@ -41,47 +35,41 @@ def set_bottom_pane_stamp(current_map, mouse_pos):
         return None
 
 
-def main(global_variables):
+def create_new_world(game_state):
+    map_1 = Map("Swindon", (40, 40), (game_state.screen_width, game_state.screen_height), False)
+    map_1.map_generation()
+    Avatar(5, 5, map_1)
+    game_state.maps[map_1.name] = map_1
+    game_state.active_map = game_state.maps["Swindon"]
+
+
+def main(game_state):
+    # game_state = utilities.import_game_state()
+    create_new_world(game_state)
+
     tiny_font = pygame.font.SysFont('Calibri', 11, True, False)
-    map_1 = pickle.load(open("maps/map_1.p", "rb"))
-    utilities.restore_surfaces(map_1)
-    
-
-    map_2 = Map((50, 20), (global_variables.screen_width, global_variables.screen_height), False)
-    map_3 = Map((36, 36), (global_variables.screen_width, global_variables.screen_height), False)
-    map_4 = Map((20, 12), (global_variables.screen_width, global_variables.screen_height), False)
-
-    map_2.map_generation()
-    map_3.map_generation()
-    map_4.map_generation()
-    global_variables.maps = [map_1, map_2, map_3, map_4]
-    global_variables.active_map = global_variables.maps[0]
-
     done = False
     super_scroll = 1
-    debug_stats = debug.DebugStatus(global_variables.active_map, global_variables)
-    debug_stats.tile_selector_graphic = ui.TileSelectorGraphic(0, 0, global_variables.active_map)
-    global_variables.debug_status = debug_stats
     bottom_pane = pygame.sprite.Sprite()
-    bottom_pane.image = pygame.Surface([global_variables.screen_width - 280, 80])
+    bottom_pane.image = pygame.Surface([game_state.screen_width - 280, 80])
     bottom_pane.image.fill((171, 171, 171))
     control_on = False
 
-    structure.Door(4, 11, map_4, map_1, 26, 11)
+    game_state.player = game_state.active_map.entity_group["Avatar"][0]
 
-    #Chest(22, 22, map_1)
-        
-    # Skeleton(25, 25, map_1)
+    game_state.player.fight_frame = 0
 
-    global_variables.player = global_variables.active_map.entity_group["Avatar"][0]
+    debug_stats = debug.DebugStatus(game_state.active_map, game_state)
+    debug_stats.tile_selector_graphic = ui.TileSelectorGraphic(0, 0, game_state.active_map)
+    game_state.debug_status = debug_stats
 
-
-    global_variables.active_map.entity_group["Avatar"][0].bag = inventory.Inventory(global_variables.screen_width, global_variables.screen_height)
-    dagger = item.Item(item.weapons[0][0], item.weapons[0][1], item.weapons[0][2])
-    bow = item.Item(item.weapons[2][0], item.weapons[2][1], item.weapons[2][2])
-    flaske = item.Item(item.treasures[1][0], item.treasures[1][1], item.treasures[1][2])
-    initial_equipment = [dagger, bow, flaske]
-    global_variables.active_map.entity_group["Avatar"][0].bag.items_list = initial_equipment
+    game_state.active_map.entity_group["Avatar"][0].bag = inventory.Inventory(game_state.screen_width, game_state.screen_height)
+    sword = weapon.Sword(weapon.weapons[0][0], weapon.weapons[0][1], weapon.weapons[0][2], weapon.weapons[0][3], weapon.weapons[0][4])
+    # bow = weapon.Bow(weapon.weapons[2][0], weapon.weapons[2][1], weapon.weapons[2][2], weapon.weapons[2][3], weapon.weapons[2][4])
+    axe = weapon.Axe(weapon.weapons[1][0], weapon.weapons[1][1], weapon.weapons[1][2], weapon.weapons[1][3], weapon.weapons[1][4])
+    initial_equipment = [sword, axe]
+    game_state.player.bag.items_list = initial_equipment
+    game_state.player.equipped_weapon = game_state.player.bag.items_list[0]
 
     while not done:
         mouse_pos = pygame.mouse.get_pos()
@@ -90,22 +78,23 @@ def main(global_variables):
                 done = True
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    global_variables.active_map.world_scroll(0, (20 * super_scroll), global_variables.screen_width, global_variables.screen_height)
+                    game_state.active_map.world_scroll(0, (20 * super_scroll), game_state.screen_width, game_state.screen_height)
                 elif event.key == pygame.K_DOWN:
-                    global_variables.active_map.world_scroll(0, (-20 * super_scroll), global_variables.screen_width, global_variables.screen_height)
+                    game_state.active_map.world_scroll(0, (-20 * super_scroll), game_state.screen_width, game_state.screen_height)
                 elif event.key == pygame.K_LEFT:
-                    global_variables.active_map.world_scroll((20 * super_scroll), 0, global_variables.screen_width, global_variables.screen_height)
+                    game_state.active_map.world_scroll((20 * super_scroll), 0, game_state.screen_width, game_state.screen_height)
                 elif event.key == pygame.K_RIGHT:
-                    global_variables.active_map.world_scroll((-20 * super_scroll), 0, global_variables.screen_width, global_variables.screen_height)
+                    game_state.active_map.world_scroll((-20 * super_scroll), 0, game_state.screen_width, game_state.screen_height)
                 elif event.key == pygame.K_LSHIFT:
                     super_scroll = 10
                 elif event.key == pygame.K_LCTRL:
                     control_on = True
 
                 elif event.key == pygame.K_m:
-                    utilities.export_map(global_variables.active_map)
+                    utilities.export_game_state(game_state)
                 elif event.key == pygame.K_l:
-                    utilities.import_map(global_variables)
+                    game_state = utilities.import_game_state()
+                    debug_stats = game_state.debug_status
                 elif event.key == pygame.K_SPACE:
                     paused = True
                     while paused:
@@ -128,16 +117,16 @@ def main(global_variables):
                         debug_stats.current_removal_entity_number = 0
 
                 if debug_stats.debug:
-                    debug.event_processing(global_variables.active_map, global_variables.debug_status, event.key)
+                    debug.key_event_processing(game_state.debug_status, event.key)
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if debug_stats.debug:
-                    debug.mouse_processing(global_variables.active_map, global_variables.debug_status, mouse_pos, event)
+                    debug.mouse_processing(game_state.active_map, game_state.debug_status, mouse_pos, event, game_state)
                 else:
-                    if mouse_pos[0] > global_variables.screen_width - 80 and mouse_pos[1] > global_variables.screen_height - 80:
-                        global_variables.active_map.entity_group["Avatar"][0].bag.open = True
+                    if mouse_pos[0] > game_state.screen_width - 80 and mouse_pos[1] > game_state.screen_height - 80:
+                        game_state.active_map.entity_group["Avatar"][0].bag.open = True
                     else:
-                        global_variables.active_map.entity_group["Avatar"][0].assign_target(global_variables, global_variables.active_map, mouse_pos)
+                        game_state.active_map.entity_group["Avatar"][0].assign_target(game_state, game_state.active_map, mouse_pos)
 
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_LSHIFT:
@@ -145,85 +134,85 @@ def main(global_variables):
                 elif event.key == pygame.K_LCTRL:
                     control_on = False
 
-
-
-
-
-
-        for flora in global_variables.active_map.entity_group["Flora"]:
+        for flora in game_state.active_map.entity_group["Flora"]:
             flora.tick_cycle()
 
-        for npc in global_variables.active_map.entity_group["Npc"]:
+        for npc in game_state.active_map.entity_group["Npc"]:
             npc.tick_cycle()
 
-        for avatar in global_variables.active_map.entity_group["Avatar"]:
+        for avatar in game_state.active_map.entity_group["Avatar"]:
             avatar.tick_cycle()
             if avatar.fighting:
-                avatar.healthbar.get_state(avatar.health, avatar.tile_x, avatar.tile_y)
-                global_variables.screen.blit(avatar.healthbar.red.image, [avatar.healthbar.red.rect.x + global_variables.active_map.x_shift, avatar.healthbar.red.rect.y + global_variables.active_map.y_shift])
-                global_variables.screen.blit(avatar.healthbar.green.image, [avatar.healthbar.green.rect.x + global_variables.active_map.x_shift, avatar.healthbar.green.rect.y + global_variables.active_map.y_shift])
+                
+                game_state.screen.blit(avatar.healthbar.red.image, [avatar.healthbar.red.rect.x + game_state.active_map.x_shift, avatar.healthbar.red.rect.y + game_state.active_map.y_shift])
+                game_state.screen.blit(avatar.healthbar.green.image, [avatar.healthbar.green.rect.x + game_state.active_map.x_shift, avatar.healthbar.green.rect.y + game_state.active_map.y_shift])
 
-
-
-        
-
-        for each in global_variables.active_map.entity_group["Npc"]:
+        for each in game_state.active_map.entity_group["Npc"]:
             if each.activated:
-                each.use(global_variables)
-        for each in global_variables.active_map.entity_group["Structure"]:
+                each.use(game_state)
+        for each in game_state.active_map.entity_group["Structure"]:
             if each.activated:
-                each.use(global_variables)
-        for each in global_variables.active_map.entity_group["Creature"]:
+                each.use(game_state)
+        for each in game_state.active_map.entity_group["Creature"]:
             each.tick_cycle()
             if each.activated:
-                each.use(global_variables)
+                each.use(game_state)
             if each.fighting:
-                combat.fight_tick(global_variables.screen, global_variables.active_map.entity_group["Avatar"][0], each)
+                combat.fight_tick(game_state.screen, game_state.active_map.entity_group["Avatar"][0], each)
                 each.healthbar.get_state(each.health, each.tile_x, each.tile_y)
-                global_variables.screen.blit(each.healthbar.red.image, [each.healthbar.red.rect.x + global_variables.active_map.x_shift, each.healthbar.red.rect.y + global_variables.active_map.y_shift])
-                global_variables.screen.blit(each.healthbar.green.image, [each.healthbar.green.rect.x + global_variables.active_map.x_shift, each.healthbar.green.rect.y + global_variables.active_map.y_shift])
 
-        bottom_pane_stamp = set_bottom_pane_stamp(global_variables.active_map, mouse_pos)
-        global_variables.screen.fill(utilities.colors.black)
+        bottom_pane_stamp = set_bottom_pane_stamp(game_state.active_map, mouse_pos)
+        game_state.screen.fill(utilities.colors.black)
 
-        # for tile in global_variables.active_map.display_tiles:
-            # if utilities.on_screen(global_variables.screen_width, global_variables.screen_height, tile.rect.x, tile.rect.y, global_variables.active_map.x_shift, global_variables.active_map.y_shift):
-                # global_variables.screen.blit(tile.image, [(tile.rect.x + global_variables.active_map.x_shift), (tile.rect.y + global_variables.active_map.y_shift)])
-        global_variables.screen.blit(global_variables.active_map.background.image, [0 + global_variables.active_map.x_shift, 0 + global_variables.active_map.y_shift])
+        game_state.screen.blit(game_state.active_map.background.image, [0 + game_state.active_map.x_shift, 0 + game_state.active_map.y_shift])
 
-        global_variables.active_map.draw_to_screen(global_variables.screen, global_variables.screen_width, global_variables.screen_height)
+        game_state.active_map.draw_to_screen(game_state.screen, game_state.screen_width, game_state.screen_height)
 
-        if mouse_pos[0] > global_variables.screen_width - 80 and mouse_pos[1] > global_variables.screen_height - 80:
+        if mouse_pos[0] > game_state.screen_width - 80 and mouse_pos[1] > game_state.screen_height - 80:
             bag_image = bag_icon_selected
         else:
             bag_image = bag_icon
-        global_variables.screen.blit(bag_image, [global_variables.screen_width - 80, global_variables.screen_height - 80])
+        game_state.screen.blit(bag_image, [game_state.screen_width - 80, game_state.screen_height - 80])
 
-        for each in global_variables.active_map.hitboxes:
+        for each in game_state.active_map.hitboxes:
             if not each.expiration_check():
-                global_variables.screen.blit(each.sprite.image, [each.sprite.rect.x + global_variables.active_map.x_shift, each.sprite.rect.y + global_variables.active_map.y_shift])
+                game_state.screen.blit(each.sprite.image, [each.sprite.rect.x + game_state.active_map.x_shift, each.sprite.rect.y + game_state.active_map.y_shift])
+
                 damage_stamp = tiny_font.render(str(each.damage), True, utilities.colors.white)
-                global_variables.screen.blit(damage_stamp, [each.sprite.rect.x + global_variables.active_map.x_shift + 1, each.sprite.rect.y + global_variables.active_map.y_shift + 1])
+                game_state.screen.blit(damage_stamp, [each.sprite.rect.x + game_state.active_map.x_shift + 1, each.sprite.rect.y + game_state.active_map.y_shift + 1])
             else:
-                global_variables.active_map.hitboxes.remove(each)
-        global_variables.screen.blit(lower_left, [0, global_variables.screen_height - 80])
-        global_variables.screen.blit(bottom_pane.image, [200, global_variables.screen_height - 79])
+                game_state.active_map.hitboxes.remove(each)
+        for each in game_state.active_map.healthbars:
+            if each.active:
+                game_state.screen.blit(each.red.image, [each.red.rect.x + game_state.active_map.x_shift, each.red.rect.y + game_state.active_map.y_shift])
+                game_state.screen.blit(each.green.image, [each.green.rect.x + game_state.active_map.x_shift, each.green.rect.y + game_state.active_map.y_shift])
+        game_state.screen.blit(lower_left, [0, game_state.screen_height - 80])
+        game_state.screen.blit(bottom_pane.image, [200, game_state.screen_height - 79])
         if bottom_pane_stamp and not debug_stats.debug:
-            global_variables.screen.blit(bottom_pane_stamp, [210, global_variables.screen_height - 60])
+            game_state.screen.blit(bottom_pane_stamp, [210, game_state.screen_height - 60])
         if debug_stats.debug:
-            for each in global_variables.active_map.entity_group["Creature"]:
-                each.search_area_graphic = debug.FoodSearchRadius(global_variables.active_map, each)
+            for each in game_state.active_map.entity_group["Creature"]:
+                each.search_area_graphic = debug.FoodSearchRadius(game_state.active_map, each)
             debug_stats.tile_selector_graphic.update_image(mouse_pos)
-            debug_stats.print_to_screen(global_variables.screen)
-            pygame.draw.rect(global_variables.screen, (255, 255, 255), debug_stats.tile_selector_graphic.image, 1)
-        if global_variables.active_map.entity_group["Avatar"][0].bag.open:
-            done = global_variables.active_map.entity_group["Avatar"][0].bag.draw_to_screen(global_variables.screen, [global_variables.screen_width, global_variables.screen_height])
+            debug_stats.print_to_screen(game_state.screen)
+            pygame.draw.rect(game_state.screen, (255, 255, 255), debug_stats.tile_selector_graphic.image, 1)
+            if debug_stats.place:
+                footprint = debug.entities[debug.string_lists[debug_stats.current_entity_group][debug_stats.current_entity_type_number]].footprint
+                initial_x = int(debug_stats.tile_selector_graphic.tile_x)
+                initial_y = int(debug_stats.tile_selector_graphic.tile_y - (footprint[1] - 1))
+                for tile_y in range(initial_y, initial_y + (footprint[1])):
+                    for tile_x in range(initial_x, initial_x + footprint[0]):
+                        new_graphic = ui.TileSelectorGraphic(tile_x, tile_y, game_state.active_map)
+                        new_graphic.update_image((tile_x * 20 - game_state.active_map.x_shift, tile_y * 20 - game_state.active_map.y_shift))
+                        pygame.draw.rect(game_state.screen, (255, 255, 255), new_graphic.image, 1)
+
+        if game_state.active_map.entity_group["Avatar"][0].bag.open:
+            done = game_state.active_map.entity_group["Avatar"][0].bag.draw_to_screen(game_state.screen, [game_state.screen_width, game_state.screen_height])
 
         pygame.display.flip()
-        global_variables.clock.tick(60)
-        global_variables.time += 1
+        game_state.clock.tick(60)
+        game_state.time += 1
 
-global_variables = GlobalVariables(800, 500 + 80, 20)
+game_state = GameState(800, 500 + 80, 20)
 
-main(global_variables)
-
+main(game_state)

@@ -14,8 +14,6 @@ pygame.init()
 pygame.display.set_mode([0, 0])
 
 
-
-
 class Background(pygame.sprite.Sprite):
     def __init__(self, width, height):
         super().__init__()
@@ -25,8 +23,9 @@ class Background(pygame.sprite.Sprite):
 
 
 class Map(object):
-    def __init__(self, dimensions, screen_dimensions, interior):
+    def __init__(self, name, dimensions, screen_dimensions, interior):
         self.background = None
+        self.name = name
         self.screen_dimensions = screen_dimensions
         self.width = (dimensions[0] * 20)
         self.height = (dimensions[1] * 20)
@@ -44,7 +43,7 @@ class Map(object):
         self.x_shift = 0
         self.y_shift = 0
         self.hitboxes = []
-        self.healthbars = []
+        
         self.entity_group = {
                             "Terrain": [],
                             "Structure":[],
@@ -54,18 +53,13 @@ class Map(object):
                             "Avatar": []
                             }
 
-
-
     def map_generation(self):
         wood_1 = pygame.image.load("art/wood_tile.png").convert()
         grass_1 = pygame.image.load("art/background/grass_1.png").convert()
-        grass_2 = pygame.image.load("art/background/grass_2.png").convert()
-        grass_3 = pygame.image.load("art/background/grass_3.png").convert()
-        grass_4 = pygame.image.load("art/background/grass_4.png").convert()
-        grass_5 = pygame.image.load("art/background/grass_5.png").convert()
         interior_terrain_types = [wood_1]
         exterior_terrain_types = [grass_1]
         self.game_tile_rows = []
+        self.healthbars = []
         self.background = Background(int(self.width / 20), int(self.height / 20))
 
         if not self.interior:
@@ -99,7 +93,6 @@ class Map(object):
                     this_row.append(GameTile(x_column, y_row))
                     self.background.image.blit(new_tile_image, (x, y))
                 self.game_tile_rows.append(this_row)
-
 
     def generate_vegetation(self):
         for forests in range(self.number_of_forests):
@@ -160,7 +153,6 @@ class Map(object):
             self.world_scroll(0, 20, self.screen_dimensions[0], self.screen_dimensions[1])
         elif y + self.y_shift > self.screen_dimensions[1] - 280:
             self.world_scroll(0, -20, self.screen_dimensions[0], self.screen_dimensions[1])
-
 
     def world_scroll(self, shift_x, shift_y, screen_width, screen_height):
         if 0 >= self.x_shift + shift_x >= -(self.width - screen_width):

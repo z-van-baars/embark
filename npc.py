@@ -3,6 +3,9 @@ import entity
 import utilities
 import item
 import ui
+import random
+import art
+import weapon
 
 pygame.init()
 pygame.display.set_mode([0, 0])
@@ -26,10 +29,13 @@ class Npc(entity.Entity):
         self.time_since_last_move = 0
         self.activated = False
 
+        self.items_list = []
         self.health = 100
         self.max_health = 100
 
-        self.dialogue_pages = [["%s: Hello from the kingdom of poopburg" % self.display_name]]
+        self.dialogue_pages = [["Line 1",
+                                "Line 2",
+                                "Line 3"]]
 
     def tick_cycle(self):
         self.age += 1
@@ -48,13 +54,12 @@ class Guard(Npc):
         self.health = 100
         self.max_health = 100
         self.dialogue_pages = [["Hello Adventurer!",
-                            "Welcome to the town of Poopybutts,",
-                            "in the Kingdom of Poopburg"]]
+                                "Welcome to the town of Swindon,",
+                                "I keep the peace here."]]
         self.set_images()
+
     def set_images(self):
-        guard_image = pygame.image.load("art/npc/guard.png").convert()
-        guard_image.set_colorkey(utilities.colors.key)
-        self.sprite.image = guard_image
+        self.sprite.image = art.guard_image
         self.sprite.rect = self.sprite.image.get_rect()
         self.sprite.rect.x = self.tile_x * 20
         self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
@@ -62,8 +67,37 @@ class Guard(Npc):
     def tick_cycle(self):
         self.age += 1
 
-    def use(self, global_variables):
-        new_dialogue_menu = ui.DialogueMenu(global_variables, (0, 0), self)
+    def use(self, game_state):
+        new_dialogue_menu = ui.DialogueMenu(game_state, (0, 0), self)
+        new_dialogue_menu.menu_onscreen()
+        self.activated = False
+
+
+class Villager(Npc):
+    height = 2
+
+    def __init__(self, x, y, current_map, display_name="Villager"):
+        super().__init__(x, y, current_map)
+        self.display_name = display_name
+        self.speed = 1
+        self.health = 100
+        self.max_health = 100
+        self.dialogue_pages = [["Hello Adventurer!",
+                                "Welcome to the town of Swindon,",
+                                "I live here"]]
+        self.set_images()
+
+    def set_images(self):
+        self.sprite.image = random.choice(art.male_villager_images)
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+
+    def tick_cycle(self):
+        self.age += 1
+
+    def use(self, game_state):
+        new_dialogue_menu = ui.DialogueMenu(game_state, (0, 0), self)
         new_dialogue_menu.menu_onscreen()
         self.activated = False
 
@@ -79,10 +113,13 @@ class Merchant(Npc):
         self.max_health = 100
         self.gold = 100
         self.items_list = []
-        for each in item.weapons:
+        for each in item.rubbish:
             for iteration in range(9):
                 new_item = item.Item(each[0], each[1], each[2])
                 self.items_list.append(new_item)
+        for each in weapon.weapons:
+            new_item = item.Item(each[0], each[1], each[2])
+            self.items_list.append(new_item)
         self.dialogue_pages = [["Hello Adventurer! Lots to do here", "in Poopybutts."], [" Lots of quality goods for sale here"]]
         self.set_images()
 
@@ -90,15 +127,12 @@ class Merchant(Npc):
         self.age += 1
 
     def set_images(self):
-        merchant_image = pygame.image.load("art/npc/merchant.png").convert()
-        merchant_image.set_colorkey(utilities.colors.key)
-        self.sprite.image = merchant_image
+        self.sprite.image = art.merchant_image
         self.sprite.rect = self.sprite.image.get_rect()
         self.sprite.rect.x = self.tile_x * 20
         self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
 
-    def use(self, global_variables):
-        new_dialogue_menu = ui.DialogueMenu(global_variables, (0, 0), self)
+    def use(self, game_state):
+        new_dialogue_menu = ui.DialogueMenu(game_state, (0, 0), self)
         new_dialogue_menu.menu_onscreen()
         self.activated = False
-        

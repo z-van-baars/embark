@@ -4,6 +4,7 @@ import navigate
 import random
 import pygame
 import ui
+import art
 
 pygame.init()
 pygame.display.set_mode([0, 0])
@@ -25,6 +26,7 @@ class Creature(entity.Entity):
         self.activated = False
         self.fighting = False
         self.time_since_last_move = 0
+        self.equipped_weapon = None
 
     def expire(self):
         self.is_valid = False
@@ -128,16 +130,18 @@ class Skeleton(Creature):
         self.sight_range = 10
 
         self.time_since_last_attack = 0
-        self.healthbar = None
+        
         self.post = (self.tile_x, self.tile_y)
+        self.fight_frame = 0
         self.display_name = "Spoopy Skellington"
         self.set_images()
 
 
     def set_images(self):
-        skeleton_image = pygame.image.load("art/creatures/skeleton.png").convert()
-        skeleton_image.set_colorkey(utilities.colors.key)
-        self.sprite.image = skeleton_image
+        self.healthbar = ui.HealthBar(self.current_map, self.tile_x, self.tile_y, self.health, self.max_health)
+        self.current_map.healthbars.append(self.healthbar)
+        self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
+        self.sprite.image = art.skeleton_image
         self.sprite.rect = self.sprite.image.get_rect()
         self.sprite.rect.x = self.tile_x * 20
         self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
@@ -168,12 +172,12 @@ class Skeleton(Creature):
                 self.move()
 
 
-    def use(self, global_variables):
+    def use(self, game_state):
         self.fighting = True
         player = self.current_map.entity_group["Avatar"][0]
         player.fighting = True
-        player.healthbar = ui.HealthBar(player.current_map, player.tile_x, player.tile_y, player.health, player.max_health)
-        self.healthbar = ui.HealthBar(self.current_map, self.tile_x, self.tile_y, self.health, self.max_health)
+        player.healthbar.active = True
+        self.healthbar.active = True
         self.activated = False
 
 

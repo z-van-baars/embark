@@ -2,11 +2,10 @@ import pygame
 import utilities
 import random
 import entity
+import art 
 
 pygame.init()
 pygame.display.set_mode([0, 0])
-
-
 
 
 class Flora(entity.Entity):
@@ -37,20 +36,7 @@ class Tree(Flora):
         self.display_name = "Tree"
 
     def set_images(self):
-        tree_image_1 = pygame.image.load("art/tree/large_tree_1.png")
-        tree_image_2 = pygame.image.load("art/tree/large_tree_2.png")
-        tree_image_3 = pygame.image.load("art/tree/large_tree_3.png")
-        tree_image_4 = pygame.image.load("art/tree/large_tree_4.png")
-        tree_image_5 = pygame.image.load("art/tree/large_tree_5.png")
-        tree_image_6 = pygame.image.load("art/tree/large_tree_6.png")
-        tree_image_1.set_colorkey(utilities.colors.key)
-        tree_image_2.set_colorkey(utilities.colors.key)
-        tree_image_3.set_colorkey(utilities.colors.key)
-        tree_image_4.set_colorkey(utilities.colors.key)
-        tree_image_5.set_colorkey(utilities.colors.key)
-        tree_image_6.set_colorkey(utilities.colors.key)
-        possible_tree_images = [tree_image_1, tree_image_2, tree_image_3, tree_image_4, tree_image_5, tree_image_6]
-        self.sprite.image = random.choice(possible_tree_images)
+        self.sprite.image = random.choice(art.pine_tree_images)
         self.sprite.rect = self.sprite.image.get_rect()
         self.sprite.rect.x = self.tile_x * 20
         self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
