@@ -19,18 +19,23 @@ bag_icon_selected = pygame.image.load("art/ui_elements/bag_highlight.png").conve
 
 def set_bottom_pane_stamp(current_map, mouse_pos):
     font = pygame.font.SysFont('Calibri', 18, True, False)
+
+    def get_name_stamp(selected_tile):
+        for entity_type in selected_tile.entity_group:
+            if selected_tile.entity_group[entity_type]:
+                if selected_tile.entity_group[entity_type][0].occupies_tile:
+                    entity = selected_tile.entity_group[entity_type][0]
+                    stamp = font.render(entity.display_name, True, utilities.colors.black)
+        return stamp
+
     tile_x = int((mouse_pos[0] - current_map.x_shift) / 20)
     tile_y = int((mouse_pos[1] - current_map.y_shift) / 20)
 
     if utilities.within_map(tile_x, tile_y, current_map):
         selected_tile = current_map.game_tile_rows[tile_y][tile_x]
-        if selected_tile.is_occupied():
-            for entity_type in selected_tile.entity_group:
-                if selected_tile.entity_group[entity_type]:
-                    if selected_tile.entity_group[entity_type][0].occupies_tile:
-                        entity = selected_tile.entity_group[entity_type][0]
-                        stamp = font.render(entity.display_name, True, utilities.colors.black)
-            return stamp
+    if selected_tile and selected_tile.is_occupied():
+        stamp = get_name_stamp(selected_tile)
+        return stamp
     else:
         return None
 
@@ -64,12 +69,24 @@ def main(game_state):
     game_state.debug_status = debug_stats
 
     game_state.active_map.entity_group["Avatar"][0].bag = inventory.Inventory(game_state.screen_width, game_state.screen_height)
-    sword = weapon.Sword(weapon.weapons[0][0], weapon.weapons[0][1], weapon.weapons[0][2], weapon.weapons[0][3], weapon.weapons[0][4])
-    # bow = weapon.Bow(weapon.weapons[2][0], weapon.weapons[2][1], weapon.weapons[2][2], weapon.weapons[2][3], weapon.weapons[2][4])
-    axe = weapon.Axe(weapon.weapons[1][0], weapon.weapons[1][1], weapon.weapons[1][2], weapon.weapons[1][3], weapon.weapons[1][4])
-    initial_equipment = [sword, axe]
+    sword = weapon.Sword(weapon.weapons[0][0],
+                         weapon.weapons[0][1],
+                         weapon.weapons[0][2],
+                         weapon.weapons[0][3],
+                         weapon.weapons[0][4])
+    bow = weapon.Bow(weapon.weapons[2][0],
+                     weapon.weapons[2][1],
+                     weapon.weapons[2][2],
+                     weapon.weapons[2][3],
+                     weapon.weapons[2][4])
+    axe = weapon.Axe(weapon.weapons[1][0],
+                     weapon.weapons[1][1],
+                     weapon.weapons[1][2],
+                     weapon.weapons[1][3],
+                     weapon.weapons[1][4])
+    initial_equipment = [sword, bow, axe]
     game_state.player.bag.items_list = initial_equipment
-    game_state.player.equipped_weapon = game_state.player.bag.items_list[0]
+    game_state.player.equipped_weapon = game_state.player.bag.items_list[1]
 
     while not done:
         mouse_pos = pygame.mouse.get_pos()
@@ -78,13 +95,25 @@ def main(game_state):
                 done = True
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    game_state.active_map.world_scroll(0, (20 * super_scroll), game_state.screen_width, game_state.screen_height)
+                    game_state.active_map.world_scroll(0,
+                                                       (20 * super_scroll),
+                                                       game_state.screen_width,
+                                                       game_state.screen_height)
                 elif event.key == pygame.K_DOWN:
-                    game_state.active_map.world_scroll(0, (-20 * super_scroll), game_state.screen_width, game_state.screen_height)
+                    game_state.active_map.world_scroll(0,
+                                                       (-20 * super_scroll),
+                                                       game_state.screen_width,
+                                                       game_state.screen_height)
                 elif event.key == pygame.K_LEFT:
-                    game_state.active_map.world_scroll((20 * super_scroll), 0, game_state.screen_width, game_state.screen_height)
+                    game_state.active_map.world_scroll((20 * super_scroll),
+                                                       0,
+                                                       game_state.screen_width,
+                                                       game_state.screen_height)
                 elif event.key == pygame.K_RIGHT:
-                    game_state.active_map.world_scroll((-20 * super_scroll), 0, game_state.screen_width, game_state.screen_height)
+                    game_state.active_map.world_scroll((-20 * super_scroll),
+                                                       0,
+                                                       game_state.screen_width,
+                                                       game_state.screen_height)
                 elif event.key == pygame.K_LSHIFT:
                     super_scroll = 10
                 elif event.key == pygame.K_LCTRL:
@@ -121,18 +150,27 @@ def main(game_state):
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if debug_stats.debug:
-                    debug.mouse_processing(game_state.active_map, game_state.debug_status, mouse_pos, event, game_state)
+                    debug.mouse_processing(game_state.active_map,
+                                           game_state.debug_status,
+                                           mouse_pos,
+                                           event,
+                                           game_state)
                 else:
                     if mouse_pos[0] > game_state.screen_width - 80 and mouse_pos[1] > game_state.screen_height - 80:
                         game_state.active_map.entity_group["Avatar"][0].bag.open = True
                     else:
-                        game_state.active_map.entity_group["Avatar"][0].assign_target(game_state, game_state.active_map, mouse_pos)
+                        game_state.active_map.entity_group["Avatar"][0].assign_target(game_state,
+                                                                                      game_state.active_map,
+                                                                                      mouse_pos)
 
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_LSHIFT:
                     super_scroll = 1
                 elif event.key == pygame.K_LCTRL:
                     control_on = False
+
+        for projectile in game_state.active_map.entity_group["Projectile"]:
+            projectile.travel()
 
         for flora in game_state.active_map.entity_group["Flora"]:
             flora.tick_cycle()
@@ -143,9 +181,13 @@ def main(game_state):
         for avatar in game_state.active_map.entity_group["Avatar"]:
             avatar.tick_cycle()
             if avatar.fighting:
-                
-                game_state.screen.blit(avatar.healthbar.red.image, [avatar.healthbar.red.rect.x + game_state.active_map.x_shift, avatar.healthbar.red.rect.y + game_state.active_map.y_shift])
-                game_state.screen.blit(avatar.healthbar.green.image, [avatar.healthbar.green.rect.x + game_state.active_map.x_shift, avatar.healthbar.green.rect.y + game_state.active_map.y_shift])
+
+                game_state.screen.blit(avatar.healthbar.red.image,
+                                       [avatar.healthbar.red.rect.x + game_state.active_map.x_shift,
+                                        avatar.healthbar.red.rect.y + game_state.active_map.y_shift])
+                game_state.screen.blit(avatar.healthbar.green.image,
+                                       [avatar.healthbar.green.rect.x + game_state.active_map.x_shift,
+                                        avatar.healthbar.green.rect.y + game_state.active_map.y_shift])
 
         for each in game_state.active_map.entity_group["Npc"]:
             if each.activated:
@@ -176,16 +218,24 @@ def main(game_state):
 
         for each in game_state.active_map.hitboxes:
             if not each.expiration_check():
-                game_state.screen.blit(each.sprite.image, [each.sprite.rect.x + game_state.active_map.x_shift, each.sprite.rect.y + game_state.active_map.y_shift])
+                game_state.screen.blit(each.sprite.image,
+                                       [each.sprite.rect.x + game_state.active_map.x_shift,
+                                        each.sprite.rect.y + game_state.active_map.y_shift])
 
                 damage_stamp = tiny_font.render(str(each.damage), True, utilities.colors.white)
-                game_state.screen.blit(damage_stamp, [each.sprite.rect.x + game_state.active_map.x_shift + 1, each.sprite.rect.y + game_state.active_map.y_shift + 1])
+                game_state.screen.blit(damage_stamp,
+                                       [each.sprite.rect.x + game_state.active_map.x_shift + 1,
+                                        each.sprite.rect.y + game_state.active_map.y_shift + 1])
             else:
                 game_state.active_map.hitboxes.remove(each)
         for each in game_state.active_map.healthbars:
             if each.active:
-                game_state.screen.blit(each.red.image, [each.red.rect.x + game_state.active_map.x_shift, each.red.rect.y + game_state.active_map.y_shift])
-                game_state.screen.blit(each.green.image, [each.green.rect.x + game_state.active_map.x_shift, each.green.rect.y + game_state.active_map.y_shift])
+                game_state.screen.blit(each.red.image,
+                                       [each.red.rect.x + game_state.active_map.x_shift,
+                                        each.red.rect.y + game_state.active_map.y_shift])
+                game_state.screen.blit(each.green.image,
+                                       [each.green.rect.x + game_state.active_map.x_shift,
+                                        each.green.rect.y + game_state.active_map.y_shift])
         game_state.screen.blit(lower_left, [0, game_state.screen_height - 80])
         game_state.screen.blit(bottom_pane.image, [200, game_state.screen_height - 79])
         if bottom_pane_stamp and not debug_stats.debug:
@@ -207,11 +257,14 @@ def main(game_state):
                         pygame.draw.rect(game_state.screen, (255, 255, 255), new_graphic.image, 1)
 
         if game_state.active_map.entity_group["Avatar"][0].bag.open:
-            done = game_state.active_map.entity_group["Avatar"][0].bag.draw_to_screen(game_state.screen, [game_state.screen_width, game_state.screen_height])
+            done = game_state.active_map.entity_group["Avatar"][0].bag.draw_to_screen(game_state.screen,
+                                                                                      [game_state.screen_width,
+                                                                                       game_state.screen_height])
 
         pygame.display.flip()
         game_state.clock.tick(60)
         game_state.time += 1
+
 
 game_state = GameState(800, 500 + 80, 20)
 

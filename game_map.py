@@ -50,7 +50,8 @@ class Map(object):
                             "Flora": [],
                             "Creature": [],
                             "Npc": [],
-                            "Avatar": []
+                            "Avatar": [],
+                            "Projectile": []
                             }
 
     def map_generation(self):

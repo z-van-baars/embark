@@ -28,11 +28,6 @@ class Creature(entity.Entity):
         self.time_since_last_move = 0
         self.equipped_weapon = None
 
-    def expire(self):
-        self.is_valid = False
-        self.current_tile.entity_group["Creature"].remove(self)
-        self.current_map.entity_group["Creature"].remove(self)
-
     def find_local_food(self, current_map, accessable_tiles=None):
         nearby_tiles = utilities.get_nearby_tiles(current_map, (self.tile_x, self.tile_y), self.sight_range)
         for each in nearby_tiles:
@@ -118,10 +113,8 @@ class Skeleton(Creature):
     footprint = (1, 1)
     height = 2
 
-
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        
         self.speed = 10
         self.accuracy = 40
         self.attack = 10
@@ -130,12 +123,10 @@ class Skeleton(Creature):
         self.sight_range = 10
 
         self.time_since_last_attack = 0
-        
         self.post = (self.tile_x, self.tile_y)
         self.fight_frame = 0
         self.display_name = "Spoopy Skellington"
         self.set_images()
-
 
     def set_images(self):
         self.healthbar = ui.HealthBar(self.current_map, self.tile_x, self.tile_y, self.health, self.max_health)
@@ -146,13 +137,11 @@ class Skeleton(Creature):
         self.sprite.rect.x = self.tile_x * 20
         self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
 
-
     def tick_cycle(self):
         self.age += 1
         self.time_since_last_move += 1
         #if not self.fighting:
             #self.idle()
-           
 
     def idle(self):
         my_position = (self.tile_x, self.tile_y)
@@ -170,7 +159,6 @@ class Skeleton(Creature):
                     self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
                     self.change_x, self.change_y = navigate.calculate_step(my_position, self.path.tiles[0])
                 self.move()
-
 
     def use(self, game_state):
         self.fighting = True

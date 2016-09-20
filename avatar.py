@@ -9,8 +9,6 @@ pygame.init()
 pygame.display.set_mode([0, 0])
 
 
-
-
 class Avatar(entity.Entity):
     occupies_tile = True
     interactable = False
@@ -37,11 +35,10 @@ class Avatar(entity.Entity):
         self.health = 100
         self.max_health = 100
         self.gold = 100
-        self.actions = [
-                    "None",
-                    "Move",
-                    "Attack",
-                    "Use"]
+        self.actions = ["None",
+                        "Move",
+                        "Shooting an interactible",
+                        "Moving to interactible"]
         self.equipped_weapon = None
         self.equipped_armor = None
         self.equipped_helmet = None
@@ -64,35 +61,40 @@ class Avatar(entity.Entity):
                     self.fight_frame += 1
                 if self.fight_frame > 21:
                     self.fight_frame = 0
-                if self.equipped_weapon.ranged:
-                    self.sprite.image = self.ranged_fight_frames[self.fight_frame]
-                else:
-                    self.sprite.image = self.melee_fight_frames[self.fight_frame]
+                self.sprite.image = self.melee_fight_frames[self.fight_frame]
                 if self.equipped_weapon:
-                    self.equipped_weapon.set_frame(self.fight_frame)
-                    self.sprite.image.blit(self.equipped_weapon.sprite.image, [0, -40])
+                    if not self.equipped_weapon.ranged:
+                        self.equipped_weapon.set_frame(self.fight_frame)
+                        self.sprite.image.blit(self.equipped_weapon.sprite.image, [0, -40])
+                    else:
+                        self.sprite.image.blit(self.equipped_weapon.sprite.image, [0, 0])
             else:
                 self.walk_frame_number = 0
                 self.sprite.image = self.rest_frame
                 if self.equipped_weapon:
+                    if not self.equipped_weapon.ranged:
+                        self.equipped_weapon.set_frame(0)
+                        self.sprite.image.blit(self.equipped_weapon.sprite.image, [0, -40])
+                    else:
+                        self.sprite.image.blit(self.equipped_weapon.sprite.image, [0, 0])
+        elif action == 1 or action == 3:
+            self.walk_frame_number += 1
+            if self.walk_frame_number > len(self.walking_frames) - 1:
+                self.walk_frame_number = 0
+            self.sprite.image = self.walking_frames[self.walk_frame_number]
+            if self.equipped_weapon:
+                if not self.equipped_weapon.ranged:
                     self.equipped_weapon.set_frame(0)
                     self.sprite.image.blit(self.equipped_weapon.sprite.image, [0, -40])
-        elif action == 1:
-            self.walk_frame_number += 1
-            if self.walk_frame_number > len(self.walking_frames) - 1:
-                self.walk_frame_number = 0
-            self.sprite.image = self.walking_frames[self.walk_frame_number]
-            if self.equipped_weapon:
-                self.equipped_weapon.set_frame(0)
-                self.sprite.image.blit(self.equipped_weapon.sprite.image, [0, -40])
-        else:
-            self.walk_frame_number += 1
-            if self.walk_frame_number > len(self.walking_frames) - 1:
-                self.walk_frame_number = 0
-            self.sprite.image = self.walking_frames[self.walk_frame_number]
-            if self.equipped_weapon:
-                self.equipped_weapon.set_frame(0)
-                self.sprite.image.blit(self.equipped_weapon.sprite.image, [0, -40])
+                else:
+                    self.sprite.image.blit(self.equipped_weapon.sprite.image, [0, 0])
+
+        elif action == 2:
+            if self.fight_frame > 0:
+                self.fight_frame += 1
+            if self.fight_frame > 21:
+                self.fight_frame = 0
+            self.sprite.image = self.ranged_fight_frames[self.fight_frame]
 
     def set_images(self):
         self.healthbar = ui.HealthBar(self.current_map, self.tile_x, self.tile_y, self.health, self.max_health)
@@ -100,28 +102,26 @@ class Avatar(entity.Entity):
         self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
         avatar_spritesheet = spritesheet.Spritesheet("art/avatar/avatar.png")
         self.rest_frame = avatar_spritesheet.get_image(0, 0, 20, 40)
-        self.walking_frames = [
-                        avatar_spritesheet.get_image(20, 0, 20, 40),
-                        avatar_spritesheet.get_image(20, 0, 20, 40),
-                        avatar_spritesheet.get_image(20, 0, 20, 40),
-                        avatar_spritesheet.get_image(20, 0, 20, 40),
-                        avatar_spritesheet.get_image(20, 0, 20, 40),
-                        avatar_spritesheet.get_image(40, 0, 20, 40),
-                        avatar_spritesheet.get_image(40, 0, 20, 40),
-                        avatar_spritesheet.get_image(40, 0, 20, 40),
-                        avatar_spritesheet.get_image(40, 0, 20, 40),
-                        avatar_spritesheet.get_image(40, 0, 20, 40),
-                        avatar_spritesheet.get_image(60, 0, 20, 40),
-                        avatar_spritesheet.get_image(60, 0, 20, 40),
-                        avatar_spritesheet.get_image(60, 0, 20, 40),
-                        avatar_spritesheet.get_image(60, 0, 20, 40),
-                        avatar_spritesheet.get_image(60, 0, 20, 40),
-                        avatar_spritesheet.get_image(80, 0, 20, 40),
-                        avatar_spritesheet.get_image(80, 0, 20, 40),
-                        avatar_spritesheet.get_image(80, 0, 20, 40),
-                        avatar_spritesheet.get_image(80, 0, 20, 40),
-                        avatar_spritesheet.get_image(80, 0, 20, 40)
-                                ]
+        self.walking_frames = [avatar_spritesheet.get_image(20, 0, 20, 40),
+                               avatar_spritesheet.get_image(20, 0, 20, 40),
+                               avatar_spritesheet.get_image(20, 0, 20, 40),
+                               avatar_spritesheet.get_image(20, 0, 20, 40),
+                               avatar_spritesheet.get_image(20, 0, 20, 40),
+                               avatar_spritesheet.get_image(40, 0, 20, 40),
+                               avatar_spritesheet.get_image(40, 0, 20, 40),
+                               avatar_spritesheet.get_image(40, 0, 20, 40),
+                               avatar_spritesheet.get_image(40, 0, 20, 40),
+                               avatar_spritesheet.get_image(40, 0, 20, 40),
+                               avatar_spritesheet.get_image(60, 0, 20, 40),
+                               avatar_spritesheet.get_image(60, 0, 20, 40),
+                               avatar_spritesheet.get_image(60, 0, 20, 40),
+                               avatar_spritesheet.get_image(60, 0, 20, 40),
+                               avatar_spritesheet.get_image(60, 0, 20, 40),
+                               avatar_spritesheet.get_image(80, 0, 20, 40),
+                               avatar_spritesheet.get_image(80, 0, 20, 40),
+                               avatar_spritesheet.get_image(80, 0, 20, 40),
+                               avatar_spritesheet.get_image(80, 0, 20, 40),
+                               avatar_spritesheet.get_image(80, 0, 20, 40)]
         self.melee_fight_frames = []
         for x in range(3):
             self.melee_fight_frames.append(avatar_spritesheet.get_image(0, 80, 20, 40))
@@ -138,17 +138,17 @@ class Avatar(entity.Entity):
 
         self.ranged_fight_frames = []
         for x in range(3):
-            self.ranged_fight_frames.append(avatar_spritesheet.get_image(0, 160, 20, 40))
-        for x in range(3):
-            self.ranged_fight_frames.append(avatar_spritesheet.get_image(20, 160, 20, 40))
-        for x in range(3):
-            self.ranged_fight_frames.append(avatar_spritesheet.get_image(40, 160, 20, 40))
+            self.ranged_fight_frames.append(avatar_spritesheet.get_image(0, 160, 40, 40))
         for x in range(4):
-            self.ranged_fight_frames.append(avatar_spritesheet.get_image(60, 160, 20, 40))
-        for x in range(4):
-            self.ranged_fight_frames.append(avatar_spritesheet.get_image(80, 160, 40, 40))
+            self.ranged_fight_frames.append(avatar_spritesheet.get_image(40, 160, 40, 40))
         for x in range(5):
+            self.ranged_fight_frames.append(avatar_spritesheet.get_image(80, 160, 40, 40))
+        for x in range(3):
             self.ranged_fight_frames.append(avatar_spritesheet.get_image(120, 160, 40, 40))
+        for x in range(3):
+            self.ranged_fight_frames.append(avatar_spritesheet.get_image(160, 160, 40, 40))
+        for x in range(4):
+            self.ranged_fight_frames.append(avatar_spritesheet.get_image(0, 160, 40, 40))
 
         self.sprite.image = avatar_spritesheet.get_image(0, 0, 20, 40)
         self.sprite.rect = self.sprite.image.get_rect()
@@ -178,7 +178,12 @@ class Avatar(entity.Entity):
                 self.change_x, self.change_y = self.calculate_step(my_position, self.target_object, self.target_coordinates)
                 self.move()
         elif self.action == 2:
-            pass
+            if self.time_since_last_attack >= self.speed * 10:
+                self.fight_frame = 1
+                self.time_since_last_attack = 0
+                target_tile = self.current_map.game_tile_rows[self.target_coordinates[1]][self.target_coordinates[0]]
+                self.equipped_weapon.fire(self.current_map, self.tile_x, self.tile_y, self.target_object)
+            self.time_since_last_attack += 1
         elif self.action == 3:
             if not self.target_object.tile_x == self.target_coordinates[0] or not self.target_object.tile_y == self.target_coordinates[1]:
                 self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
@@ -211,7 +216,6 @@ class Avatar(entity.Entity):
                                 new_context_menu.menu_onscreen()
 
             else:
-
                 new_context_menu = ui.ContextMenu(game_state, mouse_pos)
                 pygame.draw.rect(new_context_menu.screen, (255, 255, 255), new_context_menu.tile_selector_graphic.image, 1)
                 new_context_menu.menu_onscreen()
@@ -228,12 +232,15 @@ class Avatar(entity.Entity):
             self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
             self.action = 1
         elif target_type == 2:
-            self.target_coordinates = tile_x, tile_y
-            self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
-            self.target_coordinates = tile_x, tile_y
-            target_tile = current_map.game_tile_rows[self.target_coordinates[1]][self.target_coordinates[0]]
-            # self.path.tiles.insert(0, target_tile)
-            self.action = 3
+            if self.equipped_weapon and self.equipped_weapon.ranged:
+                self.target_coordinates = tile_x, tile_y
+                self.fighting = True
+                self.action = 2
+            else:
+                self.target_coordinates = tile_x, tile_y
+                self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
+                self.target_coordinates = tile_x, tile_y
+                self.action = 3
 
     def calculate_step(self, my_position, target_object, target_coordinates):
         change_x, change_y = navigate.calculate_step(my_position, self.path.tiles[0])

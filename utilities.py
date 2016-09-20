@@ -170,4 +170,14 @@ def check_if_inside(x1, x2, y1, y2, pos):
     return x1 < pos[0] < x2 and y1 < pos[1] < y2
 
 
+def get_vector(self, a, b, x, y):
+    distance_to_target = distance(a, b, x, y)
+    factor = distance_to_target / self.speed
+    x_dist = a - x
+    y_dist = b - y
+    change_x = x_dist / factor
+    change_y = y_dist / factor
+
+    return (change_x, change_y)
+
 

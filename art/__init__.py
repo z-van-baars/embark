@@ -156,3 +156,9 @@ skeleton_image.set_colorkey(utilities.colors.key)
 #weapons
 axe_spritesheet = spritesheet.Spritesheet("art/weapons/melee/axe.png")
 sword_spritesheet = spritesheet.Spritesheet("art/weapons/melee/sword.png")
+bow_image = pygame.image.load("art/weapons/ranged/bow.png")
+bow_image.set_colorkey(utilities.colors.key)
+
+#projectiles
+arrow_image = pygame.image.load("art/weapons/projectiles/arrow.png")
+arrow_image.set_colorkey(utilities.colors.key)
