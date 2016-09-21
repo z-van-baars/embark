@@ -139,7 +139,9 @@ class Map(object):
         for new_tree in range(number_of_neighbors):
             neighbor_placed = False
             while not neighbor_placed:
-                nearby_tiles = utilities.get_nearby_tiles(self, (forest_center_tree.tile_x, forest_center_tree.tile_y), forest_center_tree.group_generation_max_distance)
+                nearby_tiles = utilities.get_nearby_tiles(self,
+                                                          (forest_center_tree.tile_x, forest_center_tree.tile_y),
+                                                          forest_center_tree.group_generation_max_distance)
                 tile = random.choice(nearby_tiles)
                 if not tile.is_occupied():
                     flora.Tree(tile.column, tile.row, self)
@@ -147,7 +149,7 @@ class Map(object):
 
     def scroll_check(self, x, y):
         if x + self.x_shift < 200:
-           self.world_scroll(20, 0, self.screen_dimensions[0], self.screen_dimensions[1])
+            self.world_scroll(20, 0, self.screen_dimensions[0], self.screen_dimensions[1])
         elif x + self.x_shift > self.screen_dimensions[0] - 200:
             self.world_scroll(-20, 0, self.screen_dimensions[0], self.screen_dimensions[1])
         if y + self.y_shift < 200:
@@ -178,5 +180,8 @@ class Map(object):
             for entity in row:
                 if utilities.any_tile_visible(screen_width, screen_height, self.x_shift, self.y_shift, entity):
                     screen.blit(entity.sprite.image, [(entity.sprite.rect.x + self.x_shift), (entity.sprite.rect.y + self.y_shift)])
-                objects_to_draw.remove(entity)
+                    if entity.equipped_weapon:
+                        screen.blit(entity.equipped_weapon.sprite.image,
+                                    [(entity.sprite.rect.x + self.x_shift - 1),
+                                     (entity.sprite.rect.y + self.y_shift - 40)])
 

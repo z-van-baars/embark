@@ -28,13 +28,12 @@ def fight_tick(screen, player, enemy):
 
 def strike(attacker, defender):
     attacker.fight_frame = 1
-    damage_roll_1 = utilities.roll_dice(1, attacker.attack)
-    damage_roll_2 = utilities.roll_dice(1, attacker.attack)
+    damage_roll_1 = utilities.roll_dice(1, attacker.strength)
+    damage_roll_2 = utilities.roll_dice(1, attacker.strength)
     damage_roll = max(damage_roll_1, damage_roll_2)
 
     damage = damage_roll
-    if attacker.equipped_weapon:
-        damage = damage + attacker.equipped_weapon.attack
+    damage = damage + attacker.melee_damage
 
     defender.health -= damage_roll
     if defender.health <= 0:

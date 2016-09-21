@@ -662,8 +662,8 @@ class TradeMenu(Menu):
                 self.merchant_selected = 0
 
         def sell_clicked():
-            if self.player.bag.items_list:
-                item_to_sell = self.player.bag.items_list.pop(self.player_selected)
+            if self.player.items_list:
+                item_to_sell = self.player.items_list.pop(self.player_selected)
                 self.trade_value += item_to_sell.value
                 self.items_to_sell.append(item_to_sell)
                 self.player_selected = 0
@@ -681,14 +681,14 @@ class TradeMenu(Menu):
                 self.player_list_top -= 1
 
         def r_down_clicked():
-            if self.player_list_top + 14 < len(self.player.bag.items_list):
+            if self.player_list_top + 14 < len(self.player.items_list):
                 self.player_list_top += 1
 
         def finalize_clicked():
             if 0 <= self.player.gold + self.trade_value and 0 <= self.entity.gold - self.trade_value:
                 self.player.gold += self.trade_value
                 self.entity.gold -= self.trade_value
-                self.player.bag.items_list.extend(self.items_to_buy)
+                self.player.items_list.extend(self.items_to_buy)
                 self.entity.items_list.extend(self.items_to_sell)
                 self.items_to_sell = []
                 self.items_to_buy = []
@@ -765,7 +765,7 @@ class TradeMenu(Menu):
         small_font = pygame.font.SysFont('Calibri', 18, True, False)
         while self.open:
             merchant_visible_items = self.entity.items_list[self.merchant_list_top:self.merchant_list_top + 14]
-            player_visible_items = self.player.bag.items_list[self.player_list_top:self.player_list_top + 14]
+            player_visible_items = self.player.items_list[self.player_list_top:self.player_list_top + 14]
             click = False
             mouse_pos = pygame.mouse.get_pos()
             for event in pygame.event.get():
@@ -782,7 +782,7 @@ class TradeMenu(Menu):
                         y1 = (self.background_pane.rect.top + 84 + (count * spacer))
                         y2 = y1 + 19
                         if utilities.check_if_inside(x1, x2, y1, y2, mouse_pos):
-                            if count + self.player_list_top <= len(self.player.bag.items_list):
+                            if count + self.player_list_top <= len(self.player.items_list):
                                 self.player_selected = count + self.player_list_top
                         count += 1
                     count = 0
@@ -875,12 +875,12 @@ class LootMenu(Menu):
         def take_clicked():
             if self.entity.items_list:
                 item_to_take = entity.items_list.pop(self.container_selected)
-                self.player.bag.items_list.append(item_to_take)
+                self.player.items_list.append(item_to_take)
                 self.container_selected = 0
 
         def give_clicked():
-            if self.player.bag.items_list:
-                item_to_give = self.player.bag.items_list.pop(self.player_selected)
+            if self.player.items_list:
+                item_to_give = self.player.items_list.pop(self.player_selected)
                 self.entity.items_list.append(item_to_give)
                 self.player_selected = 0
 
@@ -897,7 +897,7 @@ class LootMenu(Menu):
                 self.player_list_top -= 1
 
         def r_down_clicked():
-            if self.player_list_top + 14 < len(self.player.bag.items_list):
+            if self.player_list_top + 14 < len(self.player.items_list):
                 self.player_list_top += 1
 
         self.background_pane = pygame.sprite.Sprite()
@@ -959,7 +959,7 @@ class LootMenu(Menu):
         small_font = pygame.font.SysFont('Calibri', 18, True, False)
         while self.open:
             container_visible_items = self.entity.items_list[self.container_list_top:self.container_list_top + 14]
-            player_visible_items = self.player.bag.items_list[self.player_list_top:self.player_list_top + 14]
+            player_visible_items = self.player.items_list[self.player_list_top:self.player_list_top + 14]
             click = False
             mouse_pos = pygame.mouse.get_pos()
             for event in pygame.event.get():
@@ -976,7 +976,7 @@ class LootMenu(Menu):
                         y1 = (self.background_pane.rect.top + 84 + (count * spacer))
                         y2 = y1 + 19
                         if utilities.check_if_inside(x1, x2, y1, y2, mouse_pos):
-                            if count + self.player_list_top <= len(self.player.bag.items_list):
+                            if count + self.player_list_top <= len(self.player.items_list):
                                 self.player_selected = count + self.player_list_top
                         count += 1
                     count = 0

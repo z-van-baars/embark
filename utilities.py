@@ -41,6 +41,14 @@ class Colors(object):
         self.key = (255, 0, 128)
         self.brown = (112, 87, 46)
 
+        self.worthless = (148, 25, 25)
+        self.shabby = (148, 82, 25)
+        self.acceptable = (216, 168, 21)
+        self.ordinary = (80, 161, 32)
+        self.fine = (25, 76, 148)
+        self.resplendent = (0, 177, 186)
+        self.titanic = (148, 25, 146)
+
 colors = Colors()
 
 
@@ -88,6 +96,9 @@ def restore_surfaces(imported_map):
     for entity_list in imported_map.entity_group:
         for entity in imported_map.entity_group[entity_list]:
             entity.set_images()
+            if entity.items_list:
+                for each in entity.items_list:
+                    each.set_images()
             entity.current_tile = None
             entity.assign_tile()
 

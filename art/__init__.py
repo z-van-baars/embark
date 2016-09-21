@@ -156,9 +156,25 @@ skeleton_image.set_colorkey(utilities.colors.key)
 #weapons
 axe_spritesheet = spritesheet.Spritesheet("art/weapons/melee/axe.png")
 sword_spritesheet = spritesheet.Spritesheet("art/weapons/melee/sword.png")
-bow_image = pygame.image.load("art/weapons/ranged/bow.png")
-bow_image.set_colorkey(utilities.colors.key)
+bow_spritesheet = spritesheet.Spritesheet("art/weapons/ranged/bow.png")
 
 #projectiles
 arrow_image = pygame.image.load("art/weapons/projectiles/arrow.png")
 arrow_image.set_colorkey(utilities.colors.key)
+
+#ui
+inventory_background = pygame.image.load("art/ui_elements/inventory/inventory_window.png")
+small_left_arrow_deselected_image = pygame.image.load("art/ui_elements/inventory/small_left_arrow_deselected.png")
+small_left_arrow_selected_image = pygame.image.load("art/ui_elements/inventory/small_left_arrow_selected.png")
+small_right_arrow_deselected_image = pygame.image.load("art/ui_elements/inventory/small_right_arrow_deselected.png")
+small_right_arrow_selected_image = pygame.image.load("art/ui_elements/inventory/small_right_arrow_selected.png")
+equip_deselected_image = pygame.image.load("art/ui_elements/inventory/equip_deselected.png")
+equip_selected_image = pygame.image.load("art/ui_elements/inventory/equip_selected.png")
+stats_selected_image = pygame.image.load("art/ui_elements/inventory/stats_selected.png")
+stats_deselected_image = pygame.image.load("art/ui_elements/inventory/stats_deselected.png")
+
+weapon_icon = pygame.image.load("art/ui_elements/inventory/icon_weapon.png")
+bow_icon = pygame.image.load("art/ui_elements/inventory/icon_bow.png")
+shield_icon = pygame.image.load("art/ui_elements/inventory/icon_shield.png")
+spell_icon = pygame.image.load("art/ui_elements/inventory/icon_spell.png")
+armor_icon = pygame.image.load("art/ui_elements/inventory/icon_armor.png")

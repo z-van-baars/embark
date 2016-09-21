@@ -31,9 +31,23 @@ class Avatar(entity.Entity):
         self.speed = 10
         self.bag = None
         self.accuracy = 60
-        self.attack = 10
+        self.level = 1
         self.health = 100
         self.max_health = 100
+        self.strength = 10
+        self.willpower = 10
+        self.agility = 10
+
+        self.archery = 1
+        self.attack = 1
+        self.combat_magic = 1
+        self.healing_magic = 1
+
+        self.armor = 0
+        self.melee_damage = 0
+        self.ranged_damage = 0
+        self.block = 0
+
         self.gold = 100
         self.actions = ["None",
                         "Move",
@@ -55,6 +69,10 @@ class Avatar(entity.Entity):
         self.current_map.entity_group["Avatar"].remove(self)
 
     def set_frame(self, action):
+        self.set_action_sprite(action)
+        self.set_weapon_sprite(action)
+
+    def set_action_sprite(self, action):
         if action == 0:
             if self.fighting:
                 if self.fight_frame > 0:
@@ -62,39 +80,35 @@ class Avatar(entity.Entity):
                 if self.fight_frame > 21:
                     self.fight_frame = 0
                 self.sprite.image = self.melee_fight_frames[self.fight_frame]
-                if self.equipped_weapon:
-                    if not self.equipped_weapon.ranged:
-                        self.equipped_weapon.set_frame(self.fight_frame)
-                        self.sprite.image.blit(self.equipped_weapon.sprite.image, [0, -40])
-                    else:
-                        self.sprite.image.blit(self.equipped_weapon.sprite.image, [0, 0])
             else:
                 self.walk_frame_number = 0
                 self.sprite.image = self.rest_frame
-                if self.equipped_weapon:
-                    if not self.equipped_weapon.ranged:
-                        self.equipped_weapon.set_frame(0)
-                        self.sprite.image.blit(self.equipped_weapon.sprite.image, [0, -40])
-                    else:
-                        self.sprite.image.blit(self.equipped_weapon.sprite.image, [0, 0])
         elif action == 1 or action == 3:
             self.walk_frame_number += 1
             if self.walk_frame_number > len(self.walking_frames) - 1:
                 self.walk_frame_number = 0
             self.sprite.image = self.walking_frames[self.walk_frame_number]
-            if self.equipped_weapon:
-                if not self.equipped_weapon.ranged:
-                    self.equipped_weapon.set_frame(0)
-                    self.sprite.image.blit(self.equipped_weapon.sprite.image, [0, -40])
-                else:
-                    self.sprite.image.blit(self.equipped_weapon.sprite.image, [0, 0])
-
         elif action == 2:
-            if self.fight_frame > 0:
+            if self.fight_frame > 1:
                 self.fight_frame += 1
             if self.fight_frame > 21:
-                self.fight_frame = 0
+                self.fight_frame = 1
             self.sprite.image = self.ranged_fight_frames[self.fight_frame]
+
+    def set_weapon_sprite(self, action):
+        if action == 0:
+            if self.fighting:
+                if self.equipped_weapon:
+                    self.equipped_weapon.set_frame(self.fight_frame)
+            else:
+                if self.equipped_weapon:
+                    self.equipped_weapon.set_frame(0)
+        elif action == 1 or action == 3:
+            if self.equipped_weapon:
+                self.equipped_weapon.set_frame(0)
+        elif action == 2:
+            if self.equipped_weapon:
+                self.equipped_weapon.set_frame(self.fight_frame)
 
     def set_images(self):
         self.healthbar = ui.HealthBar(self.current_map, self.tile_x, self.tile_y, self.health, self.max_health)
@@ -137,13 +151,13 @@ class Avatar(entity.Entity):
             self.melee_fight_frames.append(avatar_spritesheet.get_image(120, 80, 40, 40))
 
         self.ranged_fight_frames = []
-        for x in range(3):
+        for x in range(1):
             self.ranged_fight_frames.append(avatar_spritesheet.get_image(0, 160, 40, 40))
-        for x in range(4):
+        for x in range(6):
             self.ranged_fight_frames.append(avatar_spritesheet.get_image(40, 160, 40, 40))
-        for x in range(5):
+        for x in range(6):
             self.ranged_fight_frames.append(avatar_spritesheet.get_image(80, 160, 40, 40))
-        for x in range(3):
+        for x in range(4):
             self.ranged_fight_frames.append(avatar_spritesheet.get_image(120, 160, 40, 40))
         for x in range(3):
             self.ranged_fight_frames.append(avatar_spritesheet.get_image(160, 160, 40, 40))
@@ -179,7 +193,7 @@ class Avatar(entity.Entity):
                 self.move()
         elif self.action == 2:
             if self.time_since_last_attack >= self.speed * 10:
-                self.fight_frame = 1
+                self.fight_frame = 2
                 self.time_since_last_attack = 0
                 target_tile = self.current_map.game_tile_rows[self.target_coordinates[1]][self.target_coordinates[0]]
                 self.equipped_weapon.fire(self.current_map, self.tile_x, self.tile_y, self.target_object)
@@ -236,6 +250,7 @@ class Avatar(entity.Entity):
                 self.target_coordinates = tile_x, tile_y
                 self.fighting = True
                 self.action = 2
+                self.fight_frame = 1
             else:
                 self.target_coordinates = tile_x, tile_y
                 self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)

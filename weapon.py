@@ -1,6 +1,7 @@
 import item
 import art
 import pygame
+import random
 import utilities
 
 
@@ -19,6 +20,7 @@ class Projectile(object):
         self.true_x = x2 + 10
         self.true_y = y2 - 13
         self.target = target
+        self.equipped_weapon = None
 
         self.speed = speed
         self.damage = damage
@@ -74,21 +76,43 @@ class Weapon(item.Item):
     my_type = "Weapon"
     ranged = False
 
-    def __init__(self, name, value, weight, attack, attack_speed):
-        super().__init__(name, value, weight)
+    def __init__(self, name, material, quality, value, weight, melee_damage, ranged_damage, attack_speed):
+        super().__init__(name,
+                         round(value *
+                               item.quality_value_multipliers[quality] *
+                               item.material_value_multipliers[material]),
+                         weight)
+        self.quality = quality
+        self.material = material
         self.attack_speed = attack_speed
-        self.attack = attack
-
-
-class Sword(Weapon):
-
-    def __init__(self, name, value, weight, attack, attack_speed):
-        super().__init__(name, value, weight, attack, attack_speed)
+        self.melee_damage = round(melee_damage *
+                                  item.quality_damage_multipliers[quality] *
+                                  item.material_damage_multipliers[material])
+        self.ranged_damage = round(ranged_damage *
+                                   item.quality_damage_multipliers[quality] *
+                                   item.material_damage_multipliers[material])
         self.sprite = pygame.sprite.Sprite()
         self.set_surfaces()
         self.sprite.rect = self.sprite.image.get_rect()
 
+    def equip(self, player):
+        player.melee_damage += self.melee_damage
+        player.ranged_damage += self.ranged_damage
+        player.equipped_weapon = self
+
+    def unequip(self, player):
+        player.melee_damage -= self.melee_damage
+        player.ranged_damage -= self.ranged_damage
+        player.equipped_weapon = None
+
+
+class Sword(Weapon):
+
+    def __init__(self, name, material, quality, value, weight, melee_damage, ranged_damage, attack_speed):
+        super().__init__(name, material, quality, value, weight, melee_damage, ranged_damage, attack_speed)
+
     def set_surfaces(self):
+        self.icon = art.weapon_icon
         self.frames = []
         for x in range(3):
             self.frames.append(art.sword_spritesheet.get_image(0, 0, 20, 80))
@@ -110,13 +134,11 @@ class Sword(Weapon):
 
 class Axe(Weapon):
 
-    def __init__(self, name, value, weight, attack, attack_speed):
-        super().__init__(name, value, weight, attack, attack_speed)
-        self.sprite = pygame.sprite.Sprite()
-        self.set_surfaces()
-        self.sprite.rect = self.sprite.image.get_rect()
+    def __init__(self, name, material, quality, value, weight, melee_damage, ranged_damage, attack_speed):
+        super().__init__(name, material, quality, value, weight, melee_damage, ranged_damage, attack_speed)
 
     def set_surfaces(self):
+        self.icon = art.weapon_icon
         self.frames = []
         for x in range(3):
             self.frames.append(art.axe_spritesheet.get_image(0, 0, 20, 80))
@@ -139,12 +161,29 @@ class Axe(Weapon):
 class Bow(Weapon):
     ranged = True
 
-    def __init__(self, name, value, weight, attack, attack_speed):
-        super().__init__(name, value, weight, attack, attack_speed)
+    def __init__(self, name, material, quality, value, weight, melee_damage, ranged_damage, attack_speed):
+        super().__init__(name, material, quality, value, weight, melee_damage, ranged_damage, attack_speed)
         self.ammunition_type = Arrow
-        self.sprite = pygame.sprite.Sprite()
-        self.sprite.image = art.bow_image
-        self.sprite.rect = self.sprite.image.get_rect()
+
+    def set_surfaces(self):
+        self.icon = art.bow_icon
+        self.frames = []
+        for x in range(1):
+            self.frames.append(art.bow_spritesheet.get_image(0, 0, 40, 80))
+        for x in range(6):
+            self.frames.append(art.bow_spritesheet.get_image(20, 0, 40, 80))
+        for x in range(6):
+            self.frames.append(art.bow_spritesheet.get_image(60, 0, 40, 80))
+        for x in range(4):
+            self.frames.append(art.bow_spritesheet.get_image(100, 0, 40, 80))
+        for x in range(3):
+            self.frames.append(art.bow_spritesheet.get_image(140, 0, 40, 80))
+        for x in range(4):
+            self.frames.append(art.bow_spritesheet.get_image(20, 0, 40, 80))
+        self.sprite.image = self.frames[0]
+
+    def set_frame(self, frame):
+        self.sprite.image = self.frames[frame]
 
     def fire(self, current_map, x, y, target_object):
         x2 = x * 20
@@ -152,4 +191,23 @@ class Bow(Weapon):
         self.ammunition_type(current_map, x, y, x2, y2, target_object)
 
 
-weapons = [("Iron Longsword", 10, 3, 5, 10), ("Iron Battleaxe", 25, 7, 10, 10), ("Oak Bow", 15, 4, 10, 10)]
+def get_longsword(value, level):
+    material = item.get_material(value)
+    quality = item.get_quality(value)
+    return Sword("Longsword", material, quality, 10, 3, 5, 0, 10)
+
+
+def get_bow(value, level):
+    material = item.get_material(value)
+    quality = item.get_quality(value)
+    return Bow("Bow", material, quality, 10, 3, 0, 10, 10)
+
+
+def get_axe(value, level):
+    material = item.get_material(value)
+    quality = item.get_quality(value)
+    return Axe("Battleaxe", material, quality, 25, 7, 10, 0, 10)
+
+
+weapon_functions = [get_longsword, get_bow, get_axe]
+

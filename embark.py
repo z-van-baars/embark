@@ -13,8 +13,14 @@ pygame.init()
 pygame.display.set_mode([0, 0])
 
 lower_left = pygame.image.load("art/ui_elements/lower_left.png").convert()
-bag_icon = pygame.image.load("art/ui_elements/bag.png").convert()
-bag_icon_selected = pygame.image.load("art/ui_elements/bag_highlight.png").convert()
+bag_deselected = pygame.image.load("art/ui_elements/bag.png").convert()
+bag_selected = pygame.image.load("art/ui_elements/bag_highlight.png").convert()
+
+
+def open_inventory(game_state, mouse_pos):
+    inventory_window = inventory.InventoryMenu(game_state, mouse_pos)
+    inventory_window.open = True
+    inventory_window.menu_onscreen()
 
 
 def set_bottom_pane_stamp(current_map, mouse_pos):
@@ -68,25 +74,13 @@ def main(game_state):
     debug_stats.tile_selector_graphic = ui.TileSelectorGraphic(0, 0, game_state.active_map)
     game_state.debug_status = debug_stats
 
-    game_state.active_map.entity_group["Avatar"][0].bag = inventory.Inventory(game_state.screen_width, game_state.screen_height)
-    sword = weapon.Sword(weapon.weapons[0][0],
-                         weapon.weapons[0][1],
-                         weapon.weapons[0][2],
-                         weapon.weapons[0][3],
-                         weapon.weapons[0][4])
-    bow = weapon.Bow(weapon.weapons[2][0],
-                     weapon.weapons[2][1],
-                     weapon.weapons[2][2],
-                     weapon.weapons[2][3],
-                     weapon.weapons[2][4])
-    axe = weapon.Axe(weapon.weapons[1][0],
-                     weapon.weapons[1][1],
-                     weapon.weapons[1][2],
-                     weapon.weapons[1][3],
-                     weapon.weapons[1][4])
-    initial_equipment = [sword, bow, axe]
-    game_state.player.bag.items_list = initial_equipment
-    game_state.player.equipped_weapon = game_state.player.bag.items_list[1]
+    item_1 = weapon.weapon_functions[0](10, 10)
+    item_2 = weapon.weapon_functions[1](10, 10)
+    item_3 = weapon.weapon_functions[2](10, 10)
+
+    initial_equipment = [item_1, item_2, item_3]
+    game_state.player.items_list = initial_equipment
+    game_state.player.items_list[0].equip(game_state.player)
 
     while not done:
         mouse_pos = pygame.mouse.get_pos()
@@ -156,8 +150,12 @@ def main(game_state):
                                            event,
                                            game_state)
                 else:
-                    if mouse_pos[0] > game_state.screen_width - 80 and mouse_pos[1] > game_state.screen_height - 80:
-                        game_state.active_map.entity_group["Avatar"][0].bag.open = True
+                    if utilities.check_if_inside(bag_button.sprite.rect.x,
+                                                 bag_button.sprite.rect.right,
+                                                 bag_button.sprite.rect.y,
+                                                 bag_button.sprite.rect.bottom,
+                                                 mouse_pos):
+                        bag_button.click(game_state, mouse_pos)
                     else:
                         game_state.active_map.entity_group["Avatar"][0].assign_target(game_state,
                                                                                       game_state.active_map,
@@ -210,11 +208,15 @@ def main(game_state):
 
         game_state.active_map.draw_to_screen(game_state.screen, game_state.screen_width, game_state.screen_height)
 
-        if mouse_pos[0] > game_state.screen_width - 80 and mouse_pos[1] > game_state.screen_height - 80:
-            bag_image = bag_icon_selected
+        if utilities.check_if_inside(bag_button.sprite.rect.x,
+                                     bag_button.sprite.rect.right,
+                                     bag_button.sprite.rect.y,
+                                     bag_button.sprite.rect.bottom,
+                                     mouse_pos):
+            bag_button.sprite.image = bag_button.selected
         else:
-            bag_image = bag_icon
-        game_state.screen.blit(bag_image, [game_state.screen_width - 80, game_state.screen_height - 80])
+            bag_button.sprite.image = bag_button.regular
+        game_state.screen.blit(bag_button.sprite.image, [bag_button.sprite.rect.x, bag_button.sprite.rect.y])
 
         for each in game_state.active_map.hitboxes:
             if not each.expiration_check():
@@ -256,16 +258,18 @@ def main(game_state):
                         new_graphic.update_image((tile_x * 20 - game_state.active_map.x_shift, tile_y * 20 - game_state.active_map.y_shift))
                         pygame.draw.rect(game_state.screen, (255, 255, 255), new_graphic.image, 1)
 
-        if game_state.active_map.entity_group["Avatar"][0].bag.open:
-            done = game_state.active_map.entity_group["Avatar"][0].bag.draw_to_screen(game_state.screen,
-                                                                                      [game_state.screen_width,
-                                                                                       game_state.screen_height])
-
         pygame.display.flip()
         game_state.clock.tick(60)
         game_state.time += 1
 
 
 game_state = GameState(800, 500 + 80, 20)
+
+bag_button = ui.Button(bag_deselected,
+                       bag_selected,
+                       open_inventory,
+                       game_state.screen_width - 80,
+                       game_state.screen_height - 80
+                       )
 
 main(game_state)

@@ -117,7 +117,8 @@ class Skeleton(Creature):
         super().__init__(x, y, current_map)
         self.speed = 10
         self.accuracy = 40
-        self.attack = 10
+        self.strength = 5
+        self.melee_damage = 1
         self.health = 50
         self.max_health = 50
         self.sight_range = 10
