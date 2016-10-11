@@ -8,6 +8,8 @@ import combat
 from avatar import Avatar
 import ui
 import weapon
+import item
+import armor
 
 pygame.init()
 pygame.display.set_mode([0, 0])
@@ -47,7 +49,7 @@ def set_bottom_pane_stamp(current_map, mouse_pos):
 
 
 def create_new_world(game_state):
-    map_1 = Map("Swindon", (40, 40), (game_state.screen_width, game_state.screen_height), False)
+    map_1 = Map("Swindon", (60, 300), (game_state.screen_width, game_state.screen_height), False)
     map_1.map_generation()
     Avatar(5, 5, map_1)
     game_state.maps[map_1.name] = map_1
@@ -74,11 +76,11 @@ def main(game_state):
     debug_stats.tile_selector_graphic = ui.TileSelectorGraphic(0, 0, game_state.active_map)
     game_state.debug_status = debug_stats
 
-    item_1 = weapon.weapon_functions[0](10, 10)
-    item_2 = weapon.weapon_functions[1](10, 10)
-    item_3 = weapon.weapon_functions[2](10, 10)
+    item_1 = weapon.weapon_functions[0](1, game_state.player.level)
+    item_2 = weapon.weapon_functions[1](1, game_state.player.level)
+    item_3 = weapon.weapon_functions[2](1, game_state.player.level)
 
-    initial_equipment = [item_1, item_2, item_3]
+    initial_equipment = [item_1, item_2, item_3, armor.armor_functions[0]()]
     game_state.player.items_list = initial_equipment
     game_state.player.items_list[0].equip(game_state.player)
 
@@ -86,7 +88,8 @@ def main(game_state):
         mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                done = True
+                pygame.display.quit()
+                pygame.quit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     game_state.active_map.world_scroll(0,
@@ -177,29 +180,10 @@ def main(game_state):
             npc.tick_cycle()
 
         for avatar in game_state.active_map.entity_group["Avatar"]:
-            avatar.tick_cycle()
-            if avatar.fighting:
+            avatar.tick_cycle(game_state)
 
-                game_state.screen.blit(avatar.healthbar.red.image,
-                                       [avatar.healthbar.red.rect.x + game_state.active_map.x_shift,
-                                        avatar.healthbar.red.rect.y + game_state.active_map.y_shift])
-                game_state.screen.blit(avatar.healthbar.green.image,
-                                       [avatar.healthbar.green.rect.x + game_state.active_map.x_shift,
-                                        avatar.healthbar.green.rect.y + game_state.active_map.y_shift])
-
-        for each in game_state.active_map.entity_group["Npc"]:
-            if each.activated:
-                each.use(game_state)
-        for each in game_state.active_map.entity_group["Structure"]:
-            if each.activated:
-                each.use(game_state)
         for each in game_state.active_map.entity_group["Creature"]:
-            each.tick_cycle()
-            if each.activated:
-                each.use(game_state)
-            if each.fighting:
-                combat.fight_tick(game_state.screen, game_state.active_map.entity_group["Avatar"][0], each)
-                each.healthbar.get_state(each.health, each.tile_x, each.tile_y)
+            each.tick_cycle(game_state.player, (game_state.player.tile_x, game_state.player.tile_y))
 
         bottom_pane_stamp = set_bottom_pane_stamp(game_state.active_map, mouse_pos)
         game_state.screen.fill(utilities.colors.black)
@@ -250,12 +234,12 @@ def main(game_state):
             pygame.draw.rect(game_state.screen, (255, 255, 255), debug_stats.tile_selector_graphic.image, 1)
             if debug_stats.place:
                 footprint = debug.entities[debug.string_lists[debug_stats.current_entity_group][debug_stats.current_entity_type_number]].footprint
-                initial_x = int(debug_stats.tile_selector_graphic.tile_x)
-                initial_y = int(debug_stats.tile_selector_graphic.tile_y - (footprint[1] - 1))
+                initial_x = int(mouse_pos[0] / 20)
+                initial_y = int(mouse_pos[1] / 20) - (footprint[1] - 1)
                 for tile_y in range(initial_y, initial_y + (footprint[1])):
                     for tile_x in range(initial_x, initial_x + footprint[0]):
                         new_graphic = ui.TileSelectorGraphic(tile_x, tile_y, game_state.active_map)
-                        new_graphic.update_image((tile_x * 20 - game_state.active_map.x_shift, tile_y * 20 - game_state.active_map.y_shift))
+                        new_graphic.update_image((tile_x * 20, tile_y * 20))
                         pygame.draw.rect(game_state.screen, (255, 255, 255), new_graphic.image, 1)
 
         pygame.display.flip()

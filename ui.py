@@ -1,5 +1,6 @@
 import pygame
 import utilities
+from item import quality_colors
 
 pygame.init()
 pygame.display.set_mode([0, 0])
@@ -36,6 +37,10 @@ move_selected_image = pygame.image.load("art/ui_elements/contextmenu/move_select
 move_deselected_image = pygame.image.load("art/ui_elements/contextmenu/move_deselected.png").convert()
 cancel_selected_image = pygame.image.load("art/ui_elements/contextmenu/cancel_selected.png").convert()
 cancel_deselected_image = pygame.image.load("art/ui_elements/contextmenu/cancel_deselected.png").convert()
+use_selected_image = pygame.image.load("art/ui_elements/contextmenu/use_selected.png").convert()
+use_deselected_image = pygame.image.load("art/ui_elements/contextmenu/use_deselected.png").convert()
+attack_selected_image = pygame.image.load("art/ui_elements/contextmenu/attack_selected.png").convert()
+attack_deselected_image = pygame.image.load("art/ui_elements/contextmenu/attack_deselected.png").convert()
 
 dialogue_menu_pane = pygame.image.load("art/ui_elements/dialogue_box/dialogue_background.png").convert()
 leave_selected_image = pygame.image.load("art/ui_elements/dialogue_box/leave_selected.png").convert()
@@ -105,7 +110,6 @@ class HealthBar(object):
 
         if health <= 0:
             self.active = False
-            self.current_map.healthbars.remove(self)
 
 
 class Button(object):
@@ -132,8 +136,8 @@ class TileSelectorGraphic(pygame.sprite.Sprite):
 
     def update_image(self, mouse_pos):
         # print(int((mouse_pos[0] - self.current_map.x_shift) / 20), int((mouse_pos[1] - self.current_map.y_shift) / 20))
-        self.tile_x = int(mouse_pos[0] + self.current_map.x_shift) / 20
-        self.tile_y = int(mouse_pos[1] + self.current_map.y_shift) / 20
+        self.tile_x = int((mouse_pos[0] + self.current_map.x_shift) / 20)
+        self.tile_y = int((mouse_pos[1] + self.current_map.y_shift) / 20)
 
         self.image = pygame.Rect((int(mouse_pos[0] / 20) * 20), (int(mouse_pos[1] / 20) * 20), 20, 20)
 
@@ -154,7 +158,8 @@ class Menu(object):
             mouse_pos = pygame.mouse.get_pos()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.open = False
+                    pygame.display.quit()
+                    pygame.quit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     click = True
 
@@ -241,7 +246,8 @@ class DialogueEditor(Menu):
             mouse_pos = pygame.mouse.get_pos()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.open = False
+                    pygame.display.quit()
+                    pygame.quit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     click = True
                 if self.editing:
@@ -361,7 +367,8 @@ class DialogueMenu(Menu):
             mouse_pos = pygame.mouse.get_pos()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.open = False
+                    pygame.display.quit()
+                    pygame.quit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     click = True
 
@@ -434,7 +441,8 @@ class SignpostMenu(Menu):
             mouse_pos = pygame.mouse.get_pos()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.open = False
+                    pygame.display.quit()
+                    pygame.quit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     click = True
 
@@ -528,7 +536,9 @@ class SignpostEditor(Menu):
             mouse_pos = pygame.mouse.get_pos()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.open = False
+                    pygame.display.quit()
+                    pygame.quit()
+
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     click = True
                 if self.editing:
@@ -586,7 +596,7 @@ class SignpostEditor(Menu):
 
 
 class ContextMenu(Menu):
-    def __init__(self, game_state, pos, entity=None):
+    def __init__(self, game_state, pos, entity, entity_string):
         super().__init__(game_state, pos, entity)
         self.background_pane = pygame.sprite.Sprite()
         self.background_pane.image = context_menu_pane
@@ -608,6 +618,19 @@ class ContextMenu(Menu):
         def talk_click():
             self.open = False
             self.player.target_object = entity
+            self.player.target_coordinates = (entity.tile_x, entity.tile_y)
+            self.player.target_type = 2
+
+        def attack_click():
+            self.open = False
+            self.player.target_object = entity
+            self.player.target_coordinates = (entity.tile_x, entity.tile_y)
+            self.player.target_type = 3
+
+        def use_click():
+            self.open = False
+            self.player.target_object = entity
+            self.player.target_coordinates = (entity.tile_x, entity.tile_y)
             self.player.target_type = 2
 
         def move_click():
@@ -625,6 +648,16 @@ class ContextMenu(Menu):
                              talk_click,
                              self.background_pane.rect.x + 8,
                              self.background_pane.rect.y + 10)
+        use_button = Button(use_deselected_image,
+                            use_selected_image,
+                            use_click,
+                            self.background_pane.rect.x + 8,
+                            self.background_pane.rect.y + 10)
+        attack_button = Button(attack_deselected_image,
+                               attack_selected_image,
+                               attack_click,
+                               self.background_pane.rect.x + 8,
+                               self.background_pane.rect.y + 10)
 
         move_button = Button(move_deselected_image,
                              move_selected_image,
@@ -632,10 +665,12 @@ class ContextMenu(Menu):
                              self.background_pane.rect.x + 8,
                              self.background_pane.rect.y + 10)
 
-        if entity:
-            self.buttons = [cancel_button, talk_button]
-        else:
-            self.buttons = [cancel_button, move_button]
+        button_sets = {"Npc": [cancel_button, talk_button],
+                       "Creature": [cancel_button, attack_button],
+                       "Structure": [cancel_button, use_button],
+                       "Open": [cancel_button, move_button]}
+
+        self.buttons = button_sets[entity_string]
 
 
 class TradeMenu(Menu):
@@ -651,7 +686,7 @@ class TradeMenu(Menu):
 
         def exit_clicked():
             self.open = False
-            self.player.bag.items_list.extend(self.items_to_sell)
+            self.player.items_list.extend(self.items_to_sell)
             self.entity.items_list.extend(self.items_to_buy)
 
         def buy_clicked():
@@ -761,8 +796,8 @@ class TradeMenu(Menu):
     def menu_onscreen(self):
         player_selection_box = pygame.sprite.Sprite()
         merchant_selection_box = pygame.sprite.Sprite()
-        font = pygame.font.SysFont('Calibri', 26, True, False)
-        small_font = pygame.font.SysFont('Calibri', 18, True, False)
+        font = pygame.font.SysFont('Sitka', 26, True, False)
+        small_font = pygame.font.SysFont('Sitka', 18, True, False)
         while self.open:
             merchant_visible_items = self.entity.items_list[self.merchant_list_top:self.merchant_list_top + 14]
             player_visible_items = self.player.items_list[self.player_list_top:self.player_list_top + 14]
@@ -770,7 +805,8 @@ class TradeMenu(Menu):
             mouse_pos = pygame.mouse.get_pos()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.open = False
+                    pygame.display.quit()
+                    pygame.quit()
 
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     click = True
@@ -796,13 +832,13 @@ class TradeMenu(Menu):
                                 self.merchant_selected = count + self.merchant_list_top
                         count += 1
 
-            player_selection_box.image = pygame.Rect(self.background_pane.rect.left + 405,
+            player_selection_box.image = pygame.Rect(self.background_pane.rect.left + 395,
                                                      self.background_pane.rect.top + 84 + ((self.player_selected - self.player_list_top) * 18),
-                                                     170,
+                                                     180,
                                                      19)
-            merchant_selection_box.image = pygame.Rect(self.background_pane.rect.left + 115,
+            merchant_selection_box.image = pygame.Rect(self.background_pane.rect.left + 105,
                                                        self.background_pane.rect.top + 84 + ((self.merchant_selected - self.merchant_list_top) * 18),
-                                                       170,
+                                                       180,
                                                        19)
 
             for button in self.buttons:
@@ -836,7 +872,7 @@ class TradeMenu(Menu):
                                                self.background_pane.rect.top + 84 + (count * spacer)])
                 self.screen.blit(weight_stamp, [self.background_pane.rect.left + 80,
                                                 self.background_pane.rect.top + 84 + (count * spacer)])
-                self.screen.blit(name_stamp, [self.background_pane.rect.left + 120,
+                self.screen.blit(name_stamp, [self.background_pane.rect.left + 110,
                                               self.background_pane.rect.top + 84 + (count * spacer)])
                 count += 1
             count = 0
@@ -849,7 +885,7 @@ class TradeMenu(Menu):
                                                self.background_pane.rect.top + 84 + (count * spacer)])
                 self.screen.blit(weight_stamp, [self.background_pane.rect.left + 370,
                                                 self.background_pane.rect.top + 84 + (count * spacer)])
-                self.screen.blit(name_stamp, [self.background_pane.rect.left + 410,
+                self.screen.blit(name_stamp, [self.background_pane.rect.left + 400,
                                               self.background_pane.rect.top + 84 + (count * spacer)])
                 count += 1
             if self.player_selected >= self.player_list_top and self.player_selected <= self.player_list_top + 14:
@@ -1046,4 +1082,77 @@ class LootMenu(Menu):
                 pygame.draw.rect(self.screen, (255, 198, 13), player_selection_box.image, 1)
             if self.container_selected >= self.container_list_top and self.container_selected <= self.container_list_top + 14:
                 pygame.draw.rect(self.screen, (255, 198, 13), container_selection_box.image, 1)
+            pygame.display.flip()
+
+
+class ChestEditMenu(Menu):
+    def __init__(self, game_state, pos, entity):
+        super().__init__(game_state, pos, entity)
+        self.background_pane = pygame.sprite.Sprite()
+        self.background_pane.image = context_menu_pane
+        self.background_pane.rect = self.background_pane.image.get_rect()
+        self.background_pane.rect.x = self.screen_width / 2 - 100
+        self.background_pane.rect.y = self.screen_height / 2 - 80
+        self.dialogue_page = 0
+
+        def leave_click():
+            entity.opened = False
+            self.open = False
+
+        def up_click():
+            if self.entity.value < 100:
+                self.entity.value += 5
+
+        def down_click():
+            if self.entity.value > 0:
+                self.entity.value -= 5
+
+        leave_button = Button(leave_deselected_image,
+                              leave_selected_image,
+                              leave_click,
+                              self.background_pane.rect.x + 80,
+                              self.background_pane.rect.y + 10)
+        up_arrow = Button(small_up_arrow_regular,
+                          small_up_arrow_selected,
+                          up_click,
+                          (self.background_pane.rect.x + 5),
+                          (self.background_pane.rect.y + 10))
+        down_arrow = Button(small_down_arrow_regular,
+                            small_down_arrow_selected,
+                            down_click,
+                            (self.background_pane.rect.x + 55),
+                            (self.background_pane.rect.y + 10))
+
+        self.buttons = [leave_button, up_arrow, down_arrow]
+
+    def menu_onscreen(self):
+        small_font = pygame.font.SysFont('Calibri', 18, True, False)
+        while self.open:
+            click = False
+            mouse_pos = pygame.mouse.get_pos()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.display.quit()
+                    pygame.quit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    click = True
+
+            for button in self.buttons:
+                if utilities.check_if_inside(button.sprite.rect.x,
+                                             button.sprite.rect.right,
+                                             button.sprite.rect.y,
+                                             button.sprite.rect.bottom,
+                                             mouse_pos):
+                    button.sprite.image = button.selected
+                    if click:
+                        button.click()
+                else:
+                    button.sprite.image = button.regular
+
+            self.screen.blit(self.background_pane.image, [self.background_pane.rect.left, self.background_pane.rect.top])
+            self.screen.blit(small_font.render(str(self.entity.value), True, utilities.colors.black),
+                             [self.background_pane.rect.x + 30, self.background_pane.rect.y + 10])
+            for button in self.buttons:
+                self.screen.blit(button.sprite.image, [button.sprite.rect.x, button.sprite.rect.y])
+
             pygame.display.flip()

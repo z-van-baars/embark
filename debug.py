@@ -4,7 +4,35 @@ import creature
 import flora
 import structure
 import npc
+import art
 import ui
+
+tile_strings = ["Dirt",
+                "Flagstone",
+                "Wood 1",
+                "Wood 2",
+                "Wood 3",
+                "Grass 1",
+                "Grass 2",
+                "Grass 3",
+                "Grass 4",
+                "Grass 5",
+                "Marble 1",
+                "Stone Block",
+                "Stone Floor Grey",
+                "Stone Floor Brown",
+                "Dirt Path T UP",
+                "Dirt Path T Down",
+                "Dirt Path T Left",
+                "Dirt Path T Right",
+                "Dirt Path 4 Way",
+                "Dirt Path Horizontal",
+                "Dirt Path Vertical",
+                "Dirt Path Elbow LD",
+                "Dirt Path Elbow LU",
+                "Dirt Path Elbow RD",
+                "Dirt Path Elbow RU",
+                "Water"]
 
 entities = {"Forge": structure.Forge,
             "Anvil": structure.Anvil,
@@ -30,7 +58,9 @@ entities = {"Forge": structure.Forge,
             "Merchant": npc.Merchant,
             "Wheat": flora.Wheat,
             "Tree": flora.Tree,
-            "Skeleton": creature.Skeleton}
+            "Skeleton": creature.Skeleton,
+            "Grievebeast": creature.GrieveBeast,
+            "Shadebrute": creature.ShadeBrute}
 
 entity_groups = ["Structures",
                  "NPCs",
@@ -57,7 +87,9 @@ structure_strings = ["Forge",
                      "Signpost",
                      "Chest"]
 
-creature_strings = ["Skeleton"]
+creature_strings = ["Skeleton",
+                    "Grievebeast",
+                    "Shadebrute"]
 
 npc_strings = ["Guard",
                "Villager",
@@ -117,6 +149,8 @@ def c_key(debug_status):
         debug_status.edit = False
     if debug_status.place:
         debug_status.place = False
+    if debug_status.paint:
+        debug_status.paint = False
     debug_status.clear = not debug_status.clear
 
 
@@ -127,6 +161,8 @@ def r_key(debug_status):
         debug_status.edit = False
     if debug_status.place:
         debug_status.place = False
+    if debug_status.paint:
+        debug_status.paint = False
     debug_status.remove = not debug_status.remove
 
 
@@ -137,6 +173,8 @@ def t_key(debug_status):
         debug_status.edit = False
     if debug_status.remove:
         debug_status.remove = False
+    if debug_status.paint:
+        debug_status.paint = False
     debug_status.place = not debug_status.place
 
 
@@ -155,17 +193,39 @@ def e_key(debug_status):
         debug_status.remove = False
     if debug_status.place:
         debug_status.place = False
+    if debug_status.paint:
+        debug_status.paint = False
     debug_status.edit = not debug_status.edit
 
 
+def f_key(debug_status):
+    if debug_status.clear:
+        debug_status.clear = False
+    if debug_status.remove:
+        debug_status.remove = False
+    if debug_status.place:
+        debug_status.place = False
+    if debug_status.edit:
+        debug_status.edit = False
+    debug_status.paint = not debug_status.paint
+
+
 def z_key(debug_status):
-    if not debug_status.current_entity_type_number == 0:
-        debug_status.current_entity_type_number -= 1
+    if debug_status.place:
+        if not debug_status.current_entity_type_number == 0:
+            debug_status.current_entity_type_number -= 1
+    if debug_status.paint:
+        if not debug_status.tile_number == 0:
+            debug_status.tile_number -= 1
 
 
 def x_key(debug_status):
-    if not debug_status.current_entity_type_number == (len(string_lists[debug_status.current_entity_group]) - 1):
-        debug_status.current_entity_type_number += 1
+    if debug_status.place:
+        if not debug_status.current_entity_type_number == (len(string_lists[debug_status.current_entity_group]) - 1):
+            debug_status.current_entity_type_number += 1
+    if debug_status.paint:
+        if not debug_status.tile_number == (len(tile_strings) - 1):
+            debug_status.tile_number += 1
 
 
 def comma_key(debug_status):
@@ -196,6 +256,7 @@ key_functions = {pygame.K_c: c_key,
                  pygame.K_e: e_key,
                  pygame.K_z: z_key,
                  pygame.K_x: x_key,
+                 pygame.K_f: f_key,
                  pygame.K_COMMA: comma_key,
                  pygame.K_PERIOD: period_key}
 
@@ -226,13 +287,22 @@ def edit_click(game_state, debug_status, selected_tile, mouse_pos):
                                                            mouse_pos,
                                                            selected_tile.entity_group["Structure"][0])
                 new_dialogue_edit_menu.menu_onscreen()
+            if each.display_name == "Chest":
+                new_chest_edit_menu = ui.ChestEditMenu(game_state,
+                                                       mouse_pos,
+                                                       selected_tile.entity_group["Structure"][0])
+                new_chest_edit_menu.menu_onscreen()
 
 
 def remove_click(current_map, current_tile):
     for entity_type in current_tile.entity_group:
         for entity in current_tile.entity_group[entity_type]:
-            entity.leave_tile()
             entity.expire()
+
+
+def paint_click(current_map, current_tile, tile_string):
+    current_map.background.image.blit(art.tile_images[tile_string], [current_tile.column * 20,
+                                                                     current_tile.row * 20])
 
 
 def mouse_processing(current_map, debug_status, mouse_pos, event, game_state):
@@ -247,6 +317,8 @@ def mouse_processing(current_map, debug_status, mouse_pos, event, game_state):
             place_click(debug_status, current_map, selected_tile)
         if debug_status.edit:
             edit_click(game_state, debug_status, selected_tile, mouse_pos)
+        if debug_status.paint:
+            paint_click(current_map, selected_tile, tile_strings[debug_status.tile_number])
 
 
 class DebugStatus(object):
@@ -258,7 +330,9 @@ class DebugStatus(object):
         self.place = False
         self.edit = False
         self.remove = False
+        self.paint = False
 
+        self.tile_number = 0
         self.current_entity_group_number = 0
         self.current_entity_type_number = 0
         self.current_entity_group = entity_groups[self.current_entity_type_number]
@@ -274,10 +348,12 @@ class DebugStatus(object):
         clear_stamp = self.font.render("Clear Items: All [E]ntities / All [A]nimals / All [V]egetation / All [T]errain", True, utilities.colors.black)
         removal_stamp = self.font.render("Click to remove from tile at cursor: ", True, utilities.colors.black)
         place_stamp = self.font.render("Click to place items at cursor", True, utilities.colors.black)
+        paint_stamp = self.font.render("Click to paint background terrain", True, utilities.colors.black)
         self.stamps = [((210, self.game_state.screen_height - 70), debug_mode_stamp),
                        ((210, self.game_state.screen_height - 55), place_stamp),
                        ((210, self.game_state.screen_height - 55), clear_stamp),
-                       ((210, self.game_state.screen_height - 55), removal_stamp)]
+                       ((210, self.game_state.screen_height - 55), removal_stamp),
+                       ((210, self.game_state.screen_height - 55), paint_stamp)]
         self.update_entity_group_stamp()
         self.update_entity_stamp()
 
@@ -300,6 +376,9 @@ class DebugStatus(object):
             screen.blit(self.stamps[3][1], self.stamps[3][0])
         if self.edit:
             screen.blit(self.font.render("Editing", True, utilities.colors.black), [210, self.game_state.screen_height - 55])
+        if self.paint:
+            screen.blit(self.stamps[4][1], self.stamps[4][0])
+            screen.blit(self.font.render(tile_strings[self.tile_number], True, utilities.colors.black), [210, self.game_state.screen_height - 40])
         if self.draw_search_areas:
             for each in self.current_map.entity_group["Creature"]:
                 new_search_area_graphic = FoodSearchRadius(self.current_map, each)

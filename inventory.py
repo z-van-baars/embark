@@ -29,11 +29,13 @@ class InventoryMenu(ui.Menu):
 
         def equip_clicked():
             selected_item = self.player.items_list[self.player_selected]
-            if selected_item.equipable:
-                self.player.equipped_weapon.unequip(self.player)
-                selected_item.equip(self.player)
-                self.player.action = 0
-                self.player.fight_frame = 0
+            if selected_item.equippable:
+                if selected_item.is_equipped:
+                    selected_item.unequip(self.player)
+                else:
+                    selected_item.equip(self.player)
+                    self.player.action = 0
+                    self.player.fight_frame = 0
 
         self.background_pane = pygame.sprite.Sprite()
         self.background_pane.image = art.inventory_background
@@ -152,25 +154,27 @@ class InventoryMenu(ui.Menu):
             if self.player.equipped_weapon:
                 self.screen.blit(self.player.equipped_weapon.icon,
                                  [self.background_pane.rect.left + 151, self.background_pane.rect.top + 111])
+            if self.player.equipped_armor:
+                self.screen.blit(self.player.equipped_armor.icon,
+                                 [self.background_pane.rect.left + 207, self.background_pane.rect.top + 184])
 
             spacer = 18
             count = 0
             for each in player_visible_items:
                 value_stamp = small_font.render(str(each.value), True, utilities.colors.black)
                 weight_stamp = small_font.render(str(each.weight), True, utilities.colors.black)
-                material_stamp = small_font.render(each.material, True, utilities.colors.black)
-                name_stamp = small_font.render(each.name, True, utilities.colors.black)
-                quality_stamp = small_font.render(each.quality[0], True, item.quality_colors[each.quality])
+
+                if each.is_equipped:
+                    color = utilities.colors.equipped_item_red
+                else:
+                    color = utilities.colors.black
+                name_stamp = small_font.render(each.name, True, color)
 
                 self.screen.blit(value_stamp, [self.background_pane.rect.left + 320,
                                                self.background_pane.rect.top + 84 + (count * spacer)])
                 self.screen.blit(weight_stamp, [self.background_pane.rect.left + 370,
                                                 self.background_pane.rect.top + 84 + (count * spacer)])
-                self.screen.blit(quality_stamp, [self.background_pane.rect.left + 395,
-                                                 self.background_pane.rect.top + 85 + (count * spacer)])
-                self.screen.blit(material_stamp, [self.background_pane.rect.left + 410,
-                                                  self.background_pane.rect.top + 84 + (count * spacer)])
-                self.screen.blit(name_stamp, [self.background_pane.rect.left + 410 + material_stamp.get_width(),
+                self.screen.blit(name_stamp, [self.background_pane.rect.left + 400,
                                               self.background_pane.rect.top + 84 + (count * spacer)])
                 count += 1
             if self.player_selected >= self.player_list_top and self.player_selected <= self.player_list_top + 14:

@@ -1,14 +1,9 @@
 import pygame
 import random
 import utilities
-from tile import DisplayTile
-from tile import ImageTile
 from game_tile import GameTile
-import npc
-from avatar import Avatar
 import creature
 import flora
-import structure
 
 pygame.init()
 pygame.display.set_mode([0, 0])
@@ -37,25 +32,20 @@ class Map(object):
         self.number_of_buffalo = 0
         self.number_of_forests = 0
         self.number_of_wheat_clusters = 0
-
-
         self.display_tiles = pygame.sprite.Group()
         self.x_shift = 0
         self.y_shift = 0
         self.hitboxes = []
-        
-        self.entity_group = {
-                            "Terrain": [],
-                            "Structure":[],
-                            "Flora": [],
-                            "Creature": [],
-                            "Npc": [],
-                            "Avatar": [],
-                            "Projectile": []
-                            }
+        self.entity_group = {"Terrain": [],
+                             "Structure": [],
+                             "Flora": [],
+                             "Creature": [],
+                             "Npc": [],
+                             "Avatar": [],
+                             "Projectile": []}
 
     def map_generation(self):
-        wood_1 = pygame.image.load("art/wood_tile.png").convert()
+        wood_1 = pygame.image.load("art/tiles/wood_1.png").convert()
         grass_1 = pygame.image.load("art/background/grass_1.png").convert()
         interior_terrain_types = [wood_1]
         exterior_terrain_types = [grass_1]
@@ -64,7 +54,6 @@ class Map(object):
         self.background = Background(int(self.width / 20), int(self.height / 20))
 
         if not self.interior:
-
             for y_row in range(self.number_of_rows):
                 this_row = []
                 for x_column in range(self.number_of_columns):
@@ -75,15 +64,6 @@ class Map(object):
                     self.background.image.blit(new_tile_image, (x, y))
                 self.game_tile_rows.append(this_row)
             self.generate_vegetation()
-
-            for new_buffalo in range(self.number_of_buffalo):
-                buffalo_placed = False
-                while not buffalo_placed:
-                    coordinates = self.get_random_coordinates(0, self.number_of_columns - 1, 0, self.number_of_rows - 1)
-                    tile = self.game_tile_rows[coordinates[1]][coordinates[0]]
-                    if not tile.is_occupied:
-                        creature.Buffalo(coordinates[0], coordinates[1], self)
-                        buffalo_placed = True
         else:
             for y_row in range(self.number_of_rows):
                 this_row = []
@@ -100,12 +80,6 @@ class Map(object):
             self.generate_forest()
         for wheat_clusters in range(self.number_of_wheat_clusters):
             self.generate_wheat_cluster()
-
-    def get_random_coordinates(self, x_lower, x_upper, y_lower, y_upper):
-        x_position = random.randint(x_lower, x_upper)
-        y_position = random.randint(y_lower, y_upper)
-
-        return (x_position, y_position)
 
     def generate_wheat_cluster(self):
         wheat_cluster_placed = False
@@ -124,27 +98,6 @@ class Map(object):
                 tile = random.choice(nearby_tiles)
                 if not tile.is_occupied():
                     flora.Wheat(tile.column, tile.row, self)
-                    neighbor_placed = True
-
-    def generate_forest(self):
-        forest_placed = False
-        while not forest_placed:
-            coordinates = self.get_random_coordinates(0, self.number_of_columns - 1, 0, self.number_of_rows - 1)
-            tile = self.game_tile_rows[coordinates[1]][coordinates[0]]
-            if not tile.is_occupied():
-                # needed to make neighbors
-                forest_center_tree = flora.Tree(tile.column, tile.row, self)
-                forest_placed = True
-        number_of_neighbors = random.randint(9, 19)
-        for new_tree in range(number_of_neighbors):
-            neighbor_placed = False
-            while not neighbor_placed:
-                nearby_tiles = utilities.get_nearby_tiles(self,
-                                                          (forest_center_tree.tile_x, forest_center_tree.tile_y),
-                                                          forest_center_tree.group_generation_max_distance)
-                tile = random.choice(nearby_tiles)
-                if not tile.is_occupied():
-                    flora.Tree(tile.column, tile.row, self)
                     neighbor_placed = True
 
     def scroll_check(self, x, y):
@@ -180,8 +133,9 @@ class Map(object):
             for entity in row:
                 if utilities.any_tile_visible(screen_width, screen_height, self.x_shift, self.y_shift, entity):
                     screen.blit(entity.sprite.image, [(entity.sprite.rect.x + self.x_shift), (entity.sprite.rect.y + self.y_shift)])
-                    if entity.equipped_weapon:
-                        screen.blit(entity.equipped_weapon.sprite.image,
-                                    [(entity.sprite.rect.x + self.x_shift - 1),
-                                     (entity.sprite.rect.y + self.y_shift - 40)])
+                    if entity.my_type == "Avatar" or entity.my_type == "Npc" or entity.my_type == "Creature":
+                        if entity.equipped_weapon:
+                            screen.blit(entity.equipped_weapon.sprite.image,
+                                        [(entity.sprite.rect.x + self.x_shift - 1),
+                                         (entity.sprite.rect.y + self.y_shift - 40)])
 

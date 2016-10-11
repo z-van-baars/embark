@@ -3,14 +3,14 @@ import pygame
 import ui
 import art
 import utilities
-import item
 import random
+import weapon
 
 pygame.init()
 pygame.display.set_mode([0, 0])
 
 
-class Structure(entity.Entity):
+class Structure(entity.StationaryEntity):
     occupies_tile = True
     my_type = "Structure"
 
@@ -176,9 +176,8 @@ class Chest(Structure):
         self.set_images()
         self.display_name = "Chest"
         self.items_list = []
-        for x in range(10):
-            gold_bar = item.Item(item.treasures[0][0], item.treasures[0][1], item.treasures[0][2])
-            self.items_list.append(gold_bar)
+        self.value = 10
+        self.opened = False
 
     def set_images(self):
 
@@ -189,9 +188,17 @@ class Chest(Structure):
         self.sprite.rect.y = self.tile_y * 20
 
     def use(self, game_state):
+        if not self.opened:
+            self.items_list = []
+            self.fill_chest(game_state.player.level)
+            self.opened = True
         new_loot_window = ui.LootMenu(game_state, (0, 0), self)
         new_loot_window.menu_onscreen()
         self.activated = False
+
+    def fill_chest(self, player_level):
+        for x in range(random.randint(2, 10)):
+            self.items_list.append(random.choice(weapon.weapon_functions)(self.value, player_level))
 
 
 class Forge(Structure):

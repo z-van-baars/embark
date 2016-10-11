@@ -4,14 +4,14 @@ class GameTile(object):
     def __init__(self, column, row):
         self.row = row
         self.column = column
-        self.entity_group = {
-                            "Terrain": [],
-                            "Structure":[],
-                            "Flora": [],
-                            "Creature": [],
-                            "Npc": [],
-                            "Avatar": []
-                            }
+        self.entity_group = {"Terrain": [],
+                             "Structure": [],
+                             "Flora": [],
+                             "Creature": [],
+                             "Npc": [],
+                             "Projectile": [],
+                             "Avatar": []}
+
     def __lt__(self, other):
         return False
 

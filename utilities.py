@@ -40,6 +40,7 @@ class Colors(object):
         self.wheat_gold = (220, 187, 0)
         self.key = (255, 0, 128)
         self.brown = (112, 87, 46)
+        self.equipped_item_red = (110, 0, 0)
 
         self.worthless = (148, 25, 25)
         self.shabby = (148, 82, 25)
@@ -73,6 +74,12 @@ def any_tile_visible(screen_width, screen_height, x_shift, y_shift, entity):
             if on_screen(screen_width, screen_height, tile_x * 20, tile_y * 20, x_shift, y_shift):
                 return True
     return False
+
+
+def get_random_coordinates(x_lower, x_upper, y_lower, y_upper):
+        x_position = random.randint(x_lower, x_upper)
+        y_position = random.randint(y_lower, y_upper)
+        return (x_position, y_position)
 
 
 def export_game_state(game_state):
@@ -129,7 +136,7 @@ def distance(a, b, x, y):
     c = math.sqrt((a1 * a1) + (b1 * b1))
     return c
 
-
+# function for N repeated rolls of random(S+1), returning a number from 0 to N*S
 def roll_dice(number_of_dice, sides):
     # Sum of N dice each of which goes from 0 to sides
     value = 0

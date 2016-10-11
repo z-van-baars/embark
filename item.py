@@ -3,13 +3,37 @@ import utilities
 
 
 class Item(object):
-    equipable = False
+    equippable = False
 
     def __init__(self, name, value, weight):
         super().__init__()
         self.name = name
         self.value = value
         self.weight = weight
+
+
+def get_gold_ingot():
+    return Item("Gold Ingot", 100, 1)
+
+
+def get_iron_ingot():
+    return Item("Iron Ingot", 10, 1)
+
+
+def get_steel_ingot():
+    return Item("Steel Ingot", 20, 1)
+
+
+def get_wheat():
+    return Item("Wheat", 5, 1)
+
+
+def get_calipers():
+    return Item("Calipers", 1, 1)
+
+
+def get_lockpick():
+    return Item("Lockpick", 5, 1)
 
 
 rubbish = [("Scrap Paper", 1, 1), ("Broken Sword", 2, 5), ("Burnt Bread", 1, 2)]
@@ -40,23 +64,42 @@ quality_damage_multipliers = {"Worthless ": 0.1,
                               "Resplendent ": 1.4,
                               "Titanic ": 2.0}
 
-materials = ["Bronze ", "Iron ", "Steel "]
-material_damage_multipliers = {"Bronze ": 0.5,
+materials = ["Bronze ", "Iron ", "Steel ", "Mithril ", "Adamantine "]
+material_damage_multipliers = {"": 1.0,
+                               "Bronze ": 0.5,
                                "Iron ": 1.0,
-                               "Steel ": 5.0}
+                               "Steel ": 5.0,
+                               "Mithril ": 10,
+                               "Adamantine ": 20}
 
-material_value_multipliers = {"Bronze ": 0.5,
-                              "Iron ": 1.0,
-                              "Steel ": 5.0}
+material_value_multipliers = {"": 1.0,
+                              "Bronze ": 1.0,
+                              "Iron ": 2.0,
+                              "Steel ": 5.0,
+                              "Mithril ": 10,
+                              "Adamantine ": 20}
 
 
-def get_quality(value):
-    quality_roll = utilities.roll_dice(3, 4)
-    if random.randint(0, 100) < value:
-        quality_roll += utilities.roll_dice(3, 4)
-    quality = round(quality_roll / 3)
+def choose_quality(value, player_level):
+    quality_roll = utilities.roll_dice(2, 5)
+    quality_roll -= 1
+    if random.randint(1, 100) < player_level:
+        quality_roll += utilities.roll_dice(1, 5)
+    quality = round(quality_roll / 2)
     return qualities[quality]
 
 
-def get_material(value):
-    return random.choice(materials)
+def choose_material(value, player_level):
+    material_roll = utilities.roll_dice(2, 4) - 1
+    material_roll = min(material_roll, (utilities.roll_dice(2, 4) - 1))
+    material_roll = min(material_roll, (utilities.roll_dice(2, 4) - 1))
+    material_roll = min(material_roll, (utilities.roll_dice(2, 4) - 1))
+    if random.randint(1, 100) < value:
+        material_roll += utilities.roll_dice(1, round(player_level / 4) + 1)
+    material = round(material_roll / 4)
+    if material > 4:
+        material = 4
+    return materials[material]
+
+
+item_functions = [get_wheat, get_calipers, get_lockpick, get_gold_ingot, get_iron_ingot, get_steel_ingot]

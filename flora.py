@@ -2,21 +2,19 @@ import pygame
 import utilities
 import random
 import entity
-import art 
+import art
 
 pygame.init()
 pygame.display.set_mode([0, 0])
 
 
-class Flora(entity.Entity):
+class Flora(entity.StationaryEntity):
     my_type = "Flora"
     interactable = False
     occupies_tile = False
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.age = 0
-        self.group_generation_max_distance = 0
 
     def tick_cycle(self):
         self.age += 1

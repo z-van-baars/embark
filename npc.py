@@ -11,7 +11,7 @@ pygame.init()
 pygame.display.set_mode([0, 0])
 
 
-class Npc(entity.Entity):
+class Npc(entity.SentientEntity):
     occupies_tile = True
     interactable = True
     my_type = "Npc"
@@ -21,13 +21,12 @@ class Npc(entity.Entity):
     def __init__(self, x, y, current_map, display_name="New NPC"):
         super().__init__(x, y, current_map)
         self.display_name = display_name
-        self.change_x = 0
-        self.change_y = 0
         self.target_coordinates = None
         self.path = None
         self.speed = 1
         self.time_since_last_move = 0
         self.activated = False
+        self.equipped_weapon = None
 
         self.items_list = []
         self.health = 100
@@ -39,9 +38,6 @@ class Npc(entity.Entity):
 
     def tick_cycle(self):
         self.age += 1
-
-    def use(self):
-        print()
 
 
 class Guard(Npc):
@@ -70,7 +66,6 @@ class Guard(Npc):
     def use(self, game_state):
         new_dialogue_menu = ui.DialogueMenu(game_state, (0, 0), self)
         new_dialogue_menu.menu_onscreen()
-        self.activated = False
 
 
 class Villager(Npc):
@@ -113,15 +108,9 @@ class Merchant(Npc):
         self.max_health = 100
         self.gold = 100
         self.items_list = []
-        for each in item.rubbish:
-            for iteration in range(9):
-                new_item = item.Item(each[0], each[1], each[2])
-                self.items_list.append(new_item)
-        for each in weapon.weapons:
-            new_item = item.Item(each[0], each[1], each[2])
-            self.items_list.append(new_item)
         self.dialogue_pages = [["Hello Adventurer! Lots to do here", "in Poopybutts."], [" Lots of quality goods for sale here"]]
         self.set_images()
+        self.restock_items(50)
 
     def tick_cycle(self):
         self.age += 1
@@ -136,3 +125,9 @@ class Merchant(Npc):
         new_dialogue_menu = ui.DialogueMenu(game_state, (0, 0), self)
         new_dialogue_menu.menu_onscreen()
         self.activated = False
+
+    def restock_items(self, player_level):
+        for x in range(20):
+            possible_items = [random.choice(weapon.weapon_functions)(20, player_level),
+                              random.choice(item.item_functions)()]
+            self.items_list.append(random.choice(possible_items))

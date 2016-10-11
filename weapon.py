@@ -2,25 +2,26 @@ import item
 import art
 import pygame
 import random
+import entity
+import ui
 import utilities
 
 
-class Projectile(object):
+class Projectile(entity.MovingEntity):
     footprint = (1, 1)
+    my_type = "Projectile"
 
     def __init__(self, current_map, x, y, x2, y2, speed, damage, target):
+        super().__init__(x, y, current_map)
         self.current_map = current_map
         self.sprite = pygame.sprite.Sprite()
         self.set_surfaces()
         self.sprite.rect = self.sprite.image.get_rect()
         self.sprite.rect.x = x2 + 10
         self.sprite.rect.y = y2 - 13
-        self.tile_x = x
-        self.tile_y = y
         self.true_x = x2 + 10
         self.true_y = y2 - 13
         self.target = target
-        self.equipped_weapon = None
 
         self.speed = speed
         self.damage = damage
@@ -34,7 +35,7 @@ class Projectile(object):
         self.current_map.entity_group["Projectile"].append(self)
 
     def get_vector(self):
-        (self.change_x, self.change_y) = utilities.get_vector(self, self.sprite.rect.x + 20, self.sprite.rect.y, self.target_x, self.target_y)
+        (self.change_x, self.change_y) = utilities.get_vector(self, self.sprite.rect.x + 19, self.sprite.rect.y, self.target_x, self.target_y)
 
     def travel(self):
         if not self.change_x:
@@ -60,6 +61,9 @@ class Projectile(object):
                                      target_bottom,
                                      (self.sprite.rect.x + 20, self.sprite.rect.y)):
             print("strike")
+            self.target.health -= self.damage
+            ui.HitBox(self.current_map, self.target.sprite.rect.x, self.target.sprite.rect.y, self.damage, "Avatar")
+            self.target.healthbar.active = True
             self.current_map.entity_group["Projectile"].remove(self)
 
 
@@ -72,47 +76,49 @@ class Arrow(Projectile):
 
 
 class Weapon(item.Item):
-    equipable = True
+    equippable = True
     my_type = "Weapon"
     ranged = False
 
-    def __init__(self, name, material, quality, value, weight, melee_damage, ranged_damage, attack_speed):
-        super().__init__(name,
+    def __init__(self, name, material, value, weight, melee_damage, ranged_damage, attack_speed):
+        super().__init__(material + name,
                          round(value *
-                               item.quality_value_multipliers[quality] *
                                item.material_value_multipliers[material]),
                          weight)
-        self.quality = quality
         self.material = material
         self.attack_speed = attack_speed
         self.melee_damage = round(melee_damage *
-                                  item.quality_damage_multipliers[quality] *
                                   item.material_damage_multipliers[material])
         self.ranged_damage = round(ranged_damage *
-                                   item.quality_damage_multipliers[quality] *
                                    item.material_damage_multipliers[material])
         self.sprite = pygame.sprite.Sprite()
         self.set_surfaces()
         self.sprite.rect = self.sprite.image.get_rect()
+        self.is_equipped = False
 
     def equip(self, player):
+        if player.equipped_weapon:
+            player.equipped_weapon.unequip(player)
         player.melee_damage += self.melee_damage
         player.ranged_damage += self.ranged_damage
         player.equipped_weapon = self
+        self.is_equipped = True
 
     def unequip(self, player):
         player.melee_damage -= self.melee_damage
         player.ranged_damage -= self.ranged_damage
         player.equipped_weapon = None
+        self.is_equipped = False
 
 
 class Sword(Weapon):
 
-    def __init__(self, name, material, quality, value, weight, melee_damage, ranged_damage, attack_speed):
-        super().__init__(name, material, quality, value, weight, melee_damage, ranged_damage, attack_speed)
+    def __init__(self, name, material, value, weight, melee_damage, ranged_damage, attack_speed):
+        super().__init__(name, material, value, weight, melee_damage, ranged_damage, attack_speed)
+        self.range = 1.5
 
     def set_surfaces(self):
-        self.icon = art.weapon_icon
+        self.icon = art.sword_icon
         self.frames = []
         for x in range(3):
             self.frames.append(art.sword_spritesheet.get_image(0, 0, 20, 80))
@@ -132,13 +138,95 @@ class Sword(Weapon):
         self.sprite.image = self.frames[frame]
 
 
-class Axe(Weapon):
+class Mace(Weapon):
 
-    def __init__(self, name, material, quality, value, weight, melee_damage, ranged_damage, attack_speed):
-        super().__init__(name, material, quality, value, weight, melee_damage, ranged_damage, attack_speed)
+    def __init__(self, name, material, value, weight, melee_damage, ranged_damage, attack_speed):
+        super().__init__(name, material, value, weight, melee_damage, ranged_damage, attack_speed)
+        self.range = 1.5
 
     def set_surfaces(self):
-        self.icon = art.weapon_icon
+        self.icon = art.mace_icon
+        self.frames = []
+        for x in range(3):
+            self.frames.append(art.mace_spritesheet.get_image(0, 0, 20, 80))
+        for x in range(3):
+            self.frames.append(art.mace_spritesheet.get_image(20, 0, 20, 80))
+        for x in range(3):
+            self.frames.append(art.mace_spritesheet.get_image(40, 0, 20, 80))
+        for x in range(4):
+            self.frames.append(art.mace_spritesheet.get_image(60, 0, 20, 80))
+        for x in range(4):
+            self.frames.append(art.mace_spritesheet.get_image(80, 0, 40, 80))
+        for x in range(5):
+            self.frames.append(art.mace_spritesheet.get_image(120, 0, 40, 80))
+        self.sprite.image = self.frames[0]
+
+    def set_frame(self, frame):
+        self.sprite.image = self.frames[frame]
+
+
+class Spear(Weapon):
+
+    def __init__(self, name, material, value, weight, melee_damage, ranged_damage, attack_speed):
+        super().__init__(name, material, value, weight, melee_damage, ranged_damage, attack_speed)
+        self.range = 1.5
+
+    def set_surfaces(self):
+        self.icon = art.spear_icon
+        self.frames = []
+        for x in range(3):
+            self.frames.append(art.spear_spritesheet.get_image(0, 0, 20, 80))
+        for x in range(3):
+            self.frames.append(art.spear_spritesheet.get_image(20, 0, 20, 80))
+        for x in range(3):
+            self.frames.append(art.spear_spritesheet.get_image(40, 0, 20, 80))
+        for x in range(4):
+            self.frames.append(art.spear_spritesheet.get_image(60, 0, 20, 80))
+        for x in range(4):
+            self.frames.append(art.spear_spritesheet.get_image(80, 0, 40, 80))
+        for x in range(5):
+            self.frames.append(art.spear_spritesheet.get_image(120, 0, 40, 80))
+        self.sprite.image = self.frames[0]
+
+    def set_frame(self, frame):
+        self.sprite.image = self.frames[frame]
+
+
+class Dagger(Weapon):
+
+    def __init__(self, name, material, value, weight, melee_damage, ranged_damage, attack_speed):
+        super().__init__(name, material, value, weight, melee_damage, ranged_damage, attack_speed)
+        self.range = 1.5
+
+    def set_surfaces(self):
+        self.icon = art.dagger_icon
+        self.frames = []
+        for x in range(3):
+            self.frames.append(art.dagger_spritesheet.get_image(0, 0, 20, 80))
+        for x in range(3):
+            self.frames.append(art.dagger_spritesheet.get_image(20, 0, 20, 80))
+        for x in range(3):
+            self.frames.append(art.dagger_spritesheet.get_image(40, 0, 20, 80))
+        for x in range(4):
+            self.frames.append(art.dagger_spritesheet.get_image(60, 0, 20, 80))
+        for x in range(4):
+            self.frames.append(art.dagger_spritesheet.get_image(80, 0, 40, 80))
+        for x in range(5):
+            self.frames.append(art.dagger_spritesheet.get_image(120, 0, 40, 80))
+        self.sprite.image = self.frames[0]
+
+    def set_frame(self, frame):
+        self.sprite.image = self.frames[frame]
+
+
+class Axe(Weapon):
+
+    def __init__(self, name, material, value, weight, melee_damage, ranged_damage, attack_speed):
+        super().__init__(name, material, value, weight, melee_damage, ranged_damage, attack_speed)
+        self.range = 1.5
+
+    def set_surfaces(self):
+        self.icon = art.axe_icon
         self.frames = []
         for x in range(3):
             self.frames.append(art.axe_spritesheet.get_image(0, 0, 20, 80))
@@ -161,9 +249,10 @@ class Axe(Weapon):
 class Bow(Weapon):
     ranged = True
 
-    def __init__(self, name, material, quality, value, weight, melee_damage, ranged_damage, attack_speed):
-        super().__init__(name, material, quality, value, weight, melee_damage, ranged_damage, attack_speed)
+    def __init__(self, name, material, value, weight, melee_damage, ranged_damage, attack_speed):
+        super().__init__(name, material, value, weight, melee_damage, ranged_damage, attack_speed)
         self.ammunition_type = Arrow
+        self.range = 14
 
     def set_surfaces(self):
         self.icon = art.bow_icon
@@ -192,22 +281,40 @@ class Bow(Weapon):
 
 
 def get_longsword(value, level):
-    material = item.get_material(value)
-    quality = item.get_quality(value)
-    return Sword("Longsword", material, quality, 10, 3, 5, 0, 10)
+    material = item.choose_material(value, level)
+    # quality = item.choose_quality(value, level)
+    return Sword("Longsword", material, 30, 5, 10, 0, 5)
 
 
 def get_bow(value, level):
-    material = item.get_material(value)
-    quality = item.get_quality(value)
-    return Bow("Bow", material, quality, 10, 3, 0, 10, 10)
+    material = item.choose_material(value, level)
+    # quality = item.choose_quality(value, level)
+    return Bow("Bow", material, 15, 3, 0, 10, 10)
 
 
 def get_axe(value, level):
-    material = item.get_material(value)
-    quality = item.get_quality(value)
-    return Axe("Battleaxe", material, quality, 25, 7, 10, 0, 10)
+    material = item.choose_material(value, level)
+    # quality = item.choose_quality(value, level)
+    return Axe("Battleaxe", material, 25, 7, 13, 0, 10)
 
 
-weapon_functions = [get_longsword, get_bow, get_axe]
+def get_mace(value, level):
+    material = item.choose_material(value, level)
+    # quality = item.choose_quality(value, level)
+    return Mace("Mace", material, 20, 7, 15, 0, 12)
+
+
+def get_spear(value, level):
+    material = item.choose_material(value, level)
+    # quality = item.choose_quality(value, level)
+    return Spear("Spear", material, 15, 6, 10, 0, 15)
+
+
+def get_dagger(value, level):
+    material = item.choose_material(value, level)
+    # quality = item.choose_quality(value, level)
+    return Dagger("Dagger", material, 10, 3, 3, 0, 8)
+
+
+weapon_functions = [get_longsword, get_bow, get_axe, get_dagger, get_mace, get_spear]
 

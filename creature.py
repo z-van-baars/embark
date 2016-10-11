@@ -5,106 +5,35 @@ import random
 import pygame
 import ui
 import art
+import combat
+from entity import Action
 
 pygame.init()
 pygame.display.set_mode([0, 0])
 
 
-class Creature(entity.Entity):
+class Creature(entity.SentientEntity):
     my_type = "Creature"
+    ranged = False
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.local_food_supply = []
-        self.eating = False
-        self.change_x = 0
-        self.change_y = 0
         self.target_coordinates = None
         self.target_object = None
         self.path = None
         self.search_area_graphic = None
         self.activated = False
+        self.action = Action.idle
         self.fighting = False
         self.time_since_last_move = 0
         self.equipped_weapon = None
 
-    def find_local_food(self, current_map, accessable_tiles=None):
-        nearby_tiles = utilities.get_nearby_tiles(current_map, (self.tile_x, self.tile_y), self.sight_range)
-        for each in nearby_tiles:
-            if not each == self.current_tile:
-                food_at_this_tile = each.entity_group[self.food_type]
-                nearby_food_list.extend(food_at_this_tile)
-        return nearby_food_list
-
-    def choose_random_target_tile(self, current_map):
-        nearby_tiles = utilities.get_nearby_tiles(current_map, self.post, self.sight_range)
-        target_tile = random.choice(nearby_tiles)
-        target_xy = (target_tile.column, target_tile.row)
-        return target_xy
-
-    def select_closest_target(self, list_of_targets):
-        targets_to_sort = []
-        for target in list_of_targets:
-            dist = navigate.distance(target.tile_x, target.tile_y, self.tile_x, self.tile_y)
-            targets_to_sort.append((dist, target))
-
-        possible_targets = sorted(targets_to_sort)
-        if possible_targets:
-            return possible_targets[0][1]
-        else:
-            return None
-
-    def choose_random_target(self, game_map, my_position):
-        target_x, target_y = my_position
-        while my_position == (target_x, target_y):
-            target_x = random.randint(0, game_map.number_of_columns - 1)
-            target_y = random.randint(0, game_map.number_of_rows - 1)
-            tile = game_map.game_tile_rows[target_y][target_x]
-            if tile.is_occupied():
-                target_x, target_y = my_position
-        return (target_x, target_y)
-
-    def eat(self):
-        if self.current_tile.entity_group[self.food_type]:
-            self.eating = True
-            for food_object in self.current_tile.entity_group[self.food_type]:
-                self.current_hunger_saturation += min(food_object.food_value, self.bite_size)
-                food_object.food_value -= self.bite_size
-                self.ticks_without_food = 0
-                if food_object.food_value <= 0:
-                    food_object.expire()
-                    self.target_object = None
-                    self.target_coordinates = None
-                    self.path = None
-                if self.current_hunger_saturation > self.max_hunger_saturation:
-                    self.current_hunger_saturation = self.max_hunger_saturation
-
-    def starvation_check(self):
-        if self.current_hunger_saturation < 1:
-            self.expire()
-
-    def move(self):
-        self.tile_x += self.change_x
-        if self.tile_x < 0:
-            self.tile_x = 0
-        elif self.tile_x >= self.current_map.number_of_columns:
-            self.tile_x = self.current_map.number_of_columns - 1
-        self.tile_y += self.change_y
-        if self.tile_y < 0:
-            self.tile_y = 0
-        elif self.tile_y >= self.current_map.number_of_rows:
-            self.tile_y = self.current_map.number_of_rows - 1
-
-        self.assign_tile()
-        self.sprite.rect.x = self.tile_x * 20
-        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
-        self.change_x = 0
-        self.change_y = 0
-        if len(self.path.tiles) < 2:
-            self.target_coordinates = None
-            self.path = None
-        else:
-            self.path.tiles.pop(0)
+    def pursue_player(self, player, player_coordinates):
+        my_position = (self.tile_x, self.tile_y)
+        if not self.target_coordinates:
+            self.target_coordinates = player_coordinates
+            self.target_object = player
+        self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
 
 
 class Skeleton(Creature):
@@ -131,16 +60,21 @@ class Skeleton(Creature):
 
     def set_images(self):
         self.healthbar = ui.HealthBar(self.current_map, self.tile_x, self.tile_y, self.health, self.max_health)
-        self.current_map.healthbars.append(self.healthbar)
         self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
         self.sprite.image = art.skeleton_image
         self.sprite.rect = self.sprite.image.get_rect()
         self.sprite.rect.x = self.tile_x * 20
         self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
 
-    def tick_cycle(self):
+    def tick_cycle(self, player, player_coordinates):
         self.age += 1
-        self.time_since_last_move += 1
+        if self.health <= 0:
+            self.expire()
+        else:
+            self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
+            self.time_since_last_move += 1
+            if self.health < self.max_health:
+                self.healthbar.active = True
         #if not self.fighting:
             #self.idle()
 
@@ -160,6 +94,158 @@ class Skeleton(Creature):
                     self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
                     self.change_x, self.change_y = navigate.calculate_step(my_position, self.path.tiles[0])
                 self.move()
+
+    def use(self, game_state):
+        self.fighting = True
+        player = game_state.player
+        player.fighting = True
+        player.healthbar.active = True
+        self.healthbar.active = True
+
+
+class GrieveBeast(Creature):
+    occupies_tile = True
+    interactable = True
+    footprint = (2, 1)
+    height = 2
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.speed = 10
+        self.accuracy = 40
+        self.strength = 6
+        self.melee_damage = 3
+        self.health = 100
+        self.max_health = 100
+        self.sight_range = 14
+
+        self.time_since_last_attack = 0
+        self.post = (self.tile_x, self.tile_y)
+        self.fight_frame = 0
+        self.display_name = "Grievebeast"
+        self.set_images()
+
+    def set_images(self):
+        self.healthbar = ui.HealthBar(self.current_map, self.tile_x, self.tile_y, self.health, self.max_health)
+        self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
+        self.sprite.image = art.grievebeast_image
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+
+    def tick_cycle(self, player, player_coordinates):
+        self.age += 1
+        if self.health <= 0:
+            self.expire()
+        else:
+            self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
+            self.time_since_last_move += 1
+            if self.health < self.max_health:
+                self.healthbar.active = True
+
+    def use(self, game_state):
+        self.fighting = True
+        player = game_state.player
+        player.fighting = True
+        player.healthbar.active = True
+        self.healthbar.active = True
+
+
+class ShadeBrute(Creature):
+    occupies_tile = True
+    interactable = True
+    footprint = (1, 1)
+    height = 2
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.speed = 10
+        self.accuracy = 30
+        self.strength = 6
+        self.melee_damage = 3
+        self.health = 80
+        self.max_health = 80
+        self.sight_range = 8
+
+        self.time_since_last_attack = 0
+        self.post = (self.tile_x, self.tile_y)
+        self.fight_frame = 0
+        self.display_name = "Shadebrute"
+        self.walk_frame_number = 0
+        self.set_images()
+
+    def set_images(self):
+        self.healthbar = ui.HealthBar(self.current_map, self.tile_x, self.tile_y, self.health, self.max_health)
+        self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
+        self.rest_frame = art.shadebrute_spritesheet.get_image(0, 0, 20, 40)
+        self.walking_frames = [art.shadebrute_spritesheet.get_image(20, 0, 20, 40),
+                               art.shadebrute_spritesheet.get_image(20, 0, 20, 40),
+                               art.shadebrute_spritesheet.get_image(20, 0, 20, 40),
+                               art.shadebrute_spritesheet.get_image(20, 0, 20, 40),
+                               art.shadebrute_spritesheet.get_image(20, 0, 20, 40),
+                               art.shadebrute_spritesheet.get_image(40, 0, 20, 40),
+                               art.shadebrute_spritesheet.get_image(40, 0, 20, 40),
+                               art.shadebrute_spritesheet.get_image(40, 0, 20, 40),
+                               art.shadebrute_spritesheet.get_image(40, 0, 20, 40),
+                               art.shadebrute_spritesheet.get_image(40, 0, 20, 40),
+                               art.shadebrute_spritesheet.get_image(60, 0, 20, 40),
+                               art.shadebrute_spritesheet.get_image(60, 0, 20, 40),
+                               art.shadebrute_spritesheet.get_image(60, 0, 20, 40),
+                               art.shadebrute_spritesheet.get_image(60, 0, 20, 40),
+                               art.shadebrute_spritesheet.get_image(60, 0, 20, 40),
+                               art.shadebrute_spritesheet.get_image(80, 0, 20, 40),
+                               art.shadebrute_spritesheet.get_image(80, 0, 20, 40),
+                               art.shadebrute_spritesheet.get_image(80, 0, 20, 40),
+                               art.shadebrute_spritesheet.get_image(80, 0, 20, 40),
+                               art.shadebrute_spritesheet.get_image(80, 0, 20, 40)]
+        self.sprite.image = self.rest_frame
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+
+    def set_frame(self, action):
+        self.set_action_sprite(action)
+
+
+    def set_action_sprite(self, action):
+        if action == Action.move or action == Action.attack:
+            self.walk_frame_number += 1
+            if self.walk_frame_number > len(self.walking_frames) - 1:
+                self.walk_frame_number = 0
+            self.sprite.image = self.walking_frames[self.walk_frame_number]
+        else:
+            self.sprite.image = self.rest_frame
+
+
+    def tick_cycle(self, player, player_coordinates):
+
+        self.time_since_last_attack += 1
+        self.time_since_last_move += 1
+        self.age += 1
+        if self.health <= 0:
+            self.expire()
+        self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
+        if self.health < self.max_health:
+            self.healthbar.active = True
+            self.action = Action.attack
+            self.target_coordinates = player_coordinates
+            self.target_object = player
+        target = self.target_object
+        target_coordinates = self.target_coordinates
+        my_coordinates = (self.tile_x, self.tile_y)
+
+        if self.action == Action.idle:
+            pass
+        elif self.action == Action.move:
+            self.moving(my_coordinates, target, target_coordinates)
+        elif self.action == Action.attack:
+            if target.health > 0:
+                self.attacking(my_coordinates, target_coordinates, target)
+            else:
+                self.clear_target()
+                self.action = Action.idle
+
+        self.set_frame(self.action)
 
     def use(self, game_state):
         self.fighting = True
