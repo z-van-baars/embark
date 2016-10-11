@@ -32,8 +32,6 @@ class Projectile(entity.MovingEntity):
         self.change_x = None
         self.change_y = None
 
-        self.current_map.entity_group["Projectile"].append(self)
-
     def get_vector(self):
         (self.change_x, self.change_y) = utilities.get_vector(self, self.sprite.rect.x + 19, self.sprite.rect.y, self.target_x, self.target_y)
 
@@ -60,7 +58,6 @@ class Projectile(entity.MovingEntity):
                                      target_top,
                                      target_bottom,
                                      (self.sprite.rect.x + 20, self.sprite.rect.y)):
-            print("strike")
             self.target.health -= self.damage
             ui.HitBox(self.current_map, self.target.sprite.rect.x, self.target.sprite.rect.y, self.damage, "Avatar")
             self.target.healthbar.active = True

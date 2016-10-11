@@ -58,6 +58,9 @@ class Skeleton(Creature):
         self.display_name = "Spoopy Skellington"
         self.set_images()
 
+    def set_frame(self, action):
+        pass
+
     def set_images(self):
         self.healthbar = ui.HealthBar(self.current_map, self.tile_x, self.tile_y, self.health, self.max_health)
         self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
@@ -67,16 +70,33 @@ class Skeleton(Creature):
         self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
 
     def tick_cycle(self, player, player_coordinates):
+        self.time_since_last_attack += 1
+        self.time_since_last_move += 1
         self.age += 1
         if self.health <= 0:
             self.expire()
-        else:
-            self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
-            self.time_since_last_move += 1
-            if self.health < self.max_health:
-                self.healthbar.active = True
-        #if not self.fighting:
-            #self.idle()
+        self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
+        if self.health < self.max_health:
+            self.healthbar.active = True
+            self.action = Action.attack
+            self.target_coordinates = player_coordinates
+            self.target_object = player
+        target = self.target_object
+        target_coordinates = self.target_coordinates
+        my_coordinates = (self.tile_x, self.tile_y)
+
+        if self.action == Action.idle:
+            pass
+        elif self.action == Action.move:
+            self.moving(my_coordinates, target, target_coordinates)
+        elif self.action == Action.attack:
+            if target.health > 0:
+                self.attacking(my_coordinates, target_coordinates, target)
+            else:
+                self.clear_target()
+                self.action = Action.idle
+
+        self.set_frame(self.action)
 
     def idle(self):
         my_position = (self.tile_x, self.tile_y)
