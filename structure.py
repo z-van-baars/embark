@@ -242,8 +242,9 @@ class Door(Structure):
     interactable = True
     footprint = (1, 1)
     height = 2
+    gateway = True
 
-    def __init__(self, x, y, current_map, twin_map, x2, y2):
+    def __init__(self, x, y, current_map, x2=0, y2=1, twin_map=None):
         super().__init__(x, y, current_map)
         self.set_images()
 
@@ -259,26 +260,29 @@ class Door(Structure):
         self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
 
     def use(self, game_state):
-        game_state.active_map.healthbars.remove(game_state.player.healthbar)
-        game_state.active_map = self.twin_map
-        game_state.active_map.healthbars.append(game_state.player.healthbar)
-        game_state.player.tile_x = self.destination_x
-        game_state.player.tile_y = self.destination_y
-        game_state.player.leave_tile()
-        game_state.player.assign_map(game_state.active_map)
-        game_state.player.assign_tile()
-        game_state.screen.fill(utilities.colors.black)
-        game_state.player.sprite.rect.x = game_state.player.tile_x * 20
-        game_state.player.sprite.rect.y = (game_state.player.tile_y - 1) * 20
+        if self.twin_map is not None and self.twin_map in game_state.maps:
+            twin_map = game_state.maps[self.twin_map]
+            game_state.active_map.healthbars.remove(game_state.player.healthbar)
+            game_state.active_map = twin_map
+            game_state.active_map.healthbars.append(game_state.player.healthbar)
+            game_state.player.tile_x = self.destination_x
+            game_state.player.tile_y = self.destination_y
+            game_state.player.leave_tile()
+            game_state.player.assign_map(game_state.active_map)
+            game_state.player.assign_tile()
+            game_state.screen.fill(utilities.colors.black)
+            game_state.player.sprite.rect.x = game_state.player.tile_x * 20
+            game_state.player.sprite.rect.y = (game_state.player.tile_y - 1) * 20
 
         self.activated = False
 
 
 class VertGate(Door):
     footprint = (1, 2)
+    height = 2
 
-    def __init__(self, x, y, current_map, twin_map, x2, y2):
-        super().__init__(x, y, current_map, twin_map, x2, y2)
+    def __init__(self, x, y, current_map, x2=0, y2=1, twin_map=None):
+        super().__init__(x, y, current_map, x2, y2, twin_map)
         self.display_name = "Vertical Gate"
 
     def set_images(self):
@@ -290,9 +294,10 @@ class VertGate(Door):
 
 class HorizGate(Door):
     footprint = (2, 1)
+    height = 1
 
-    def __init__(self, x, y, current_map, twin_map, x2, y2):
-        super().__init__(x, y, current_map, twin_map, x2, y2)
+    def __init__(self, x, y, current_map, x2=0, y2=1, twin_map=None):
+        super().__init__(x, y, current_map, x2, y2, twin_map)
         self.display_name = "Horizontal Gate"
 
     def set_images(self):
@@ -403,4 +408,207 @@ class LargeShingleHouse(Structure):
         self.sprite.rect.x = self.tile_x * 20
         self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
 
+
+class ChairForward(Structure):
+    interactable = False
+    footprint = (1, 1)
+    height = 2
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.display_name = "Chair"
+        self.set_images()
+
+    def set_images(self):
+        self.sprite.image = art.chair_forward_image
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+
+
+class ChairBackward(Structure):
+    interactable = False
+    footprint = (1, 1)
+    height = 2
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.display_name = "Chair"
+        self.set_images()
+
+    def set_images(self):
+        self.sprite.image = art.chair_backward_image
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+
+
+class BarrelVertical(Structure):
+    interactable = False
+    footprint = (1, 1)
+    height = 1
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.display_name = "Barrel"
+        self.set_images()
+
+    def set_images(self):
+        self.sprite.image = art.barrel_vertical_image
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+
+
+class Pot(Structure):
+    interactable = False
+    footprint = (1, 1)
+    height = 1
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.display_name = "Pot"
+        self.set_images()
+
+    def set_images(self):
+        self.sprite.image = random.choice(art.pot_images)
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+
+
+class BarrelHorizontal(Structure):
+    interactable = False
+    footprint = (1, 1)
+    height = 1
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.display_name = "Barrel"
+        self.set_images()
+
+    def set_images(self):
+        self.sprite.image = art.barrel_horizontal_image
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+
+
+class TableEmpty(Structure):
+    interactable = False
+    footprint = (2, 1)
+    height = 2
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.display_name = "Table"
+        self.set_images()
+
+    def set_images(self):
+        self.sprite.image = art.empty_table_image
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+
+
+class Table(Structure):
+    interactable = False
+    footprint = (2, 1)
+    height = 2
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.display_name = "Table"
+        self.set_images()
+
+    def set_images(self):
+        self.sprite.image = random.choice(art.table_images)
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+
+
+class EmptyNarrowBookshelf(Structure):
+    interactable = False
+    footprint = (1, 1)
+    height = 2
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.display_name = "Bookshelf"
+        self.set_images()
+
+    def set_images(self):
+        self.sprite.image = art.narrow_bookshelf_empty_image
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+
+
+class NarrowBookshelf(Structure):
+    interactable = False
+    footprint = (1, 1)
+    height = 2
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.display_name = "Bookshelf"
+        self.set_images()
+
+    def set_images(self):
+        self.sprite.image = random.choice(art.narrow_bookshelf_images)
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+
+
+class EmptyWideBookshelf(Structure):
+    interactable = False
+    footprint = (2, 1)
+    height = 2
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.display_name = "Bookshelf"
+        self.set_images()
+
+    def set_images(self):
+        self.sprite.image = art.wide_bookshelf_empty_image
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+
+
+class WideBookshelf(Structure):
+    interactable = False
+    footprint = (2, 1)
+    height = 2
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.display_name = "Bookshelf"
+        self.set_images()
+
+    def set_images(self):
+        self.sprite.image = random.choice(art.wide_bookshelf_images)
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+
+
+class Wardrobe(Structure):
+    interactable = False
+    footprint = (2, 1)
+    height = 2
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.display_name = "Wardrobe"
+        self.set_images()
+
+    def set_images(self):
+        self.sprite.image = art.wardrobe_image
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
 

@@ -6,6 +6,7 @@ import structure
 import npc
 import art
 import ui
+import avatar
 
 tile_strings = ["Dirt",
                 "Flagstone",
@@ -34,8 +35,10 @@ tile_strings = ["Dirt",
                 "Dirt Path Elbow RU",
                 "Water"]
 
-entities = {"Forge": structure.Forge,
+entities = {"Avatar": avatar.Avatar,
+            "Forge": structure.Forge,
             "Anvil": structure.Anvil,
+            "Door": structure.Door,
             "Wall Stone": structure.StoneWall,
             "Wall Interior": structure.HouseInteriorWall,
             "Palisade Vertical": structure.VerticalPalisade,
@@ -53,6 +56,18 @@ entities = {"Forge": structure.Forge,
             "House Shingle Large": structure.LargeShingleHouse,
             "Signpost": structure.Signpost,
             "Chest": structure.Chest,
+            "Pot": structure.Pot,
+            "Table Empty": structure.TableEmpty,
+            "Table": structure.Table,
+            "Barrel Vertical": structure.BarrelVertical,
+            "Barrel Horizontal": structure.BarrelHorizontal,
+            "Chair Forward": structure.ChairForward,
+            "Chair Backward": structure.ChairBackward,
+            "Bookshelf Narrow": structure.NarrowBookshelf,
+            "Bookshelf Narrow Empty": structure.EmptyNarrowBookshelf,
+            "Bookshelf Wide": structure.WideBookshelf,
+            "Bookshelf Wide Empty": structure.EmptyWideBookshelf,
+            "Wardrobe": structure.Wardrobe,
             "Guard": npc.Guard,
             "Villager": npc.Villager,
             "Merchant": npc.Merchant,
@@ -60,15 +75,19 @@ entities = {"Forge": structure.Forge,
             "Tree": flora.Tree,
             "Skeleton": creature.Skeleton,
             "Grievebeast": creature.GrieveBeast,
+            "Doompaw": creature.DoomPaw,
             "Shadebrute": creature.ShadeBrute}
 
 entity_groups = ["Structures",
+                 "Furniture",
                  "NPCs",
                  "Creatures",
-                 "Flora"]
+                 "Flora",
+                 "Avatar"]
 
 structure_strings = ["Forge",
                      "Anvil",
+                     "Door",
                      "Wall Stone",
                      "Wall Interior",
                      "Palisade Horizontal",
@@ -84,10 +103,26 @@ structure_strings = ["Forge",
                      "House Shingle Small",
                      "House Shingle Medium",
                      "House Shingle Large",
-                     "Signpost",
-                     "Chest"]
+                     "Signpost"
+                     ]
 
-creature_strings = ["Skeleton",
+furniture_strings = ["Table Empty",
+                     "Table",
+                     "Chair Forward",
+                     "Chair Backward",
+                     "Bookshelf Narrow",
+                     "Bookshelf Narrow Empty",
+                     "Bookshelf Wide",
+                     "Bookshelf Wide Empty",
+                     "Wardrobe",
+                     "Pot",
+                     "Chest",
+                     "Barrel Vertical",
+                     "Barrel Horizontal"
+                     ]
+
+creature_strings = ["Doompaw",
+                    "Skeleton",
                     "Grievebeast",
                     "Shadebrute"]
 
@@ -99,7 +134,9 @@ npc_strings = ["Guard",
 flora_strings = ["Wheat",
                  "Tree"]
 
-string_lists = {"Flora": flora_strings, "NPCs": npc_strings, "Creatures": creature_strings, "Structures": structure_strings}
+avatar_strings = ["Avatar"]
+
+string_lists = {"Flora": flora_strings, "NPCs": npc_strings, "Creatures": creature_strings, "Structures": structure_strings, "Furniture": furniture_strings, "Avatar": avatar_strings}
 for string_list in string_lists:
     string_lists[string_list] = sorted(string_lists[string_list])
 
@@ -265,13 +302,25 @@ def key_event_processing(debug_status, event_key):
     key_functions.get(event_key, do_nothing)(debug_status)
 
 
-def place_click(debug_status, current_map, selected_tile):
+def place_click(game_state, debug_status, current_map, selected_tile):
     entity_string = string_lists[debug_status.current_entity_group][debug_status.current_entity_type_number]
     entity_to_place = entities[entity_string]
-    if not utilities.any_tile_blocked(selected_tile, current_map, entity_to_place):
-        entity_to_place(selected_tile.column, selected_tile.row, current_map)
+    if not entity_to_place.gateway:
+        if not utilities.any_tile_blocked(selected_tile, current_map, entity_to_place):
+            if entity_to_place.my_type == "Avatar":
+                game_state.player.tile_x = selected_tile.column
+                game_state.player.tile_y = selected_tile.row
+                game_state.player.leave_tile()
+                game_state.player.assign_map(current_map)
+                game_state.player.assign_tile()
+                game_state.player.sprite.rect.x = game_state.player.tile_x * 20
+                game_state.player.sprite.rect.y = (game_state.player.tile_y - 1) * 20
+            else:
+                entity_to_place(selected_tile.column, selected_tile.row, current_map)
+        else:
+            print("BLOCKED!")
     else:
-        print("BLOCKED!")
+        entity_to_place(selected_tile.column, selected_tile.row, current_map)
 
 
 def edit_click(game_state, debug_status, selected_tile, mouse_pos):
@@ -292,6 +341,11 @@ def edit_click(game_state, debug_status, selected_tile, mouse_pos):
                                                        mouse_pos,
                                                        selected_tile.entity_group["Structure"][0])
                 new_chest_edit_menu.menu_onscreen()
+            if each.gateway:
+                door_edit_menu = ui.DoorEditMenu(game_state,
+                                                 mouse_pos,
+                                                 each)
+                door_edit_menu.menu_onscreen()
 
 
 def remove_click(current_map, current_tile):
@@ -314,12 +368,11 @@ def mouse_processing(current_map, debug_status, mouse_pos, event, game_state):
         if debug_status.remove:
             remove_click(current_map, selected_tile)
         if debug_status.place:
-            place_click(debug_status, current_map, selected_tile)
+            place_click(game_state, debug_status, current_map, selected_tile)
         if debug_status.edit:
             edit_click(game_state, debug_status, selected_tile, mouse_pos)
         if debug_status.paint:
             paint_click(current_map, selected_tile, tile_strings[debug_status.tile_number])
-
 
 class DebugStatus(object):
     def __init__(self, current_map, game_state):

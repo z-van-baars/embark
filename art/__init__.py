@@ -126,6 +126,85 @@ medium_thatch_house_images = [medium_thatch_house_image_1,
 large_shingle_house_image = pygame.image.load("art/structures/houses/large_house_1.png").convert()
 large_shingle_house_image.set_colorkey(utilities.colors.key)
 
+#Furniture
+chair_forward_image = pygame.image.load("art/structures/furniture/chair_1.png").convert()
+chair_backward_image = pygame.image.load("art/structures/furniture/chair_2.png").convert()
+empty_table_image = pygame.image.load("art/structures/furniture/table_empty.png").convert()
+table_image_1 = pygame.image.load("art/structures/furniture/table_1.png").convert()
+table_image_2 = pygame.image.load("art/structures/furniture/table_2.png").convert()
+table_image_3 = pygame.image.load("art/structures/furniture/table_3.png").convert()
+table_image_4 = pygame.image.load("art/structures/furniture/table_4.png").convert()
+barrel_vertical_image = pygame.image.load("art/structures/furniture/barrel_1.png").convert()
+barrel_horizontal_image = pygame.image.load("art/structures/furniture/barrel_2.png").convert()
+pot_image_1 = pygame.image.load("art/structures/furniture/pot_1.png").convert()
+pot_image_2 = pygame.image.load("art/structures/furniture/pot_2.png").convert()
+pot_image_3 = pygame.image.load("art/structures/furniture/pot_3.png").convert()
+pot_image_4 = pygame.image.load("art/structures/furniture/pot_4.png").convert()
+wardrobe_image = pygame.image.load("art/structures/furniture/wardrobe_1.png").convert()
+narrow_bookshelf_empty_image = pygame.image.load("art/structures/furniture/narrow_bookshelf_empty.png").convert()
+narrow_bookshelf_image_1 = pygame.image.load("art/structures/furniture/narrow_bookshelf_1.png").convert()
+narrow_bookshelf_image_2 = pygame.image.load("art/structures/furniture/narrow_bookshelf_2.png").convert()
+narrow_bookshelf_image_3 = pygame.image.load("art/structures/furniture/narrow_bookshelf_3.png").convert()
+narrow_bookshelf_image_4 = pygame.image.load("art/structures/furniture/narrow_bookshelf_4.png").convert()
+wide_bookshelf_empty_image = pygame.image.load("art/structures/furniture/wide_bookshelf_empty.png").convert()
+wide_bookshelf_image_1 = pygame.image.load("art/structures/furniture/wide_bookshelf_1.png").convert()
+wide_bookshelf_image_2 = pygame.image.load("art/structures/furniture/wide_bookshelf_2.png").convert()
+wide_bookshelf_image_3 = pygame.image.load("art/structures/furniture/wide_bookshelf_3.png").convert()
+wide_bookshelf_image_4 = pygame.image.load("art/structures/furniture/wide_bookshelf_4.png").convert()
+wide_bookshelf_image_5 = pygame.image.load("art/structures/furniture/wide_bookshelf_5.png").convert()
+wide_bookshelf_image_6 = pygame.image.load("art/structures/furniture/wide_bookshelf_6.png").convert()
+
+furniture_images = [chair_forward_image,
+                    chair_backward_image,
+                    empty_table_image,
+                    table_image_1,
+                    table_image_2,
+                    table_image_3,
+                    table_image_4,
+                    barrel_vertical_image,
+                    barrel_horizontal_image,
+                    pot_image_1,
+                    pot_image_2,
+                    pot_image_3,
+                    pot_image_4,
+                    wardrobe_image,
+                    narrow_bookshelf_empty_image,
+                    narrow_bookshelf_image_1,
+                    narrow_bookshelf_image_2,
+                    narrow_bookshelf_image_3,
+                    narrow_bookshelf_image_4,
+                    wide_bookshelf_empty_image,
+                    wide_bookshelf_image_1,
+                    wide_bookshelf_image_2,
+                    wide_bookshelf_image_3,
+                    wide_bookshelf_image_4,
+                    wide_bookshelf_image_5,
+                    wide_bookshelf_image_6]
+for each in furniture_images:
+    each.set_colorkey(utilities.colors.key)
+
+pot_images = [pot_image_1,
+              pot_image_2,
+              pot_image_3,
+              pot_image_4]
+table_images = [table_image_1,
+                table_image_2,
+                table_image_3,
+                table_image_4]
+
+narrow_bookshelf_images = [narrow_bookshelf_image_1,
+                           narrow_bookshelf_image_2,
+                           narrow_bookshelf_image_3,
+                           narrow_bookshelf_image_4]
+
+wide_bookshelf_images = [wide_bookshelf_image_1,
+                         wide_bookshelf_image_2,
+                         wide_bookshelf_image_3,
+                         wide_bookshelf_image_4,
+                         wide_bookshelf_image_5,
+                         wide_bookshelf_image_6]
+
+
 #Flora
 tree_image_1 = pygame.image.load("art/tree/large_tree_1.png")
 tree_image_2 = pygame.image.load("art/tree/large_tree_2.png")
@@ -146,6 +225,8 @@ skeleton_image = pygame.image.load("art/creatures/skeleton.png").convert()
 skeleton_image.set_colorkey(utilities.colors.key)
 grievebeast_image = pygame.image.load("art/creatures/grievebeast.png").convert()
 grievebeast_image.set_colorkey(utilities.colors.key)
+doompaw_image = pygame.image.load("art/creatures/doompaw.png").convert()
+doompaw_image.set_colorkey(utilities.colors.key)
 shadebrute_spritesheet = spritesheet.Spritesheet("art/creatures/shadebrute.png")
 
 #weapons

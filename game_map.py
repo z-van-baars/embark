@@ -101,20 +101,26 @@ class Map(object):
                     neighbor_placed = True
 
     def scroll_check(self, x, y):
-        if x + self.x_shift < 200:
+        if x + self.x_shift < 200 and not self.x_shift < -(self.width - self.screen_dimensions[0]):
             self.world_scroll(20, 0, self.screen_dimensions[0], self.screen_dimensions[1])
-        elif x + self.x_shift > self.screen_dimensions[0] - 200:
+        elif x + self.x_shift > self.screen_dimensions[0] - 200 and not self.x_shift > 0:
             self.world_scroll(-20, 0, self.screen_dimensions[0], self.screen_dimensions[1])
-        if y + self.y_shift < 200:
+        if y + self.y_shift < 200 and not self.y_shift < -(self.height - self.screen_dimensions[1] + 80):
             self.world_scroll(0, 20, self.screen_dimensions[0], self.screen_dimensions[1])
-        elif y + self.y_shift > self.screen_dimensions[1] - 280:
+        elif y + self.y_shift > self.screen_dimensions[1] - 280 and not self.y_shift > 0:
             self.world_scroll(0, -20, self.screen_dimensions[0], self.screen_dimensions[1])
 
     def world_scroll(self, shift_x, shift_y, screen_width, screen_height):
-        if 0 >= self.x_shift + shift_x >= -(self.width - screen_width):
-            self.x_shift += shift_x
-        if 0 >= self.y_shift + shift_y >= -(self.height - screen_height):
-            self.y_shift += shift_y
+        self.x_shift += shift_x
+        self.y_shift += shift_y
+        if self.x_shift > 0:
+            self.x_shift = 0
+        elif self.x_shift < -(self.width - screen_width):
+            self.x_shift = -(self.width - screen_width)
+        if self.y_shift > 0:
+            self.y_shift = 0
+        elif self.y_shift < -(self.height - screen_height + 80):
+            self.y_shift = -(self.height - screen_height + 80)
 
     def draw_to_screen(self, screen, screen_width, screen_height):
         objects_to_draw = []

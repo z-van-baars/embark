@@ -5,7 +5,7 @@ import pickle
 
 pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.init()
-pygame.display.set_caption("Embark v 0.21")
+pygame.display.set_caption("Embark v 0.3")
 
 
 class GameState(object):
@@ -30,6 +30,7 @@ class Colors(object):
     def __init__(self):
         self.black = (0, 0, 0)
         self.white = (255, 255, 255)
+        self.light_grey = (194, 194, 194)
         self.light_green = (0, 210, 0)
         self.dark_green = (0, 200, 0)
         self.red = (255, 0, 0)
@@ -83,18 +84,22 @@ def get_random_coordinates(x_lower, x_upper, y_lower, y_upper):
 
 
 def export_game_state(game_state):
+    print("Exporting Game State......")
     game_state.clock = None
     pickle.dump(game_state, open("saves/save_1.p", "wb"))
     game_state.clock = pygame.time.Clock()
+    print("Done")
 
 
 def import_game_state():
+    print("Importing Game State......")
     imported_game_state = pickle.load(open("saves/save_1.p", "rb"))
     imported_game_state.clock = pygame.time.Clock()
     imported_game_state.reset_surfaces()
     imported_game_state.debug_status.reset_surfaces()
     for each in imported_game_state.maps:
         restore_surfaces(imported_game_state.maps[each])
+    print("Done")
     return imported_game_state
 
 
@@ -103,9 +108,9 @@ def restore_surfaces(imported_map):
     for entity_list in imported_map.entity_group:
         for entity in imported_map.entity_group[entity_list]:
             entity.set_images()
-            if entity.items_list:
+            if hasattr(entity, 'items_list'):
                 for each in entity.items_list:
-                    each.set_images()
+                    each.set_surfaces()
             entity.current_tile = None
             entity.assign_tile()
 
@@ -115,7 +120,10 @@ def any_tile_blocked(tile, active_map, entity):
     initial_y = tile.row - (entity.footprint[1] - 1)
     for tile_y in range(initial_y, initial_y + (entity.footprint[1])):
         for tile_x in range(initial_x, initial_x + entity.footprint[0]):
-            if active_map.game_tile_rows[tile_y][tile_x].is_occupied():
+            if within_map(tile_x, tile_y, active_map):
+                if active_map.game_tile_rows[tile_y][tile_x].is_occupied():
+                    return True
+            else:
                 return True
     return False
 

@@ -1,12 +1,15 @@
 import pygame
 import utilities
 from item import quality_colors
+import game_map
 
 pygame.init()
 pygame.display.set_mode([0, 0])
 
 trade_background = pygame.image.load("art/ui_elements/tradescreen/trade_window.png").convert()
 loot_background = pygame.image.load("art/ui_elements/lootscreen/loot_screen.png").convert()
+
+door_edit_menu_pane = pygame.image.load("art/ui_elements/door_editor/door_edit_menu_bg.png")
 
 small_up_arrow_selected = pygame.image.load("art/ui_elements/tradescreen/small_up_arrow_selected.png").convert()
 small_up_arrow_regular = pygame.image.load("art/ui_elements/tradescreen/small_up_arrow_regular.png").convert()
@@ -55,6 +58,26 @@ back_deselected_image = pygame.image.load("art/ui_elements/dialogue_box/back_des
 
 edit_deselected_image = pygame.image.load("art/ui_elements/dialogue_box/edit_deselected.png").convert()
 edit_selected_image = pygame.image.load("art/ui_elements/dialogue_box/edit_selected.png").convert()
+
+map_editor_bg = pygame.image.load("art/ui_elements/map_editor/map_editor_bg.png").convert()
+new_map_bg = pygame.image.load("art/ui_elements/map_editor/new_map_bg.png").convert()
+
+accept_selected_image = pygame.image.load("art/ui_elements/map_editor/accept_selected.png").convert()
+accept_deselected_image = pygame.image.load("art/ui_elements/map_editor/accept_deselected.png").convert()
+map_cancel_selected_image = pygame.image.load("art/ui_elements/map_editor/cancel_selected.png").convert()
+map_cancel_deselected_image = pygame.image.load("art/ui_elements/map_editor/cancel_deselected.png").convert()
+delete_selected_image = pygame.image.load("art/ui_elements/map_editor/delete_selected.png").convert()
+delete_deselected_image = pygame.image.load("art/ui_elements/map_editor/delete_deselected.png").convert()
+load_selected_image = pygame.image.load("art/ui_elements/map_editor/load_selected.png").convert()
+load_deselected_image = pygame.image.load("art/ui_elements/map_editor/load_deselected.png").convert()
+new_selected_image = pygame.image.load("art/ui_elements/map_editor/new_selected.png").convert()
+new_deselected_image = pygame.image.load("art/ui_elements/map_editor/new_deselected.png").convert()
+x_selected_image = pygame.image.load("art/ui_elements/map_editor/x_selected.png").convert()
+x_deselected_image = pygame.image.load("art/ui_elements/map_editor/x_deselected.png").convert()
+up_arrow_deselected_image = pygame.image.load("art/ui_elements/map_editor/up_arrow_deselected.png").convert()
+up_arrow_selected_image = pygame.image.load("art/ui_elements/map_editor/up_arrow_selected.png").convert()
+down_arrow_deselected_image = pygame.image.load("art/ui_elements/map_editor/down_arrow_deselected.png").convert()
+down_arrow_selected_image = pygame.image.load("art/ui_elements/map_editor/down_arrow_selected.png").convert()
 
 
 class HitBox(object):
@@ -176,6 +199,284 @@ class Menu(object):
                     button.sprite.image = button.regular
 
             self.screen.blit(self.background_pane.image, [self.background_pane.rect.left, self.background_pane.rect.top])
+            for button in self.buttons:
+                self.screen.blit(button.sprite.image, [button.sprite.rect.x, button.sprite.rect.y])
+
+            pygame.display.flip()
+
+
+class MapEditor(Menu):
+    def __init__(self, game_state):
+        super().__init__(game_state, None, None)
+        self.background_pane = pygame.sprite.Sprite()
+        self.background_pane.image = map_editor_bg
+        self.background_pane.rect = self.background_pane.image.get_rect()
+        self.background_pane.rect.x = self.screen_width / 2 - 200
+        self.background_pane.rect.y = self.screen_height / 2 - 180
+        self.editing = False
+        self.maps_list = []
+        for each in game_state.maps:
+            self.maps_list.append(each)
+        self.maps_list = sorted(self.maps_list)
+        self.maps_list_top = 0
+        self.selected_map = 0
+
+        def up_arrow_click():
+            if self.maps_list_top > 0:
+                self.maps_list_top -= 1
+
+        def down_arrow_click():
+            if self.maps_list_top < len(self.maps_list) - 12:
+                self.maps_list_top += 1
+
+        def new_click():
+            new_map_window = NewMapWindow(game_state)
+            new_map_window.menu_onscreen()
+            self.maps_list = []
+            for each in game_state.maps:
+                self.maps_list.append(each)
+            self.maps_list = sorted(self.maps_list)
+
+        def delete_click():
+            map_string = self.maps_list[self.selected_map]
+            del game_state.maps[map_string]
+            self.maps_list = []
+            for each in game_state.maps:
+                self.maps_list.append(each)
+            self.maps_list = sorted(self.maps_list)
+
+        def load_click():
+            map_string = self.maps_list[self.selected_map]
+            game_state.active_map = game_state.maps[map_string]
+            self.open = False
+
+        def x_click():
+            self.open = False
+
+        x_button = Button(x_deselected_image,
+                          x_selected_image,
+                          x_click,
+                          self.background_pane.rect.x + 360,
+                          self.background_pane.rect.y + 5)
+        up_arrow_button = Button(up_arrow_deselected_image,
+                                 up_arrow_selected_image,
+                                 up_arrow_click,
+                                 self.background_pane.rect.x + 353,
+                                 self.background_pane.rect.y + 44)
+        down_arrow_button = Button(down_arrow_deselected_image,
+                                   down_arrow_selected_image,
+                                   down_arrow_click,
+                                   self.background_pane.rect.x + 353,
+                                   self.background_pane.rect.y + 266)
+        new_button = Button(new_deselected_image,
+                            new_selected_image,
+                            new_click,
+                            self.background_pane.rect.x + 20,
+                            self.background_pane.rect.y + 310)
+        delete_button = Button(delete_deselected_image,
+                               delete_selected_image,
+                               delete_click,
+                               self.background_pane.rect.x + 280,
+                               self.background_pane.rect.y + 310)
+        load_button = Button(load_deselected_image,
+                             load_selected_image,
+                             load_click,
+                             self.background_pane.rect.x + 150,
+                             self.background_pane.rect.y + 310)
+
+        self.buttons = [x_button, up_arrow_button, down_arrow_button, new_button, load_button, delete_button]
+
+    def menu_onscreen(self):
+        small_font = pygame.font.SysFont('Calibri', 18, True, False)
+        cursor = small_font.render("<", True, utilities.colors.red)
+        map_selection_box = pygame.sprite.Sprite()
+        while self.open:
+            click = False
+            mouse_pos = pygame.mouse.get_pos()
+            visible_maps = self.maps_list[self.maps_list_top:self.maps_list_top + 12]
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.display.quit()
+                    pygame.quit()
+
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    click = True
+                    count = 0
+                    spacer = 20
+                    for each in visible_maps:
+                        x1 = self.background_pane.rect.left + 22
+                        x2 = x1 + 200
+                        y1 = (self.background_pane.rect.top + 44 + (count * spacer))
+                        y2 = y1 + 20
+                        if utilities.check_if_inside(x1, x2, y1, y2, mouse_pos):
+                            if count + self.maps_list_top <= len(self.maps_list):
+                                self.selected_map = count + self.maps_list_top
+                        count += 1
+            map_selection_box.image = pygame.Rect(self.background_pane.rect.left + 20,
+                                                  self.background_pane.rect.top + 44 + ((self.selected_map - self.maps_list_top) * 20),
+                                                  200,
+                                                  20)
+
+            for button in self.buttons:
+                if utilities.check_if_inside(button.sprite.rect.x,
+                                             button.sprite.rect.right,
+                                             button.sprite.rect.y,
+                                             button.sprite.rect.bottom,
+                                             mouse_pos):
+                    button.sprite.image = button.selected
+                    if click:
+                        button.click()
+                else:
+                    button.sprite.image = button.regular
+
+            self.screen.blit(self.background_pane.image, [self.background_pane.rect.left, self.background_pane.rect.top])
+
+            spacer = 20
+            count = 0
+            for each in visible_maps:
+                name_stamp = small_font.render(each, True, utilities.colors.light_grey)
+                self.screen.blit(name_stamp, [self.background_pane.rect.left + 22,
+                                              self.background_pane.rect.top + 44 + (count * spacer)])
+                count += 1
+            if self.selected_map >= self.maps_list_top and self.selected_map <= self.maps_list_top + 44:
+                pygame.draw.rect(self.screen, (255, 198, 13), map_selection_box.image, 1)
+
+            for button in self.buttons:
+                self.screen.blit(button.sprite.image, [button.sprite.rect.x, button.sprite.rect.y])
+
+            pygame.display.flip()
+
+
+class NewMapWindow(Menu):
+    def __init__(self, game_state):
+        super().__init__(game_state, None, None)
+        self.background_pane = pygame.sprite.Sprite()
+        self.background_pane.image = new_map_bg
+        self.background_pane.rect = self.background_pane.image.get_rect()
+        self.background_pane.rect.x = self.screen_width / 2 - 170
+        self.background_pane.rect.y = self.screen_height / 2 - 95
+        self.editing = False
+        self.new_map_name = "New Map 001"
+        self.new_map_x = 10
+        self.new_map_y = 10
+
+        def map_cancel_click():
+            self.open = False
+
+        def accept_click():
+            new_map = game_map.Map(self.new_map_name,
+                                   (self.new_map_x, self.new_map_y),
+                                   (game_state.screen_width, game_state.screen_height),
+                                   False)
+            new_map.map_generation()
+            game_state.maps[new_map.name] = new_map
+            self.open = False
+
+        def x_up_click():
+            if self.new_map_x < 100:
+                self.new_map_x += 1
+
+        def x_down_click():
+            if self.new_map_x > 2:
+                self.new_map_x -= 1
+
+        def y_up_click():
+            if self.new_map_y < 100:
+                self.new_map_y += 1
+
+        def y_down_click():
+            if self.new_map_y > 2:
+                self.new_map_y -= 1
+
+        map_cancel_button = Button(map_cancel_deselected_image,
+                                   map_cancel_selected_image,
+                                   map_cancel_click,
+                                   self.background_pane.rect.x + 234,
+                                   self.background_pane.rect.y + 5)
+
+        accept_button = Button(accept_deselected_image,
+                               accept_selected_image,
+                               accept_click,
+                               self.background_pane.rect.x + 234,
+                               self.background_pane.rect.y + 150)
+
+        x_up_button = Button(up_arrow_deselected_image,
+                             up_arrow_selected_image,
+                             x_up_click,
+                             self.background_pane.rect.x + 50,
+                             self.background_pane.rect.y + 85)
+
+        x_down_button = Button(down_arrow_deselected_image,
+                               down_arrow_selected_image,
+                               x_down_click,
+                               self.background_pane.rect.x + 50,
+                               self.background_pane.rect.y + 150)
+
+        y_up_button = Button(up_arrow_deselected_image,
+                             up_arrow_selected_image,
+                             y_up_click,
+                             self.background_pane.rect.x + 138,
+                             self.background_pane.rect.y + 85)
+
+        y_down_button = Button(down_arrow_deselected_image,
+                               down_arrow_selected_image,
+                               y_down_click,
+                               self.background_pane.rect.x + 138,
+                               self.background_pane.rect.y + 150)
+
+        self.buttons = [map_cancel_button, accept_button, x_up_button, x_down_button, y_up_button, y_down_button]
+
+    def menu_onscreen(self):
+        small_font = pygame.font.SysFont('Calibri', 18, True, False)
+        cursor = small_font.render("<", True, utilities.colors.red)
+        while self.open:
+            click = False
+            mouse_pos = pygame.mouse.get_pos()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.display.quit()
+                    pygame.quit()
+
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    click = True
+                    if utilities.check_if_inside(self.background_pane.rect.x + 16,
+                                                 self.background_pane.rect.right - 10,
+                                                 self.background_pane.rect.y + 48,
+                                                 self.background_pane.rect.y + 70,
+                                                 mouse_pos):
+                        self.editing = True
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_BACKSPACE:
+                        self.new_map_name = self.new_map_name[:-1]
+                    elif event.key == pygame.K_RETURN:
+                        self.editing = False
+                    else:
+                        self.new_map_name += event.unicode
+
+            for button in self.buttons:
+                if utilities.check_if_inside(button.sprite.rect.x,
+                                             button.sprite.rect.right,
+                                             button.sprite.rect.y,
+                                             button.sprite.rect.bottom,
+                                             mouse_pos):
+                    button.sprite.image = button.selected
+                    if click:
+                        button.click()
+                else:
+                    button.sprite.image = button.regular
+
+            self.screen.blit(self.background_pane.image, [self.background_pane.rect.left, self.background_pane.rect.top])
+
+            name_stamp = small_font.render(self.new_map_name, True, utilities.colors.light_grey)
+            self.screen.blit(name_stamp, [self.background_pane.rect.x + 20, self.background_pane.rect.y + 48])
+            self.screen.blit(small_font.render(str(self.new_map_x), True, utilities.colors.light_grey),
+                             [self.background_pane.rect.x + 50, self.background_pane.rect.y + 122])
+            self.screen.blit(small_font.render(str(self.new_map_y), True, utilities.colors.light_grey),
+                             [self.background_pane.rect.x + 138, self.background_pane.rect.y + 122])
+            if self.editing:
+                self.screen.blit(cursor, [name_stamp.get_width() + self.background_pane.rect.left + 20,
+                                          self.background_pane.rect.y + 48])
+
             for button in self.buttons:
                 self.screen.blit(button.sprite.image, [button.sprite.rect.x, button.sprite.rect.y])
 
@@ -1152,6 +1453,132 @@ class ChestEditMenu(Menu):
             self.screen.blit(self.background_pane.image, [self.background_pane.rect.left, self.background_pane.rect.top])
             self.screen.blit(small_font.render(str(self.entity.value), True, utilities.colors.black),
                              [self.background_pane.rect.x + 30, self.background_pane.rect.y + 10])
+            for button in self.buttons:
+                self.screen.blit(button.sprite.image, [button.sprite.rect.x, button.sprite.rect.y])
+
+            pygame.display.flip()
+
+
+class DoorEditMenu(Menu):
+    def __init__(self, game_state, pos, entity):
+        super().__init__(game_state, pos, entity)
+        self.background_pane = pygame.sprite.Sprite()
+        self.background_pane.image = door_edit_menu_pane
+        self.background_pane.rect = self.background_pane.image.get_rect()
+        self.background_pane.rect.x = self.screen_width / 2 - 100
+        self.background_pane.rect.y = self.screen_height / 2 - 80
+        self.dialogue_page = 0
+
+        self.maps_list = []
+
+        for each in game_state.maps:
+            self.maps_list.append(each)
+        self.maps_list = sorted(self.maps_list)
+        if entity.twin_map is not None and entity.twin_map in game_state.maps:
+            self.selected_map = self.maps_list.index(entity.twin_map)
+        else:
+            self.selected_map = 0
+
+        def leave_click():
+            self.open = False
+            entity.twin_map = self.maps_list[self.selected_map]
+
+        def x_up_click():
+            entity.destination_x += 1
+
+        def x_down_click():
+            if not entity.destination_x == 0:
+                entity.destination_x -= 1
+
+        def y_up_click():
+            entity.destination_y += 1
+
+        def y_down_click():
+            if not entity.destination_y == 0:
+                entity.destination_y -= 1
+
+        def map_up_click():
+            self.selected_map -= 1
+            if self.selected_map < 0:
+                self.selected_map = len(self.maps_list) - 1
+
+        def map_down_click():
+            self.selected_map += 1
+            if self.selected_map > len(self.maps_list) - 1:
+                self.selected_map = 0
+
+        leave_button = Button(leave_deselected_image,
+                              leave_selected_image,
+                              leave_click,
+                              self.background_pane.rect.x + 135,
+                              self.background_pane.rect.y + 170)
+        map_up_arrow = Button(small_up_arrow_regular,
+                              small_up_arrow_selected,
+                              map_up_click,
+                              (self.background_pane.rect.x + 20),
+                              (self.background_pane.rect.y + 35))
+        map_down_arrow = Button(small_down_arrow_regular,
+                                small_down_arrow_selected,
+                                map_down_click,
+                                (self.background_pane.rect.x + 150),
+                                (self.background_pane.rect.y + 35))
+
+        x_up_arrow = Button(small_up_arrow_regular,
+                            small_up_arrow_selected,
+                            x_up_click,
+                            (self.background_pane.rect.x + 60),
+                            (self.background_pane.rect.y + 100))
+        x_down_arrow = Button(small_down_arrow_regular,
+                              small_down_arrow_selected,
+                              x_down_click,
+                              (self.background_pane.rect.x + 110),
+                              (self.background_pane.rect.y + 100))
+        y_up_arrow = Button(small_up_arrow_regular,
+                            small_up_arrow_selected,
+                            y_up_click,
+                            (self.background_pane.rect.x + 60),
+                            (self.background_pane.rect.y + 170))
+        y_down_arrow = Button(small_down_arrow_regular,
+                              small_down_arrow_selected,
+                              y_down_click,
+                              (self.background_pane.rect.x + 110),
+                              (self.background_pane.rect.y + 170))
+
+        self.buttons = [leave_button, map_up_arrow, map_down_arrow, x_up_arrow, x_down_arrow, y_up_arrow, y_down_arrow]
+
+    def menu_onscreen(self):
+        small_font = pygame.font.SysFont('Calibri', 18, True, False)
+        while self.open:
+            click = False
+            mouse_pos = pygame.mouse.get_pos()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.display.quit()
+                    pygame.quit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    click = True
+
+            for button in self.buttons:
+                if utilities.check_if_inside(button.sprite.rect.x,
+                                             button.sprite.rect.right,
+                                             button.sprite.rect.y,
+                                             button.sprite.rect.bottom,
+                                             mouse_pos):
+                    button.sprite.image = button.selected
+                    if click:
+                        button.click()
+                else:
+                    button.sprite.image = button.regular
+
+            self.screen.blit(self.background_pane.image, [self.background_pane.rect.left, self.background_pane.rect.top])
+            self.screen.blit(small_font.render(str(self.maps_list[self.selected_map]), True, utilities.colors.black),
+                             [self.background_pane.rect.x + 70, self.background_pane.rect.y + 35])
+            self.screen.blit(small_font.render(str(self.entity.destination_x), True, utilities.colors.black),
+                             [self.background_pane.rect.x + 80, self.background_pane.rect.y + 100])
+            self.screen.blit(small_font.render(str(self.entity.destination_y), True, utilities.colors.black),
+                             [self.background_pane.rect.x + 80, self.background_pane.rect.y + 170])
+            self.screen.blit(small_font.render("{0}, {1}".format(self.entity.tile_x, self.entity.tile_y), True, utilities.colors.black),
+                             [self.background_pane.rect.x + 2, self.background_pane.rect.y + 176])
             for button in self.buttons:
                 self.screen.blit(button.sprite.image, [button.sprite.rect.x, button.sprite.rect.y])
 

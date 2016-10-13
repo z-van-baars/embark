@@ -61,10 +61,6 @@ class Avatar(entity.SentientEntity):
 
         self.set_images()
 
-    def expire(self):
-        self.current_tile.entity_group["Avatar"].remove(self)
-        self.current_map.entity_group["Avatar"].remove(self)
-
     def set_frame(self, action):
         self.set_action_sprite(action)
         if self.equipped_weapon:

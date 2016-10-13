@@ -14,6 +14,7 @@ class Action(Enum):
 
 class Entity(object):
     occupies_tile = False
+    gateway = False
 
     def __init__(self, x, y, current_map):
         super().__init__()
@@ -37,9 +38,9 @@ class Entity(object):
             return False
 
     def expire(self):
-        print("I am le tired")
         self.leave_tile()
         self.current_map.entity_group[self.my_type].remove(self)
+        self.current_map = None
 
     def assign_tile(self):
         if self.current_tile:
@@ -63,9 +64,11 @@ class Entity(object):
         self.current_tile = None
 
     def assign_map(self, new_map):
-        if self.current_map:
+        if self.current_map is not None:
             self.current_map.entity_group[self.my_type].remove(self)
         self.current_map = new_map
+        if self.healthbar:
+            self.current_map.healthbars.append(self.healthbar)
 
         self.current_map.entity_group[self.my_type].append(self)
 
@@ -84,6 +87,7 @@ class SentientEntity(MovingEntity):
         self.current_map.entity_group[self.my_type].remove(self)
         if self.healthbar:
             self.current_map.healthbars.remove(self.healthbar)
+        self.current_map = None
 
     def clear_target(self):
         self.target_coordinates = None

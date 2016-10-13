@@ -10,6 +10,7 @@ import ui
 import weapon
 import item
 import armor
+import structure
 
 pygame.init()
 pygame.display.set_mode([0, 0])
@@ -41,33 +42,21 @@ def set_bottom_pane_stamp(current_map, mouse_pos):
 
     if utilities.within_map(tile_x, tile_y, current_map):
         selected_tile = current_map.game_tile_rows[tile_y][tile_x]
-    if selected_tile and selected_tile.is_occupied():
-        stamp = get_name_stamp(selected_tile)
-        return stamp
+        if selected_tile and selected_tile.is_occupied():
+            stamp = get_name_stamp(selected_tile)
+            return stamp
+        else:
+            return None
     else:
         return None
 
 
 def create_new_world(game_state):
-    map_1 = Map("Swindon", (60, 300), (game_state.screen_width, game_state.screen_height), False)
+    map_1 = Map("Swindon", (60, 60), (game_state.screen_width, game_state.screen_height), False)
     map_1.map_generation()
     Avatar(5, 5, map_1)
     game_state.maps[map_1.name] = map_1
     game_state.active_map = game_state.maps["Swindon"]
-
-
-def main(game_state):
-    # game_state = utilities.import_game_state()
-    create_new_world(game_state)
-
-    tiny_font = pygame.font.SysFont('Calibri', 11, True, False)
-    done = False
-    super_scroll = 1
-    bottom_pane = pygame.sprite.Sprite()
-    bottom_pane.image = pygame.Surface([game_state.screen_width - 280, 80])
-    bottom_pane.image.fill((171, 171, 171))
-    control_on = False
-
     game_state.player = game_state.active_map.entity_group["Avatar"][0]
 
     game_state.player.fight_frame = 0
@@ -77,12 +66,50 @@ def main(game_state):
     game_state.debug_status = debug_stats
 
     item_1 = weapon.weapon_functions[0](1, game_state.player.level)
-    item_2 = weapon.weapon_functions[1](1, game_state.player.level)
-    item_3 = weapon.weapon_functions[2](1, game_state.player.level)
 
-    initial_equipment = [item_1, item_2, item_3, armor.armor_functions[0]()]
+    initial_equipment = [item_1, armor.armor_functions[0]()]
     game_state.player.items_list = initial_equipment
     game_state.player.items_list[0].equip(game_state.player)
+
+
+def main(game_state):
+    game_state = utilities.import_game_state()
+    # create_new_world(game_state)
+
+    debug_stats = game_state.debug_status
+    map_2 = Map("North Forest", (30, 50), (game_state.screen_width, game_state.screen_height), False)
+    map_3 = Map("Threlkeld", (60, 50), (game_state.screen_width, game_state.screen_height), False)
+    map_4 = Map("East Forest A", (50, 30), (game_state.screen_width, game_state.screen_height), False)
+    map_5 = Map("East Forest B", (50, 30), (game_state.screen_width, game_state.screen_height), False)
+    map_6 = Map("Dungeon Level 1", (30, 30), (game_state.screen_width, game_state.screen_height), True)
+    map_7 = Map("Dungeon Level 2", (40, 20), (game_state.screen_width, game_state.screen_height), True)
+    map_8 = Map("Your House", (14, 14), (game_state.screen_width, game_state.screen_height), True)
+    map_9 = Map("Threlkeld Blacksmith", (20, 15), (game_state.screen_width, game_state.screen_height), True)
+    map_10 = Map("Threlkeld General Store", (20, 15), (game_state.screen_width, game_state.screen_height), True)
+    map_11 = Map("Threlkeld Tavern", (25, 20), (game_state.screen_width, game_state.screen_height), True)
+
+    new_maps = [map_2,
+                map_3,
+                map_4,
+                map_5,
+                map_6,
+                map_7,
+                map_8,
+                map_9,
+                map_10,
+                map_11]
+
+    for each in new_maps:
+        each.map_generation()
+        game_state.maps[each.name] = each
+
+    tiny_font = pygame.font.SysFont('Calibri', 11, True, False)
+    done = False
+    super_scroll = 1
+    bottom_pane = pygame.sprite.Sprite()
+    bottom_pane.image = pygame.Surface([game_state.screen_width - 280, 80])
+    bottom_pane.image.fill((171, 171, 171))
+    control_on = False
 
     while not done:
         mouse_pos = pygame.mouse.get_pos()
@@ -142,6 +169,10 @@ def main(game_state):
                         debug_stats.remove = False
                         debug_stats.current_removal_entity_number = 0
 
+                elif event.key == pygame.K_HOME:
+                    new_map_editor = ui.MapEditor(game_state)
+                    new_map_editor.menu_onscreen()
+
                 if debug_stats.debug:
                     debug.key_event_processing(game_state.debug_status, event.key)
 
@@ -160,9 +191,10 @@ def main(game_state):
                                                  mouse_pos):
                         bag_button.click(game_state, mouse_pos)
                     else:
-                        game_state.active_map.entity_group["Avatar"][0].assign_target(game_state,
-                                                                                      game_state.active_map,
-                                                                                      mouse_pos)
+                        if len(game_state.active_map.entity_group["Avatar"]) > 0:
+                            game_state.active_map.entity_group["Avatar"][0].assign_target(game_state,
+                                                                                          game_state.active_map,
+                                                                                          mouse_pos)
 
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_LSHIFT:

@@ -35,6 +35,43 @@ class Creature(entity.SentientEntity):
             self.target_object = player
         self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
 
+    def tick_cycle(self, player, player_coordinates):
+        self.time_since_last_attack += 1
+        self.time_since_last_move += 1
+        self.age += 1
+        if self.health <= 0:
+            self.expire()
+        self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
+        if self.health < self.max_health:
+            self.healthbar.active = True
+            self.action = Action.attack
+            self.target_coordinates = player_coordinates
+            self.target_object = player
+        target = self.target_object
+        target_coordinates = self.target_coordinates
+        my_coordinates = (self.tile_x, self.tile_y)
+
+        if self.action == Action.idle:
+            pass
+        elif self.action == Action.move:
+            self.moving(my_coordinates, target, target_coordinates)
+        elif self.action == Action.attack:
+            if target.health > 0:
+                self.attacking(my_coordinates, target_coordinates, target)
+            else:
+                self.clear_target()
+                self.action = Action.idle
+
+        self.set_frame(self.action)
+
+    def use(self, game_state):
+        self.fighting = True
+        player = game_state.player
+        player.fighting = True
+        player.healthbar.active = True
+        self.healthbar.active = True
+        self.activated = False
+
 
 class Skeleton(Creature):
     occupies_tile = True
@@ -69,35 +106,6 @@ class Skeleton(Creature):
         self.sprite.rect.x = self.tile_x * 20
         self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
 
-    def tick_cycle(self, player, player_coordinates):
-        self.time_since_last_attack += 1
-        self.time_since_last_move += 1
-        self.age += 1
-        if self.health <= 0:
-            self.expire()
-        self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
-        if self.health < self.max_health:
-            self.healthbar.active = True
-            self.action = Action.attack
-            self.target_coordinates = player_coordinates
-            self.target_object = player
-        target = self.target_object
-        target_coordinates = self.target_coordinates
-        my_coordinates = (self.tile_x, self.tile_y)
-
-        if self.action == Action.idle:
-            pass
-        elif self.action == Action.move:
-            self.moving(my_coordinates, target, target_coordinates)
-        elif self.action == Action.attack:
-            if target.health > 0:
-                self.attacking(my_coordinates, target_coordinates, target)
-            else:
-                self.clear_target()
-                self.action = Action.idle
-
-        self.set_frame(self.action)
-
     def idle(self):
         my_position = (self.tile_x, self.tile_y)
         if not self.target_coordinates:
@@ -114,13 +122,6 @@ class Skeleton(Creature):
                     self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
                     self.change_x, self.change_y = navigate.calculate_step(my_position, self.path.tiles[0])
                 self.move()
-
-    def use(self, game_state):
-        self.fighting = True
-        player = game_state.player
-        player.fighting = True
-        player.healthbar.active = True
-        self.healthbar.active = True
 
 
 class GrieveBeast(Creature):
@@ -153,15 +154,9 @@ class GrieveBeast(Creature):
         self.sprite.rect.x = self.tile_x * 20
         self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
 
-    def tick_cycle(self, player, player_coordinates):
-        self.age += 1
-        if self.health <= 0:
-            self.expire()
-        else:
-            self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
-            self.time_since_last_move += 1
-            if self.health < self.max_health:
-                self.healthbar.active = True
+    def set_frame(self, action):
+        pass
+
 
     def use(self, game_state):
         self.fighting = True
@@ -169,6 +164,51 @@ class GrieveBeast(Creature):
         player.fighting = True
         player.healthbar.active = True
         self.healthbar.active = True
+        self.activated = False
+
+
+class DoomPaw(Creature):
+    occupies_tile = True
+    interactable = True
+    footprint = (2, 1)
+    height = 2
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.speed = 20
+        self.accuracy = 40
+        self.strength = 10
+        self.melee_damage = 5
+        self.health = 250
+        self.max_health = 250
+        self.sight_range = 14
+
+        self.time_since_last_attack = 0
+        self.post = (self.tile_x, self.tile_y)
+        self.fight_frame = 0
+        self.display_name = "Doompaw"
+        self.set_images()
+
+    def set_images(self):
+        self.healthbar = ui.HealthBar(self.current_map, self.tile_x, self.tile_y, self.health, self.max_health)
+        self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
+        self.sprite.image = art.doompaw_image
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+
+    def set_frame(self, action):
+        pass
+
+
+    def use(self, game_state):
+        self.fighting = True
+        player = game_state.player
+        player.fighting = True
+        player.healthbar.active = True
+        self.healthbar.active = True
+        self.activated = False
+
 
 
 class ShadeBrute(Creature):
@@ -236,44 +276,6 @@ class ShadeBrute(Creature):
         else:
             self.sprite.image = self.rest_frame
 
-
-    def tick_cycle(self, player, player_coordinates):
-
-        self.time_since_last_attack += 1
-        self.time_since_last_move += 1
-        self.age += 1
-        if self.health <= 0:
-            self.expire()
-        self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
-        if self.health < self.max_health:
-            self.healthbar.active = True
-            self.action = Action.attack
-            self.target_coordinates = player_coordinates
-            self.target_object = player
-        target = self.target_object
-        target_coordinates = self.target_coordinates
-        my_coordinates = (self.tile_x, self.tile_y)
-
-        if self.action == Action.idle:
-            pass
-        elif self.action == Action.move:
-            self.moving(my_coordinates, target, target_coordinates)
-        elif self.action == Action.attack:
-            if target.health > 0:
-                self.attacking(my_coordinates, target_coordinates, target)
-            else:
-                self.clear_target()
-                self.action = Action.idle
-
-        self.set_frame(self.action)
-
-    def use(self, game_state):
-        self.fighting = True
-        player = self.current_map.entity_group["Avatar"][0]
-        player.fighting = True
-        player.healthbar.active = True
-        self.healthbar.active = True
-        self.activated = False
 
 
 class Buffalo(Creature):
