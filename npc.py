@@ -27,7 +27,9 @@ class Npc(entity.SentientEntity):
         self.time_since_last_move = 0
         self.activated = False
         self.equipped_weapon = None
+        self.image_index = None
 
+        self.gold = 10
         self.items_list = []
         self.health = 100
         self.max_health = 100
@@ -52,13 +54,8 @@ class Guard(Npc):
         self.dialogue_pages = [["Hello Adventurer!",
                                 "Welcome to the town of Swindon,",
                                 "I keep the peace here."]]
-        self.set_images()
-
-    def set_images(self):
-        self.sprite.image = art.guard_image
-        self.sprite.rect = self.sprite.image.get_rect()
-        self.sprite.rect.x = self.tile_x * 20
-        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+        self.image_key = "Guard"
+        self.set_images(self.image_key)
 
     def tick_cycle(self):
         self.age += 1
@@ -80,13 +77,54 @@ class Villager(Npc):
         self.dialogue_pages = [["Hello Adventurer!",
                                 "Welcome to the town of Swindon,",
                                 "I live here"]]
-        self.set_images()
+        self.image_key = "Male Villager"
+        self.set_images(self.image_key)
 
-    def set_images(self):
-        self.sprite.image = random.choice(art.male_villager_images)
-        self.sprite.rect = self.sprite.image.get_rect()
-        self.sprite.rect.x = self.tile_x * 20
-        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+    def tick_cycle(self):
+        self.age += 1
+
+    def use(self, game_state):
+        new_dialogue_menu = ui.DialogueMenu(game_state, (0, 0), self)
+        new_dialogue_menu.menu_onscreen()
+        self.activated = False
+
+
+class Lord(Npc):
+    height = 2
+
+    def __init__(self, x, y, current_map, display_name="Lord"):
+        super().__init__(x, y, current_map)
+        self.display_name = display_name
+        self.speed = 1
+        self.health = 100
+        self.max_health = 100
+        self.dialogue_pages = [["Be quick Adventurer, I am the lord of",
+                                "Threlkeld and have many matters to attend to."]]
+        self.image_key = "Lord"
+        self.set_images(self.image_key)
+
+    def tick_cycle(self):
+        self.age += 1
+
+    def use(self, game_state):
+        new_dialogue_menu = ui.DialogueMenu(game_state, (0, 0), self)
+        new_dialogue_menu.menu_onscreen()
+        self.activated = False
+
+
+class Sage(Npc):
+    height = 2
+
+    def __init__(self, x, y, current_map, display_name="Sage"):
+        super().__init__(x, y, current_map)
+        self.display_name = display_name
+        self.speed = 1
+        self.health = 100
+        self.max_health = 100
+        self.dialogue_pages = [["I advise the lord on all matters magical and arcane.",
+                                "There is more to this world than meets the eye."]]
+        self.image_key = "Sage"
+        self.set_images(self.image_key)
 
     def tick_cycle(self):
         self.age += 1
@@ -109,17 +147,12 @@ class Merchant(Npc):
         self.gold = 100
         self.items_list = []
         self.dialogue_pages = [["Hello Adventurer! Lots to do here", "in Poopybutts."], [" Lots of quality goods for sale here"]]
-        self.set_images()
+        self.image_key = "Merchant"
+        self.set_images(self.image_key)
         self.restock_items(50)
 
     def tick_cycle(self):
         self.age += 1
-
-    def set_images(self):
-        self.sprite.image = art.merchant_image
-        self.sprite.rect = self.sprite.image.get_rect()
-        self.sprite.rect.x = self.tile_x * 20
-        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
 
     def use(self, game_state):
         new_dialogue_menu = ui.DialogueMenu(game_state, (0, 0), self)
@@ -129,5 +162,5 @@ class Merchant(Npc):
     def restock_items(self, player_level):
         for x in range(20):
             possible_items = [random.choice(weapon.weapon_functions)(20, player_level),
-                              random.choice(item.item_functions)()]
+                              random.choice(random.choice(item.item_functions))()]
             self.items_list.append(random.choice(possible_items))

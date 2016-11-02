@@ -45,22 +45,22 @@ class InventoryMenu(ui.Menu):
         x = self.background_pane.rect.x
         y = self.background_pane.rect.y
 
-        exit_button = ui.Button(ui.exit_button_regular,
-                                ui.exit_button_selected,
+        exit_button = ui.Button(ui.x_deselected_image,
+                                ui.x_selected_image,
                                 exit_clicked,
-                                (x + 546),
+                                (x + 570),
                                 (y + 10))
 
         r_up_arrow = ui.Button(ui.small_up_arrow_regular,
                                ui.small_up_arrow_selected,
                                r_up_clicked,
-                               (x + 578),
-                               (y + 46))
+                               (x + 574),
+                               (y + 45))
         r_down_arrow = ui.Button(ui.small_down_arrow_regular,
                                  ui.small_down_arrow_selected,
                                  r_down_clicked,
-                                 (x + 578),
-                                 (y + 326))
+                                 (x + 575),
+                                 (y + 323))
 
         equip_button = ui.Button(art.equip_deselected_image,
                                  art.equip_selected_image,
@@ -135,20 +135,20 @@ class InventoryMenu(ui.Menu):
                            [str(self.player.archery), 86, 189],
                            [str(self.player.combat_magic), 96, 233],
                            [str(self.player.healing_magic), 96, 256],
-                           [str(self.player.melee_damage), 250, 248],
-                           [str(self.player.ranged_damage), 260, 271],
-                           [str(self.player.block), 215, 291],
-                           [str(self.player.armor), 215, 312]]
+                           [str(self.player.melee_damage), 230, 252],
+                           [str(self.player.ranged_damage), 230, 275],
+                           [str(self.player.block), 230, 295],
+                           [str(self.player.armor), 230, 316]]
 
-            self.screen.blit(font.render(str(self.player.gold), True, utilities.colors.black),
+            self.screen.blit(font.render(str(self.player.gold), True, utilities.colors.border_gold),
                              [self.background_pane.rect.left + 410, self.background_pane.rect.top + 12])
-            self.screen.blit(font.render(str(self.player.level), True, utilities.colors.black),
+            self.screen.blit(font.render(str(self.player.level), True, utilities.colors.border_gold),
                              [self.background_pane.rect.left + 90, self.background_pane.rect.top + 34])
             for each in stat_stamps:
                 string = each[0]
                 left_spacer = each[1]
                 top_spacer = each[2]
-                self.screen.blit(small_font.render(string, True, utilities.colors.black),
+                self.screen.blit(small_font.render(string, True, utilities.colors.border_gold),
                                  [self.background_pane.rect.left + left_spacer, self.background_pane.rect.top + top_spacer])
 
             if self.player.equipped_weapon:
@@ -161,13 +161,13 @@ class InventoryMenu(ui.Menu):
             spacer = 18
             count = 0
             for each in player_visible_items:
-                value_stamp = small_font.render(str(each.value), True, utilities.colors.black)
-                weight_stamp = small_font.render(str(each.weight), True, utilities.colors.black)
+                value_stamp = small_font.render(str(each.value), True, utilities.colors.border_gold)
+                weight_stamp = small_font.render(str(each.weight), True, utilities.colors.border_gold)
 
                 if each.is_equipped:
                     color = utilities.colors.equipped_item_red
                 else:
-                    color = utilities.colors.black
+                    color = utilities.colors.border_gold
                 name_stamp = small_font.render(each.name, True, color)
 
                 self.screen.blit(value_stamp, [self.background_pane.rect.left + 320,

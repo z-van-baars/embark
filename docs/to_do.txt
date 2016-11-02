@@ -1,0 +1,44 @@
+Additional items
+	-more armor
+	-more weapons
+	-commodities
+		-Wheat
+		-Grain
+		-Iron
+		-Steel
+		-Gold
+		-Lumber
+		-Meat
+		-Lobsters
+	-Gems
+	-Books
+
+Readable books + Notes w/menu like dialogue menu
+
+Quests + Quest Menu
+
+Editable NPC Names
+	
+inventory tabs / all / armor / weapon / etc
+
+Added complexity to merchants
+	-Editable inventory to stock
+	-sale price and buy price multipliers
+	-fluxuating demand
+	-restocking merchant gold and items
+lockable doors and chests
+	-keys?
+	-relocking once locked?
+	-lockpicking?
+	-pickpocketing?
+additional container types
+	-bins
+	-barrels
+	-baskets
+	-crates
+	-wardrobes
+	-cabinets
+	-boss chests
+	-jewelry boxes
+	-safes
+fog of war/exploration barriers?

@@ -4,18 +4,15 @@ from utilities import GameState
 from game_map import Map
 import debug
 import inventory
-import combat
 from avatar import Avatar
 import ui
 import weapon
-import item
 import armor
-import structure
 
 pygame.init()
 pygame.display.set_mode([0, 0])
 
-lower_left = pygame.image.load("art/ui_elements/lower_left.png").convert()
+lower_left = pygame.image.load("art/ui_elements/lower_left/lower_left.png").convert()
 bag_deselected = pygame.image.load("art/ui_elements/bag.png").convert()
 bag_selected = pygame.image.load("art/ui_elements/bag_highlight.png").convert()
 
@@ -26,6 +23,13 @@ def open_inventory(game_state, mouse_pos):
     inventory_window.menu_onscreen()
 
 
+def menu_button_click(game_state):
+    menu_window = ui.OptionsMenu(game_state)
+    menu_window.open = True
+    game_state = menu_window.menu_onscreen()
+    return game_state
+
+
 def set_bottom_pane_stamp(current_map, mouse_pos):
     font = pygame.font.SysFont('Calibri', 18, True, False)
 
@@ -34,7 +38,7 @@ def set_bottom_pane_stamp(current_map, mouse_pos):
             if selected_tile.entity_group[entity_type]:
                 if selected_tile.entity_group[entity_type][0].occupies_tile:
                     entity = selected_tile.entity_group[entity_type][0]
-                    stamp = font.render(entity.display_name, True, utilities.colors.black)
+                    stamp = font.render(entity.display_name, True, utilities.colors.border_gold)
         return stamp
 
     tile_x = int((mouse_pos[0] - current_map.x_shift) / 20)
@@ -52,8 +56,9 @@ def set_bottom_pane_stamp(current_map, mouse_pos):
 
 
 def create_new_world(game_state):
-    map_1 = Map("Swindon", (60, 60), (game_state.screen_width, game_state.screen_height), False)
+    map_1 = Map("Swindon", (60, 60), (game_state.screen_width, game_state.screen_height))
     map_1.map_generation()
+
     Avatar(5, 5, map_1)
     game_state.maps[map_1.name] = map_1
     game_state.active_map = game_state.maps["Swindon"]
@@ -70,48 +75,33 @@ def create_new_world(game_state):
     initial_equipment = [item_1, armor.armor_functions[0]()]
     game_state.player.items_list = initial_equipment
     game_state.player.items_list[0].equip(game_state.player)
+    map_1.update_object_layer()
 
 
 def main(game_state):
-    game_state = utilities.import_game_state()
-    # create_new_world(game_state)
-
+    #game_state = utilities.import_game_state()
+    create_new_world(game_state)
     debug_stats = game_state.debug_status
-    map_2 = Map("North Forest", (30, 50), (game_state.screen_width, game_state.screen_height), False)
-    map_3 = Map("Threlkeld", (60, 50), (game_state.screen_width, game_state.screen_height), False)
-    map_4 = Map("East Forest A", (50, 30), (game_state.screen_width, game_state.screen_height), False)
-    map_5 = Map("East Forest B", (50, 30), (game_state.screen_width, game_state.screen_height), False)
-    map_6 = Map("Dungeon Level 1", (30, 30), (game_state.screen_width, game_state.screen_height), True)
-    map_7 = Map("Dungeon Level 2", (40, 20), (game_state.screen_width, game_state.screen_height), True)
-    map_8 = Map("Your House", (14, 14), (game_state.screen_width, game_state.screen_height), True)
-    map_9 = Map("Threlkeld Blacksmith", (20, 15), (game_state.screen_width, game_state.screen_height), True)
-    map_10 = Map("Threlkeld General Store", (20, 15), (game_state.screen_width, game_state.screen_height), True)
-    map_11 = Map("Threlkeld Tavern", (25, 20), (game_state.screen_width, game_state.screen_height), True)
-
-    new_maps = [map_2,
-                map_3,
-                map_4,
-                map_5,
-                map_6,
-                map_7,
-                map_8,
-                map_9,
-                map_10,
-                map_11]
-
-    for each in new_maps:
-        each.map_generation()
-        game_state.maps[each.name] = each
 
     tiny_font = pygame.font.SysFont('Calibri', 11, True, False)
     done = False
     super_scroll = 1
-    bottom_pane = pygame.sprite.Sprite()
-    bottom_pane.image = pygame.Surface([game_state.screen_width - 280, 80])
-    bottom_pane.image.fill((171, 171, 171))
     control_on = False
 
+    bag_button = ui.Button(bag_deselected,
+                           bag_selected,
+                           open_inventory,
+                           game_state.screen_width - 80,
+                           game_state.screen_height - 80)
+
+    menu_button = ui.Button(ui.menu_button_deselected,
+                            ui.menu_button_selected,
+                            menu_button_click,
+                            game_state.screen_width - 32,
+                            0)
+    game_state.player.equipped_armor = None
     while not done:
+
         mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -143,11 +133,6 @@ def main(game_state):
                 elif event.key == pygame.K_LCTRL:
                     control_on = True
 
-                elif event.key == pygame.K_m:
-                    utilities.export_game_state(game_state)
-                elif event.key == pygame.K_l:
-                    game_state = utilities.import_game_state()
-                    debug_stats = game_state.debug_status
                 elif event.key == pygame.K_SPACE:
                     paused = True
                     while paused:
@@ -190,6 +175,12 @@ def main(game_state):
                                                  bag_button.sprite.rect.bottom,
                                                  mouse_pos):
                         bag_button.click(game_state, mouse_pos)
+                    elif utilities.check_if_inside(menu_button.sprite.rect.x,
+                                                   menu_button.sprite.rect.right,
+                                                   menu_button.sprite.rect.y,
+                                                   menu_button.sprite.rect.bottom,
+                                                   mouse_pos):
+                        game_state = menu_button.click(game_state)
                     else:
                         if len(game_state.active_map.entity_group["Avatar"]) > 0:
                             game_state.active_map.entity_group["Avatar"][0].assign_target(game_state,
@@ -204,7 +195,8 @@ def main(game_state):
 
         for projectile in game_state.active_map.entity_group["Projectile"]:
             projectile.travel()
-
+        for each in game_state.active_map.entity_group["Structure"]:
+            each.tick_cycle()
         for flora in game_state.active_map.entity_group["Flora"]:
             flora.tick_cycle()
 
@@ -221,8 +213,13 @@ def main(game_state):
         game_state.screen.fill(utilities.colors.black)
 
         game_state.screen.blit(game_state.active_map.background.image, [0 + game_state.active_map.x_shift, 0 + game_state.active_map.y_shift])
+        for each in game_state.active_map.object_layer.z_levels:
+            game_state.screen.blit(each.image, [0 + game_state.active_map.x_shift, 0 + game_state.active_map.y_shift])
 
-        game_state.active_map.draw_to_screen(game_state.screen, game_state.screen_width, game_state.screen_height)
+            game_state.active_map.draw_actors(game_state.screen,
+                                              game_state.screen_width,
+                                              game_state.screen_height,
+                                              game_state.active_map.object_layer.z_levels.index(each) + 1)
 
         if utilities.check_if_inside(bag_button.sprite.rect.x,
                                      bag_button.sprite.rect.right,
@@ -232,7 +229,17 @@ def main(game_state):
             bag_button.sprite.image = bag_button.selected
         else:
             bag_button.sprite.image = bag_button.regular
+
+        if utilities.check_if_inside(menu_button.sprite.rect.x,
+                                     menu_button.sprite.rect.right,
+                                     menu_button.sprite.rect.y,
+                                     menu_button.sprite.rect.bottom,
+                                     mouse_pos):
+            menu_button.sprite.image = menu_button.selected
+        else:
+            menu_button.sprite.image = menu_button.regular
         game_state.screen.blit(bag_button.sprite.image, [bag_button.sprite.rect.x, bag_button.sprite.rect.y])
+        game_state.screen.blit(menu_button.sprite.image, [menu_button.sprite.rect.x, menu_button.sprite.rect.y])
 
         for each in game_state.active_map.hitboxes:
             if not each.expiration_check():
@@ -255,9 +262,8 @@ def main(game_state):
                                        [each.green.rect.x + game_state.active_map.x_shift,
                                         each.green.rect.y + game_state.active_map.y_shift])
         game_state.screen.blit(lower_left, [0, game_state.screen_height - 80])
-        game_state.screen.blit(bottom_pane.image, [200, game_state.screen_height - 79])
         if bottom_pane_stamp and not debug_stats.debug:
-            game_state.screen.blit(bottom_pane_stamp, [210, game_state.screen_height - 60])
+            game_state.screen.blit(bottom_pane_stamp, [10, game_state.screen_height - 60])
         if debug_stats.debug:
             for each in game_state.active_map.entity_group["Creature"]:
                 each.search_area_graphic = debug.FoodSearchRadius(game_state.active_map, each)
@@ -273,6 +279,15 @@ def main(game_state):
                         new_graphic = ui.TileSelectorGraphic(tile_x, tile_y, game_state.active_map)
                         new_graphic.update_image((tile_x * 20, tile_y * 20))
                         pygame.draw.rect(game_state.screen, (255, 255, 255), new_graphic.image, 1)
+            if debug_stats.paint:
+                footprint = debug_stats.brush_size
+                initial_x = int(mouse_pos[0] / 20)
+                initial_y = int(mouse_pos[1] / 20) - (footprint[1] - 1)
+                for tile_y in range(initial_y, initial_y + (footprint[1])):
+                    for tile_x in range(initial_x, initial_x + footprint[0]):
+                        new_graphic = ui.TileSelectorGraphic(tile_x, tile_y, game_state.active_map)
+                        new_graphic.update_image((tile_x * 20, tile_y * 20))
+                        pygame.draw.rect(game_state.screen, (255, 255, 255), new_graphic.image, 1)
 
         pygame.display.flip()
         game_state.clock.tick(60)
@@ -280,12 +295,5 @@ def main(game_state):
 
 
 game_state = GameState(800, 500 + 80, 20)
-
-bag_button = ui.Button(bag_deselected,
-                       bag_selected,
-                       open_inventory,
-                       game_state.screen_width - 80,
-                       game_state.screen_height - 80
-                       )
 
 main(game_state)

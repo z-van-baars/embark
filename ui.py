@@ -2,6 +2,7 @@ import pygame
 import utilities
 from item import quality_colors
 import game_map
+import art
 
 pygame.init()
 pygame.display.set_mode([0, 0])
@@ -9,25 +10,62 @@ pygame.display.set_mode([0, 0])
 trade_background = pygame.image.load("art/ui_elements/tradescreen/trade_window.png").convert()
 loot_background = pygame.image.load("art/ui_elements/lootscreen/loot_screen.png").convert()
 
+options_menu_bg = pygame.image.load("art/ui_elements/options_menu/options_bg.png").convert()
+
+video_selected_image = pygame.image.load("art/ui_elements/buttons/video_selected.png").convert()
+video_selected_image.set_colorkey(utilities.colors.key)
+video_deselected_image = pygame.image.load("art/ui_elements/buttons/video_deselected.png").convert()
+video_deselected_image.set_colorkey(utilities.colors.key)
+audio_selected_image = pygame.image.load("art/ui_elements/buttons/audio_selected.png").convert()
+audio_selected_image.set_colorkey(utilities.colors.key)
+audio_deselected_image = pygame.image.load("art/ui_elements/buttons/audio_deselected.png").convert()
+audio_deselected_image.set_colorkey(utilities.colors.key)
+quit_selected_image = pygame.image.load("art/ui_elements/buttons/quit_selected.png").convert()
+quit_selected_image.set_colorkey(utilities.colors.key)
+quit_deselected_image = pygame.image.load("art/ui_elements/buttons/quit_deselected.png").convert()
+quit_deselected_image.set_colorkey(utilities.colors.key)
+options_load_selected_image = pygame.image.load("art/ui_elements/buttons/load_selected.png").convert()
+options_load_selected_image.set_colorkey(utilities.colors.key)
+options_load_deselected_image = pygame.image.load("art/ui_elements/buttons/load_deselected.png").convert()
+options_load_deselected_image.set_colorkey(utilities.colors.key)
+save_selected_image = pygame.image.load("art/ui_elements/buttons/save_selected.png").convert()
+save_selected_image.set_colorkey(utilities.colors.key)
+save_deselected_image = pygame.image.load("art/ui_elements/buttons/save_deselected.png").convert()
+save_deselected_image.set_colorkey(utilities.colors.key)
+
 door_edit_menu_pane = pygame.image.load("art/ui_elements/door_editor/door_edit_menu_bg.png")
 
-small_up_arrow_selected = pygame.image.load("art/ui_elements/tradescreen/small_up_arrow_selected.png").convert()
-small_up_arrow_regular = pygame.image.load("art/ui_elements/tradescreen/small_up_arrow_regular.png").convert()
-small_down_arrow_selected = pygame.image.load("art/ui_elements/tradescreen/small_down_arrow_selected.png").convert()
-small_down_arrow_regular = pygame.image.load("art/ui_elements/tradescreen/small_down_arrow_regular.png").convert()
+menu_button_selected = pygame.image.load("art/ui_elements/buttons/menu_button_selected.png").convert()
+menu_button_deselected = pygame.image.load("art/ui_elements/buttons/menu_button_deselected.png").convert()
+
+small_up_arrow_selected = pygame.image.load("art/ui_elements/buttons/arrows/small_up_arrow_selected.png").convert()
+small_up_arrow_regular = pygame.image.load("art/ui_elements/buttons/arrows/small_up_arrow_regular.png").convert()
+small_down_arrow_selected = pygame.image.load("art/ui_elements/buttons/arrows/small_down_arrow_selected.png").convert()
+small_down_arrow_regular = pygame.image.load("art/ui_elements/buttons/arrows/small_down_arrow_regular.png").convert()
+
+small_left_arrow_selected = pygame.image.load("art/ui_elements/buttons/arrows/small_left_arrow_selected.png").convert()
+small_left_arrow_regular = pygame.image.load("art/ui_elements/buttons/arrows/small_left_arrow_regular.png").convert()
+small_right_arrow_selected = pygame.image.load("art/ui_elements/buttons/arrows/small_right_arrow_selected.png").convert()
+small_right_arrow_regular = pygame.image.load("art/ui_elements/buttons/arrows/small_right_arrow_regular.png").convert()
 buy_button_selected = pygame.image.load("art/ui_elements/tradescreen/buy_selected.png").convert()
+buy_button_selected.set_colorkey(utilities.colors.key)
 buy_button_regular = pygame.image.load("art/ui_elements/tradescreen/buy_regular.png").convert()
+buy_button_regular.set_colorkey(utilities.colors.key)
 sell_button_selected = pygame.image.load("art/ui_elements/tradescreen/sell_selected.png").convert()
+sell_button_selected.set_colorkey(utilities.colors.key)
 sell_button_regular = pygame.image.load("art/ui_elements/tradescreen/sell_regular.png").convert()
+sell_button_regular.set_colorkey(utilities.colors.key)
 finalize_button_selected = pygame.image.load("art/ui_elements/tradescreen/finalize_order_selected.png").convert()
 finalize_button_regular = pygame.image.load("art/ui_elements/tradescreen/finalize_order_regular.png").convert()
-exit_button_selected = pygame.image.load("art/ui_elements/tradescreen/exit_selected.png").convert()
-exit_button_regular = pygame.image.load("art/ui_elements/tradescreen/exit_regular.png").convert()
 
 take_button_regular = pygame.image.load("art/ui_elements/lootscreen/take_image_regular.png").convert()
+take_button_regular.set_colorkey(utilities.colors.key)
 take_button_selected = pygame.image.load("art/ui_elements/lootscreen/take_image_selected.png").convert()
+take_button_selected.set_colorkey(utilities.colors.key)
 give_button_regular = pygame.image.load("art/ui_elements/lootscreen/give_image_regular.png").convert()
+give_button_regular.set_colorkey(utilities.colors.key)
 give_button_selected = pygame.image.load("art/ui_elements/lootscreen/give_image_selected.png").convert()
+give_button_selected.set_colorkey(utilities.colors.key)
 
 player_hitbox_image = pygame.image.load("art/ui_elements/player_hitbox.png")
 enemy_hitbox_image = pygame.image.load("art/ui_elements/enemy_hitbox.png")
@@ -35,49 +73,78 @@ enemy_hitbox_image = pygame.image.load("art/ui_elements/enemy_hitbox.png")
 
 context_menu_pane = pygame.image.load("art/ui_elements/contextmenu/context_options_bg.png").convert()
 talk_selected_image = pygame.image.load("art/ui_elements/contextmenu/talk_selected.png").convert()
+talk_selected_image.set_colorkey(utilities.colors.key)
 talk_deselected_image = pygame.image.load("art/ui_elements/contextmenu/talk_deselected.png").convert()
+talk_deselected_image.set_colorkey(utilities.colors.key)
 move_selected_image = pygame.image.load("art/ui_elements/contextmenu/move_selected.png").convert()
+move_selected_image.set_colorkey(utilities.colors.key)
 move_deselected_image = pygame.image.load("art/ui_elements/contextmenu/move_deselected.png").convert()
+move_deselected_image.set_colorkey(utilities.colors.key)
 cancel_selected_image = pygame.image.load("art/ui_elements/contextmenu/cancel_selected.png").convert()
+cancel_selected_image.set_colorkey(utilities.colors.key)
 cancel_deselected_image = pygame.image.load("art/ui_elements/contextmenu/cancel_deselected.png").convert()
+cancel_deselected_image.set_colorkey(utilities.colors.key)
 use_selected_image = pygame.image.load("art/ui_elements/contextmenu/use_selected.png").convert()
+use_selected_image.set_colorkey(utilities.colors.key)
 use_deselected_image = pygame.image.load("art/ui_elements/contextmenu/use_deselected.png").convert()
+use_deselected_image.set_colorkey(utilities.colors.key)
 attack_selected_image = pygame.image.load("art/ui_elements/contextmenu/attack_selected.png").convert()
+attack_selected_image.set_colorkey(utilities.colors.key)
 attack_deselected_image = pygame.image.load("art/ui_elements/contextmenu/attack_deselected.png").convert()
+attack_deselected_image.set_colorkey(utilities.colors.key)
 
 dialogue_menu_pane = pygame.image.load("art/ui_elements/dialogue_box/dialogue_background.png").convert()
-leave_selected_image = pygame.image.load("art/ui_elements/dialogue_box/leave_selected.png").convert()
-leave_deselected_image = pygame.image.load("art/ui_elements/dialogue_box/leave_deselected.png").convert()
+
+done_selected_image = pygame.image.load("art/ui_elements/dialogue_box/done_selected.png").convert()
+done_selected_image.set_colorkey(utilities.colors.key)
+done_deselected_image = pygame.image.load("art/ui_elements/dialogue_box/done_deselected.png").convert()
+done_deselected_image.set_colorkey(utilities.colors.key)
 more_selected_image = pygame.image.load("art/ui_elements/dialogue_box/more_selected.png").convert()
+more_selected_image.set_colorkey(utilities.colors.key)
 more_deselected_image = pygame.image.load("art/ui_elements/dialogue_box/more_deselected.png").convert()
+more_deselected_image.set_colorkey(utilities.colors.key)
 trade_selected_image = pygame.image.load("art/ui_elements/dialogue_box/trade_selected.png").convert()
+trade_selected_image.set_colorkey(utilities.colors.key)
 trade_deselected_image = pygame.image.load("art/ui_elements/dialogue_box/trade_deselected.png").convert()
+trade_deselected_image.set_colorkey(utilities.colors.key)
 back_selected_image = pygame.image.load("art/ui_elements/dialogue_box/back_selected.png").convert()
+back_selected_image.set_colorkey(utilities.colors.key)
 back_deselected_image = pygame.image.load("art/ui_elements/dialogue_box/back_deselected.png").convert()
+back_deselected_image.set_colorkey(utilities.colors.key)
 
 
 edit_deselected_image = pygame.image.load("art/ui_elements/dialogue_box/edit_deselected.png").convert()
+edit_deselected_image.set_colorkey(utilities.colors.key)
 edit_selected_image = pygame.image.load("art/ui_elements/dialogue_box/edit_selected.png").convert()
+edit_selected_image.set_colorkey(utilities.colors.key)
 
 map_editor_bg = pygame.image.load("art/ui_elements/map_editor/map_editor_bg.png").convert()
 new_map_bg = pygame.image.load("art/ui_elements/map_editor/new_map_bg.png").convert()
 
 accept_selected_image = pygame.image.load("art/ui_elements/map_editor/accept_selected.png").convert()
+accept_selected_image.set_colorkey(utilities.colors.key)
 accept_deselected_image = pygame.image.load("art/ui_elements/map_editor/accept_deselected.png").convert()
+accept_deselected_image.set_colorkey(utilities.colors.key)
 map_cancel_selected_image = pygame.image.load("art/ui_elements/map_editor/cancel_selected.png").convert()
+map_cancel_selected_image.set_colorkey(utilities.colors.key)
 map_cancel_deselected_image = pygame.image.load("art/ui_elements/map_editor/cancel_deselected.png").convert()
+map_cancel_deselected_image.set_colorkey(utilities.colors.key)
 delete_selected_image = pygame.image.load("art/ui_elements/map_editor/delete_selected.png").convert()
+delete_selected_image.set_colorkey(utilities.colors.key)
 delete_deselected_image = pygame.image.load("art/ui_elements/map_editor/delete_deselected.png").convert()
+delete_deselected_image.set_colorkey(utilities.colors.key)
 load_selected_image = pygame.image.load("art/ui_elements/map_editor/load_selected.png").convert()
+load_selected_image.set_colorkey(utilities.colors.key)
 load_deselected_image = pygame.image.load("art/ui_elements/map_editor/load_deselected.png").convert()
+load_deselected_image.set_colorkey(utilities.colors.key)
 new_selected_image = pygame.image.load("art/ui_elements/map_editor/new_selected.png").convert()
+new_selected_image.set_colorkey(utilities.colors.key)
 new_deselected_image = pygame.image.load("art/ui_elements/map_editor/new_deselected.png").convert()
-x_selected_image = pygame.image.load("art/ui_elements/map_editor/x_selected.png").convert()
-x_deselected_image = pygame.image.load("art/ui_elements/map_editor/x_deselected.png").convert()
-up_arrow_deselected_image = pygame.image.load("art/ui_elements/map_editor/up_arrow_deselected.png").convert()
-up_arrow_selected_image = pygame.image.load("art/ui_elements/map_editor/up_arrow_selected.png").convert()
-down_arrow_deselected_image = pygame.image.load("art/ui_elements/map_editor/down_arrow_deselected.png").convert()
-down_arrow_selected_image = pygame.image.load("art/ui_elements/map_editor/down_arrow_selected.png").convert()
+new_deselected_image.set_colorkey(utilities.colors.key)
+x_selected_image = pygame.image.load("art/ui_elements/buttons/x_selected.png").convert()
+x_selected_image.set_colorkey(utilities.colors.key)
+x_deselected_image = pygame.image.load("art/ui_elements/buttons/x_deselected.png").convert()
+x_deselected_image.set_colorkey(utilities.colors.key)
 
 
 class HitBox(object):
@@ -174,6 +241,7 @@ class Menu(object):
         self.active_map = game_state.active_map
         self.screen_width = game_state.screen_width
         self.screen_height = game_state.screen_height
+        self.game_state = game_state
 
     def menu_onscreen(self):
         while self.open:
@@ -203,6 +271,110 @@ class Menu(object):
                 self.screen.blit(button.sprite.image, [button.sprite.rect.x, button.sprite.rect.y])
 
             pygame.display.flip()
+
+
+class OptionsMenu(Menu):
+    def __init__(self, game_state):
+        super().__init__(game_state, None, None)
+        self.background_pane = pygame.sprite.Sprite()
+        self.background_pane.image = options_menu_bg
+        self.background_pane.rect = self.background_pane.image.get_rect()
+        self.background_pane.rect.x = self.screen_width / 2 - 150
+        self.background_pane.rect.y = self.screen_height / 2 - 200
+        self.editing = False
+        self.maps_list = []
+        for each in game_state.maps:
+            self.maps_list.append(each)
+        self.maps_list = sorted(self.maps_list)
+        self.maps_list_top = 0
+        self.selected_map = 0
+
+        def video_click():
+            pass
+
+        def audio_click():
+            pass
+
+        def quit_click():
+            pygame.display.quit()
+            pygame.quit()
+
+        def save_click():
+            utilities.export_game_state(game_state)
+
+        def load_click():
+            self.game_state = utilities.import_game_state()
+            self.open = False
+
+        def x_click():
+            self.open = False
+
+        x_button = Button(x_deselected_image,
+                          x_selected_image,
+                          x_click,
+                          self.background_pane.rect.x + 272,
+                          self.background_pane.rect.y + 8)
+
+        video_button = Button(video_deselected_image,
+                              video_selected_image,
+                              video_click,
+                              self.background_pane.rect.x + 90,
+                              self.background_pane.rect.y + 210)
+        audio_button = Button(audio_deselected_image,
+                              audio_selected_image,
+                              audio_click,
+                              self.background_pane.rect.x + 90,
+                              self.background_pane.rect.y + 250)
+        save_button = Button(save_deselected_image,
+                             save_selected_image,
+                             save_click,
+                             self.background_pane.rect.x + 90,
+                             self.background_pane.rect.y + 40)
+        quit_button = Button(quit_deselected_image,
+                             quit_selected_image,
+                             quit_click,
+                             self.background_pane.rect.x + 90,
+                             self.background_pane.rect.y + 320)
+        load_button = Button(options_load_deselected_image,
+                             options_load_selected_image,
+                             load_click,
+                             self.background_pane.rect.x + 90,
+                             self.background_pane.rect.y + 80)
+
+        self.buttons = [x_button, audio_button, video_button, quit_button, save_button, load_button]
+
+    def menu_onscreen(self):
+        small_font = pygame.font.SysFont('Calibri', 18, True, False)
+        while self.open:
+            click = False
+            mouse_pos = pygame.mouse.get_pos()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.display.quit()
+                    pygame.quit()
+
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    click = True
+
+            for button in self.buttons:
+                if utilities.check_if_inside(button.sprite.rect.x,
+                                             button.sprite.rect.right,
+                                             button.sprite.rect.y,
+                                             button.sprite.rect.bottom,
+                                             mouse_pos):
+                    button.sprite.image = button.selected
+                    if click:
+                        button.click()
+                else:
+                    button.sprite.image = button.regular
+
+            self.screen.blit(self.background_pane.image, [self.background_pane.rect.left, self.background_pane.rect.top])
+
+            for button in self.buttons:
+                self.screen.blit(button.sprite.image, [button.sprite.rect.x, button.sprite.rect.y])
+
+            pygame.display.flip()
+        return self.game_state
 
 
 class MapEditor(Menu):
@@ -256,18 +428,18 @@ class MapEditor(Menu):
         x_button = Button(x_deselected_image,
                           x_selected_image,
                           x_click,
-                          self.background_pane.rect.x + 360,
-                          self.background_pane.rect.y + 5)
-        up_arrow_button = Button(up_arrow_deselected_image,
-                                 up_arrow_selected_image,
+                          self.background_pane.rect.x + 372,
+                          self.background_pane.rect.y + 8)
+        up_arrow_button = Button(small_up_arrow_regular,
+                                 small_up_arrow_selected,
                                  up_arrow_click,
-                                 self.background_pane.rect.x + 353,
-                                 self.background_pane.rect.y + 44)
-        down_arrow_button = Button(down_arrow_deselected_image,
-                                   down_arrow_selected_image,
+                                 self.background_pane.rect.x + 364,
+                                 self.background_pane.rect.y + 42)
+        down_arrow_button = Button(small_down_arrow_regular,
+                                   small_down_arrow_selected,
                                    down_arrow_click,
-                                   self.background_pane.rect.x + 353,
-                                   self.background_pane.rect.y + 266)
+                                   self.background_pane.rect.x + 364,
+                                   self.background_pane.rect.y + 275)
         new_button = Button(new_deselected_image,
                             new_selected_image,
                             new_click,
@@ -288,7 +460,7 @@ class MapEditor(Menu):
 
     def menu_onscreen(self):
         small_font = pygame.font.SysFont('Calibri', 18, True, False)
-        cursor = small_font.render("<", True, utilities.colors.red)
+        cursor = small_font.render("<", True, utilities.colors.border_gold)
         map_selection_box = pygame.sprite.Sprite()
         while self.open:
             click = False
@@ -334,7 +506,7 @@ class MapEditor(Menu):
             spacer = 20
             count = 0
             for each in visible_maps:
-                name_stamp = small_font.render(each, True, utilities.colors.light_grey)
+                name_stamp = small_font.render(each, True, utilities.colors.border_gold)
                 self.screen.blit(name_stamp, [self.background_pane.rect.left + 22,
                                               self.background_pane.rect.top + 44 + (count * spacer)])
                 count += 1
@@ -366,9 +538,9 @@ class NewMapWindow(Menu):
         def accept_click():
             new_map = game_map.Map(self.new_map_name,
                                    (self.new_map_x, self.new_map_y),
-                                   (game_state.screen_width, game_state.screen_height),
-                                   False)
+                                   (game_state.screen_width, game_state.screen_height))
             new_map.map_generation()
+            new_map.object_layer_generation()
             game_state.maps[new_map.name] = new_map
             self.open = False
 
@@ -388,11 +560,11 @@ class NewMapWindow(Menu):
             if self.new_map_y > 2:
                 self.new_map_y -= 1
 
-        map_cancel_button = Button(map_cancel_deselected_image,
-                                   map_cancel_selected_image,
-                                   map_cancel_click,
-                                   self.background_pane.rect.x + 234,
-                                   self.background_pane.rect.y + 5)
+        x_button = Button(x_deselected_image,
+                          x_selected_image,
+                          map_cancel_click,
+                          self.background_pane.rect.x + 310,
+                          self.background_pane.rect.y + 8)
 
         accept_button = Button(accept_deselected_image,
                                accept_selected_image,
@@ -400,31 +572,31 @@ class NewMapWindow(Menu):
                                self.background_pane.rect.x + 234,
                                self.background_pane.rect.y + 150)
 
-        x_up_button = Button(up_arrow_deselected_image,
-                             up_arrow_selected_image,
+        x_up_button = Button(small_up_arrow_regular,
+                             small_up_arrow_selected,
                              x_up_click,
-                             self.background_pane.rect.x + 50,
-                             self.background_pane.rect.y + 85)
+                             self.background_pane.rect.x + 53,
+                             self.background_pane.rect.y + 88)
 
-        x_down_button = Button(down_arrow_deselected_image,
-                               down_arrow_selected_image,
+        x_down_button = Button(small_down_arrow_regular,
+                               small_down_arrow_selected,
                                x_down_click,
-                               self.background_pane.rect.x + 50,
-                               self.background_pane.rect.y + 150)
+                               self.background_pane.rect.x + 53,
+                               self.background_pane.rect.y + 156)
 
-        y_up_button = Button(up_arrow_deselected_image,
-                             up_arrow_selected_image,
+        y_up_button = Button(small_up_arrow_regular,
+                             small_up_arrow_selected,
                              y_up_click,
-                             self.background_pane.rect.x + 138,
-                             self.background_pane.rect.y + 85)
+                             self.background_pane.rect.x + 141,
+                             self.background_pane.rect.y + 88)
 
-        y_down_button = Button(down_arrow_deselected_image,
-                               down_arrow_selected_image,
+        y_down_button = Button(small_down_arrow_regular,
+                               small_down_arrow_selected,
                                y_down_click,
-                               self.background_pane.rect.x + 138,
-                               self.background_pane.rect.y + 150)
+                               self.background_pane.rect.x + 141,
+                               self.background_pane.rect.y + 156)
 
-        self.buttons = [map_cancel_button, accept_button, x_up_button, x_down_button, y_up_button, y_down_button]
+        self.buttons = [x_button, accept_button, x_up_button, x_down_button, y_up_button, y_down_button]
 
     def menu_onscreen(self):
         small_font = pygame.font.SysFont('Calibri', 18, True, False)
@@ -467,11 +639,11 @@ class NewMapWindow(Menu):
 
             self.screen.blit(self.background_pane.image, [self.background_pane.rect.left, self.background_pane.rect.top])
 
-            name_stamp = small_font.render(self.new_map_name, True, utilities.colors.light_grey)
+            name_stamp = small_font.render(self.new_map_name, True, utilities.colors.border_gold)
             self.screen.blit(name_stamp, [self.background_pane.rect.x + 20, self.background_pane.rect.y + 48])
-            self.screen.blit(small_font.render(str(self.new_map_x), True, utilities.colors.light_grey),
+            self.screen.blit(small_font.render(str(self.new_map_x), True, utilities.colors.border_gold),
                              [self.background_pane.rect.x + 50, self.background_pane.rect.y + 122])
-            self.screen.blit(small_font.render(str(self.new_map_y), True, utilities.colors.light_grey),
+            self.screen.blit(small_font.render(str(self.new_map_y), True, utilities.colors.border_gold),
                              [self.background_pane.rect.x + 138, self.background_pane.rect.y + 122])
             if self.editing:
                 self.screen.blit(cursor, [name_stamp.get_width() + self.background_pane.rect.left + 20,
@@ -483,65 +655,119 @@ class NewMapWindow(Menu):
             pygame.display.flip()
 
 
-class DialogueEditor(Menu):
+class NpcEditor(Menu):
     def __init__(self, game_state, pos, entity):
         super().__init__(game_state, pos, entity)
         self.background_pane = pygame.sprite.Sprite()
-        self.background_pane.image = dialogue_menu_pane
+        self.background_pane.image = art.npc_edit_window
         self.background_pane.rect = self.background_pane.image.get_rect()
-        self.background_pane.rect.x = self.screen_width / 2 - 200
-        self.background_pane.rect.y = self.screen_height / 2 - 80
+        self.background_pane.rect.x = self.screen_width / 2 - 300
+        self.background_pane.rect.y = self.screen_height / 2 - 200
         self.dialogue_page = 0
         self.dialogue_line = 0
-        self.editing = False
+        self.editing_name = False
+        self.editing_gold = False
 
-        def leave_click():
+        def x_click():
             self.open = False
 
-        def more_click():
-            self.dialogue_page += 1
-            self.dialogue_line = 0
-            if self.dialogue_page > len(self.entity.dialogue_pages) - 1:
-                self.dialogue_page = 0
+        def edit_dialogue_click():
+            new_dialogue_window = DialogueEditor(game_state,
+                                                 pos,
+                                                 entity)
+            new_dialogue_window.menu_onscreen()
 
-        def back_click():
-            self.dialogue_page -= 1
-            self.dialogue_line = 0
-            if self.dialogue_page < 0:
-                self.dialogue_page = len(self.entity.dialogue_pages) - 1
+        def edit_gold_click():
+            self.editing_gold = not self.editing_gold
 
-        def edit_click():
-            self.editing = not self.editing
+        def edit_items_click():
+            pass
 
-        leave_button = Button(leave_deselected_image,
-                              leave_selected_image,
-                              leave_click,
-                              self.background_pane.rect.x + 324,
-                              self.background_pane.rect.y + 130)
+        def edit_name_click():
+            self.editing_name = not self.editing_name
 
-        back_button = Button(back_deselected_image,
-                             back_selected_image,
-                             back_click,
-                             self.background_pane.rect.x + 205,
-                             self.background_pane.rect.y + 130)
+        def edit_quests_click():
+            pass
 
-        more_button = Button(more_deselected_image,
-                             more_selected_image,
-                             more_click,
-                             self.background_pane.rect.x + 145,
-                             self.background_pane.rect.y + 130)
+        def edit_stock_click():
+            pass
 
-        edit_button = Button(edit_deselected_image,
-                             edit_selected_image,
-                             edit_click,
-                             self.background_pane.rect.x + 20,
-                             self.background_pane.rect.y + 130)
+        x_button = Button(x_deselected_image,
+                          x_selected_image,
+                          x_click,
+                          self.background_pane.rect.right - 28,
+                          self.background_pane.rect.y + 8)
 
-        self.buttons = [leave_button, back_button, more_button, edit_button]
+        edit_dialogue_button = Button(art.edit_dialogue_deselected,
+                                      art.edit_dialogue_selected,
+                                      edit_dialogue_click,
+                                      self.background_pane.rect.x + 20,
+                                      self.background_pane.rect.y + 40)
+
+        edit_gold_button = Button(art.edit_gold_deselected,
+                                  art.edit_gold_selected,
+                                  edit_gold_click,
+                                  self.background_pane.rect.x + 20,
+                                  self.background_pane.rect.y + 82)
+
+        edit_items_button = Button(art.edit_items_deselected,
+                                   art.edit_items_selected,
+                                   edit_items_click,
+                                   self.background_pane.rect.x + 20,
+                                   self.background_pane.rect.y + 124)
+
+        edit_name_button = Button(art.edit_name_deselected,
+                                  art.edit_name_selected,
+                                  edit_name_click,
+                                  self.background_pane.rect.x + 20,
+                                  self.background_pane.rect.y + 166)
+
+        edit_quests_button = Button(art.edit_quests_deselected,
+                                    art.edit_quests_selected,
+                                    edit_quests_click,
+                                    self.background_pane.rect.x + 20,
+                                    self.background_pane.rect.y + 208)
+
+        edit_stock_button = Button(art.edit_stock_deselected,
+                                   art.edit_stock_selected,
+                                   edit_stock_click,
+                                   self.background_pane.rect.x + 20,
+                                   self.background_pane.rect.y + 250)
+
+        self.buttons = [x_button,
+                        edit_dialogue_button,
+                        edit_gold_button,
+                        edit_items_button,
+                        edit_name_button,
+                        edit_quests_button,
+                        edit_stock_button]
+
+    def add_characters(self, target_string, event):
+        target_string = str(target_string)
+        if event.key == pygame.K_BACKSPACE:
+            if len(target_string) > 1:
+                target_string = target_string[:-1]
+        else:
+            target_string += event.unicode
+        return target_string
 
     def menu_onscreen(self):
         small_font = pygame.font.SysFont('Calibri', 18, True, False)
+        font = pygame.font.SysFont('Sitka', 24, True, False)
         cursor = small_font.render("<", True, utilities.colors.red)
+
+        number_keys = [pygame.K_0,
+                       pygame.K_1,
+                       pygame.K_2,
+                       pygame.K_3,
+                       pygame.K_4,
+                       pygame.K_5,
+                       pygame.K_6,
+                       pygame.K_7,
+                       pygame.K_8,
+                       pygame.K_9,
+                       pygame.K_BACKSPACE]
+
         while self.open:
             click = False
             mouse_pos = pygame.mouse.get_pos()
@@ -551,25 +777,13 @@ class DialogueEditor(Menu):
                     pygame.quit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     click = True
-                if self.editing:
+                if self.editing_name:
                     if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_BACKSPACE:
-                            line = self.entity.dialogue_pages[self.dialogue_page][self.dialogue_line]
-                            line = line[:-1]
-                            self.entity.dialogue_pages[self.dialogue_page][self.dialogue_line] = line
-                        elif event.key == pygame.K_RETURN:
-                            self.entity.dialogue_pages.append([''])
-                        elif event.key == pygame.K_UP:
-                            if self.dialogue_line > 0:
-                                self.dialogue_line -= 1
-                        elif event.key == pygame.K_DOWN:
-                            if self.dialogue_line < 2:
-                                self.dialogue_line += 1
-                        elif event.key == pygame.K_TAB:
-                            if len(self.entity.dialogue_pages[self.dialogue_page]) < 2:
-                                self.entity.dialogue_pages[self.dialogue_page].append("")
-                        else:
-                            self.entity.dialogue_pages[self.dialogue_page][self.dialogue_line] += event.unicode
+                        self.entity.display_name = self.add_characters(self.entity.display_name, event)
+                if self.editing_gold:
+                    if event.type == pygame.KEYDOWN:
+                        if event.key in number_keys:
+                            self.entity.gold = int(self.add_characters(self.entity.gold, event))
 
             for button in self.buttons:
                 if utilities.check_if_inside(button.sprite.rect.x,
@@ -584,20 +798,125 @@ class DialogueEditor(Menu):
                     button.sprite.image = button.regular
 
             self.screen.blit(self.background_pane.image, [self.background_pane.rect.left, self.background_pane.rect.top])
-            if self.editing:
-                self.screen.blit(small_font.render("Editing Dialogue", True, utilities.colors.black),
-                                 [self.background_pane.rect.x, self.background_pane.rect.y + 4])
-            self.screen.blit(small_font.render(self.entity.display_name, True, utilities.colors.black),
+            entity_name_stamp = small_font.render(self.entity.display_name, True, utilities.colors.border_gold)
+            self.screen.blit(entity_name_stamp,
+                             [self.background_pane.rect.x + 30, self.background_pane.rect.y + 14])
+
+            if self.editing_name:
+                self.screen.blit(cursor, [self.background_pane.rect.x + 30 + entity_name_stamp.get_width() + 2, self.background_pane.rect.y + 14])
+
+            for button in self.buttons:
+                self.screen.blit(button.sprite.image, [button.sprite.rect.x, button.sprite.rect.y])
+            entity_gold_stamp = font.render(str(self.entity.gold), True, utilities.colors.border_gold)
+            self.screen.blit(entity_gold_stamp, [self.background_pane.rect.x + 160, self.background_pane.rect.y + 90])
+            if self.editing_gold:
+                self.screen.blit(cursor, [self.background_pane.rect.x + 160 + entity_gold_stamp.get_width() + 2, self.background_pane.rect.y + 90])
+
+            pygame.display.flip()
+
+
+class DialogueEditor(Menu):
+    def __init__(self, game_state, pos, entity):
+        super().__init__(game_state, pos, entity)
+        self.background_pane = pygame.sprite.Sprite()
+        self.background_pane.image = dialogue_menu_pane
+        self.background_pane.rect = self.background_pane.image.get_rect()
+        self.background_pane.rect.x = self.screen_width / 2 - 200
+        self.background_pane.rect.y = self.screen_height / 2 - 80
+        self.dialogue_page = 0
+        self.dialogue_line = 0
+
+        def done_click():
+            self.open = False
+
+        def more_click():
+            self.dialogue_page += 1
+            self.dialogue_line = 0
+            if self.dialogue_page > len(self.entity.dialogue_pages) - 1:
+                self.dialogue_page = 0
+
+        def back_click():
+            self.dialogue_page -= 1
+            self.dialogue_line = 0
+            if self.dialogue_page < 0:
+                self.dialogue_page = len(self.entity.dialogue_pages) - 1
+
+        done_button = Button(done_deselected_image,
+                             done_selected_image,
+                             done_click,
+                             self.background_pane.rect.x + 324,
+                             self.background_pane.rect.y + 130)
+
+        back_button = Button(back_deselected_image,
+                             back_selected_image,
+                             back_click,
+                             self.background_pane.rect.x + 145,
+                             self.background_pane.rect.y + 130)
+
+        more_button = Button(more_deselected_image,
+                             more_selected_image,
+                             more_click,
+                             self.background_pane.rect.x + 205,
+                             self.background_pane.rect.y + 130)
+
+        self.buttons = [done_button, back_button, more_button]
+
+    def menu_onscreen(self):
+        small_font = pygame.font.SysFont('Calibri', 18, True, False)
+        cursor = small_font.render("<", True, utilities.colors.red)
+        while self.open:
+            click = False
+            mouse_pos = pygame.mouse.get_pos()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.display.quit()
+                    pygame.quit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    click = True
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_BACKSPACE:
+                        line = self.entity.dialogue_pages[self.dialogue_page][self.dialogue_line]
+                        line = line[:-1]
+                        self.entity.dialogue_pages[self.dialogue_page][self.dialogue_line] = line
+                    elif event.key == pygame.K_RETURN:
+                        self.entity.dialogue_pages.append([''])
+                    elif event.key == pygame.K_UP:
+                        if self.dialogue_line > 0:
+                            self.dialogue_line -= 1
+                    elif event.key == pygame.K_DOWN:
+                        if self.dialogue_line < 2:
+                            self.dialogue_line += 1
+                    elif event.key == pygame.K_TAB:
+                        if len(self.entity.dialogue_pages[self.dialogue_page]) < 2:
+                            self.entity.dialogue_pages[self.dialogue_page].append("")
+                    else:
+                        self.entity.dialogue_pages[self.dialogue_page][self.dialogue_line] += event.unicode
+
+            for button in self.buttons:
+                if utilities.check_if_inside(button.sprite.rect.x,
+                                             button.sprite.rect.right,
+                                             button.sprite.rect.y,
+                                             button.sprite.rect.bottom,
+                                             mouse_pos):
+                    button.sprite.image = button.selected
+                    if click:
+                        button.click()
+                else:
+                    button.sprite.image = button.regular
+
+            self.screen.blit(self.background_pane.image, [self.background_pane.rect.left, self.background_pane.rect.top])
+            self.screen.blit(small_font.render("Editing Dialogue", True, utilities.colors.border_gold),
+                             [self.background_pane.rect.x, self.background_pane.rect.y + 4])
+            self.screen.blit(small_font.render(self.entity.display_name, True, utilities.colors.border_gold),
                              [self.background_pane.rect.x + 180, self.background_pane.rect.y + 4])
             counter = 0
             for dialogue_line in self.entity.dialogue_pages[self.dialogue_page]:
                 counter += 1
-                self.screen.blit(small_font.render(dialogue_line, True, utilities.colors.black),
+                self.screen.blit(small_font.render(dialogue_line, True, utilities.colors.border_gold),
                                  [self.background_pane.rect.left + 25, self.background_pane.rect.top + counter * 20 + 20])
             active_dialogue_line = small_font.render(self.entity.dialogue_pages[self.dialogue_page][self.dialogue_line], True, utilities.colors.black)
-            if self.editing:
-                self.screen.blit(cursor, [active_dialogue_line.get_width() + self.background_pane.rect.left + 27,
-                                          self.background_pane.rect.top + (self.dialogue_line + 1) * 20 + 20])
+            self.screen.blit(cursor, [active_dialogue_line.get_width() + self.background_pane.rect.left + 27,
+                                      self.background_pane.rect.top + (self.dialogue_line + 1) * 20 + 20])
 
             for button in self.buttons:
                 self.screen.blit(button.sprite.image, [button.sprite.rect.x, button.sprite.rect.y])
@@ -615,7 +934,7 @@ class DialogueMenu(Menu):
         self.background_pane.rect.y = self.screen_height / 2 - 80
         self.dialogue_page = 0
 
-        def leave_click():
+        def done_click():
             self.open = False
 
         def more_click():
@@ -632,22 +951,22 @@ class DialogueMenu(Menu):
             new_trade_window = TradeMenu(game_state, (pos), self.entity)
             new_trade_window.menu_onscreen()
 
-        leave_button = Button(leave_deselected_image,
-                              leave_selected_image,
-                              leave_click,
-                              self.background_pane.rect.x + 324,
-                              self.background_pane.rect.y + 130)
+        done_button = Button(done_deselected_image,
+                             done_selected_image,
+                             done_click,
+                             self.background_pane.rect.x + 324,
+                             self.background_pane.rect.y + 130)
 
         back_button = Button(back_deselected_image,
                              back_selected_image,
                              back_click,
-                             self.background_pane.rect.x + 205,
+                             self.background_pane.rect.x + 145,
                              self.background_pane.rect.y + 130)
 
         more_button = Button(more_deselected_image,
                              more_selected_image,
                              more_click,
-                             self.background_pane.rect.x + 145,
+                             self.background_pane.rect.x + 205,
                              self.background_pane.rect.y + 130)
 
         trade_button = Button(trade_deselected_image,
@@ -657,9 +976,9 @@ class DialogueMenu(Menu):
                               self.background_pane.rect.y + 130)
 
         if entity.items_list:
-            self.buttons = [leave_button, back_button, more_button, trade_button]
+            self.buttons = [done_button, back_button, more_button, trade_button]
         else:
-            self.buttons = [leave_button, back_button, more_button]
+            self.buttons = [done_button, back_button, more_button]
 
     def menu_onscreen(self):
         small_font = pygame.font.SysFont('Calibri', 18, True, False)
@@ -686,12 +1005,12 @@ class DialogueMenu(Menu):
                     button.sprite.image = button.regular
 
             self.screen.blit(self.background_pane.image, [self.background_pane.rect.left, self.background_pane.rect.top])
-            self.screen.blit(small_font.render(self.entity.display_name, True, utilities.colors.black),
+            self.screen.blit(small_font.render(self.entity.display_name, True, utilities.colors.border_gold),
                              [self.background_pane.rect.x + 180, self.background_pane.rect.y + 4])
             counter = 0
             for dialogue_line in self.entity.dialogue_pages[self.dialogue_page]:
                 counter += 1
-                self.screen.blit(small_font.render(dialogue_line, True, utilities.colors.black),
+                self.screen.blit(small_font.render(dialogue_line, True, utilities.colors.border_gold),
                                  [self.background_pane.rect.left + 25, self.background_pane.rect.top + counter * 20 + 20])
 
             for button in self.buttons:
@@ -710,7 +1029,7 @@ class SignpostMenu(Menu):
         self.background_pane.rect.y = self.screen_height / 2 - 80
         self.dialogue_page = 0
 
-        def leave_click():
+        def done_click():
             self.open = False
 
         def more_click():
@@ -727,13 +1046,13 @@ class SignpostMenu(Menu):
             new_trade_window = TradeMenu(game_state, (pos), self.entity)
             new_trade_window.menu_onscreen()
 
-        leave_button = Button(leave_deselected_image,
-                              leave_selected_image,
-                              leave_click,
-                              self.background_pane.rect.x + 324,
-                              self.background_pane.rect.y + 130)
+        done_button = Button(done_deselected_image,
+                             done_selected_image,
+                             done_click,
+                             self.background_pane.rect.x + 324,
+                             self.background_pane.rect.y + 130)
 
-        self.buttons = [leave_button]
+        self.buttons = [done_button]
 
     def menu_onscreen(self):
         small_font = pygame.font.SysFont('Calibri', 18, True, False)
@@ -759,12 +1078,12 @@ class SignpostMenu(Menu):
                 else:
                     button.sprite.image = button.regular
             self.screen.blit(self.background_pane.image, [self.background_pane.rect.left, self.background_pane.rect.top])
-            self.screen.blit(small_font.render(self.entity.display_name, True, utilities.colors.black),
+            self.screen.blit(small_font.render(self.entity.display_name, True, utilities.colors.border_gold),
                              [self.background_pane.rect.x + 180, self.background_pane.rect.y + 4])
             counter = 0
             for dialogue_line in self.entity.dialogue_pages[self.dialogue_page]:
                 counter += 1
-                self.screen.blit(small_font.render(dialogue_line, True, utilities.colors.black),
+                self.screen.blit(small_font.render(dialogue_line, True, utilities.colors.border_gold),
                                  [self.background_pane.rect.left + 25, self.background_pane.rect.top + counter * 20 + 20])
 
             for button in self.buttons:
@@ -785,7 +1104,7 @@ class SignpostEditor(Menu):
         self.dialogue_line = 0
         self.editing = False
 
-        def leave_click():
+        def done_click():
             self.open = False
 
         def more_click():
@@ -803,22 +1122,22 @@ class SignpostEditor(Menu):
         def edit_click():
             self.editing = not self.editing
 
-        leave_button = Button(leave_deselected_image,
-                              leave_selected_image,
-                              leave_click,
-                              self.background_pane.rect.x + 324,
-                              self.background_pane.rect.y + 130)
+        done_button = Button(done_deselected_image,
+                             done_selected_image,
+                             done_click,
+                             self.background_pane.rect.x + 324,
+                             self.background_pane.rect.y + 130)
 
         back_button = Button(back_deselected_image,
                              back_selected_image,
                              back_click,
-                             self.background_pane.rect.x + 205,
+                             self.background_pane.rect.x + 145,
                              self.background_pane.rect.y + 130)
 
         more_button = Button(more_deselected_image,
                              more_selected_image,
                              more_click,
-                             self.background_pane.rect.x + 145,
+                             self.background_pane.rect.x + 205,
                              self.background_pane.rect.y + 130)
 
         edit_button = Button(edit_deselected_image,
@@ -827,7 +1146,7 @@ class SignpostEditor(Menu):
                              self.background_pane.rect.x + 20,
                              self.background_pane.rect.y + 130)
 
-        self.buttons = [leave_button, back_button, more_button, edit_button]
+        self.buttons = [done_button, back_button, more_button, edit_button]
 
     def menu_onscreen(self):
         small_font = pygame.font.SysFont('Calibri', 18, True, False)
@@ -876,14 +1195,14 @@ class SignpostEditor(Menu):
 
             self.screen.blit(self.background_pane.image, [self.background_pane.rect.left, self.background_pane.rect.top])
             if self.editing:
-                self.screen.blit(small_font.render("Editing Signpost", True, utilities.colors.black),
-                                 [self.background_pane.rect.x, self.background_pane.rect.y + 4])
-            self.screen.blit(small_font.render(self.entity.display_name, True, utilities.colors.black),
+                self.screen.blit(small_font.render("Editing Signpost", True, utilities.colors.border_gold),
+                                 [self.background_pane.rect.x + 4, self.background_pane.rect.y + 4])
+            self.screen.blit(small_font.render(self.entity.display_name, True, utilities.colors.border_gold),
                              [self.background_pane.rect.x + 180, self.background_pane.rect.y + 4])
             counter = 0
             for dialogue_line in self.entity.dialogue_pages[self.dialogue_page]:
                 counter += 1
-                self.screen.blit(small_font.render(dialogue_line, True, utilities.colors.black),
+                self.screen.blit(small_font.render(dialogue_line, True, utilities.colors.border_gold),
                                  [self.background_pane.rect.left + 25, self.background_pane.rect.top + counter * 20 + 20])
             active_dialogue_line = small_font.render(self.entity.dialogue_pages[self.dialogue_page][self.dialogue_line], True, utilities.colors.black)
             if self.editing:
@@ -993,14 +1312,14 @@ class TradeMenu(Menu):
         def buy_clicked():
             if self.entity.items_list:
                 item_to_buy = self.entity.items_list.pop(self.merchant_selected)
-                self.trade_value -= item_to_buy.value
+                self.trade_value -= round(item_to_buy.value * self.player.buy_multiplier)
                 self.items_to_buy.append(item_to_buy)
                 self.merchant_selected = 0
 
         def sell_clicked():
             if self.player.items_list:
                 item_to_sell = self.player.items_list.pop(self.player_selected)
-                self.trade_value += item_to_sell.value
+                self.trade_value += round(item_to_sell.value * self.player.sell_multiplier)
                 self.items_to_sell.append(item_to_sell)
                 self.player_selected = 0
 
@@ -1044,11 +1363,11 @@ class TradeMenu(Menu):
         x = self.background_pane.rect.x
         y = self.background_pane.rect.y
 
-        exit_button = Button(exit_button_regular,
-                             exit_button_selected,
+        exit_button = Button(x_deselected_image,
+                             x_selected_image,
                              exit_clicked,
-                             (x + 546),
-                             (y + 10))
+                             (x + 572),
+                             (y + 8))
         buy_button = Button(buy_button_regular,
                             buy_button_selected,
                             buy_clicked,
@@ -1156,19 +1475,19 @@ class TradeMenu(Menu):
             for button in self.buttons:
                 self.screen.blit(button.sprite.image, [button.sprite.rect.x, button.sprite.rect.y])
 
-            self.screen.blit(font.render(str(self.trade_value), True, utilities.colors.black),
+            self.screen.blit(font.render(str(self.trade_value), True, utilities.colors.border_gold),
                              [self.background_pane.rect.left + 260, self.background_pane.rect.bottom - 42])
-            self.screen.blit(font.render(str(self.entity.gold), True, utilities.colors.black),
+            self.screen.blit(font.render(str(self.entity.gold), True, utilities.colors.border_gold),
                              [self.background_pane.rect.left + 135, self.background_pane.rect.top + 12])
-            self.screen.blit(font.render(str(self.player.gold), True, utilities.colors.black),
+            self.screen.blit(font.render(str(self.player.gold), True, utilities.colors.border_gold),
                              [self.background_pane.rect.left + 410, self.background_pane.rect.top + 12])
 
             spacer = 18
             count = 0
             for each in merchant_visible_items:
-                value_stamp = small_font.render(str(each.value), True, utilities.colors.black)
-                weight_stamp = small_font.render(str(each.weight), True, utilities.colors.black)
-                name_stamp = small_font.render(each.name, True, utilities.colors.black)
+                value_stamp = small_font.render(str(round(each.value * self.player.buy_multiplier)), True, utilities.colors.border_gold)
+                weight_stamp = small_font.render(str(each.weight), True, utilities.colors.border_gold)
+                name_stamp = small_font.render(each.name, True, utilities.colors.border_gold)
                 self.screen.blit(value_stamp, [self.background_pane.rect.left + 30,
                                                self.background_pane.rect.top + 84 + (count * spacer)])
                 self.screen.blit(weight_stamp, [self.background_pane.rect.left + 80,
@@ -1178,9 +1497,9 @@ class TradeMenu(Menu):
                 count += 1
             count = 0
             for each in player_visible_items:
-                value_stamp = small_font.render(str(each.value), True, utilities.colors.black)
-                weight_stamp = small_font.render(str(each.weight), True, utilities.colors.black)
-                name_stamp = small_font.render(each.name, True, utilities.colors.black)
+                value_stamp = small_font.render(str(round(each.value * self.player.sell_multiplier)), True, utilities.colors.border_gold)
+                weight_stamp = small_font.render(str(each.weight), True, utilities.colors.border_gold)
+                name_stamp = small_font.render(each.name, True, utilities.colors.border_gold)
 
                 self.screen.blit(value_stamp, [self.background_pane.rect.left + 320,
                                                self.background_pane.rect.top + 84 + (count * spacer)])
@@ -1205,6 +1524,7 @@ class LootMenu(Menu):
         self.container_selected = 0
         self.items_to_give = []
         self.items_to_take = []
+        self.display_name = entity.display_name
 
         def exit_clicked():
             self.open = False
@@ -1245,11 +1565,11 @@ class LootMenu(Menu):
         x = self.background_pane.rect.x
         y = self.background_pane.rect.y
 
-        exit_button = Button(exit_button_regular,
-                             exit_button_selected,
+        exit_button = Button(x_deselected_image,
+                             x_selected_image,
                              exit_clicked,
-                             (x + 546),
-                             (y + 10))
+                             (x + 572),
+                             (y + 8))
         take_button = Button(take_button_regular,
                              take_button_selected,
                              take_clicked,
@@ -1352,14 +1672,14 @@ class LootMenu(Menu):
             self.screen.blit(self.background_pane.image, [self.background_pane.rect.left, self.background_pane.rect.top])
             for button in self.buttons:
                 self.screen.blit(button.sprite.image, [button.sprite.rect.x, button.sprite.rect.y])
-            self.screen.blit(font.render(str(self.player.gold), True, utilities.colors.black),
+            self.screen.blit(font.render(str(self.player.gold), True, utilities.colors.border_gold),
                              [self.background_pane.rect.left + 410, self.background_pane.rect.top + 12])
             spacer = 18
             count = 0
             for each in container_visible_items:
-                value_stamp = small_font.render(str(each.value), True, utilities.colors.black)
-                weight_stamp = small_font.render(str(each.weight), True, utilities.colors.black)
-                name_stamp = small_font.render(each.name, True, utilities.colors.black)
+                value_stamp = small_font.render(str(each.value), True, utilities.colors.border_gold)
+                weight_stamp = small_font.render(str(each.weight), True, utilities.colors.border_gold)
+                name_stamp = small_font.render(each.name, True, utilities.colors.border_gold)
                 self.screen.blit(value_stamp,
                                  [self.background_pane.rect.left + 30, self.background_pane.rect.top + 84 + (count * spacer)])
                 self.screen.blit(weight_stamp,
@@ -1369,9 +1689,9 @@ class LootMenu(Menu):
                 count += 1
             count = 0
             for each in player_visible_items:
-                value_stamp = small_font.render(str(each.value), True, utilities.colors.black)
-                weight_stamp = small_font.render(str(each.weight), True, utilities.colors.black)
-                name_stamp = small_font.render(each.name, True, utilities.colors.black)
+                value_stamp = small_font.render(str(each.value), True, utilities.colors.border_gold)
+                weight_stamp = small_font.render(str(each.weight), True, utilities.colors.border_gold)
+                name_stamp = small_font.render(each.name, True, utilities.colors.border_gold)
                 self.screen.blit(value_stamp,
                                  [self.background_pane.rect.left + 320, self.background_pane.rect.top + 84 + (count * spacer)])
                 self.screen.blit(weight_stamp,
@@ -1383,6 +1703,8 @@ class LootMenu(Menu):
                 pygame.draw.rect(self.screen, (255, 198, 13), player_selection_box.image, 1)
             if self.container_selected >= self.container_list_top and self.container_selected <= self.container_list_top + 14:
                 pygame.draw.rect(self.screen, (255, 198, 13), container_selection_box.image, 1)
+            self.screen.blit(small_font.render(self.display_name, True, utilities.colors.border_gold),
+                             [self.background_pane.rect.x + 40, self.background_pane.rect.y + 16])
             pygame.display.flip()
 
 
@@ -1479,7 +1801,7 @@ class DoorEditMenu(Menu):
         else:
             self.selected_map = 0
 
-        def leave_click():
+        def accept_click():
             self.open = False
             entity.twin_map = self.maps_list[self.selected_map]
 
@@ -1507,44 +1829,44 @@ class DoorEditMenu(Menu):
             if self.selected_map > len(self.maps_list) - 1:
                 self.selected_map = 0
 
-        leave_button = Button(leave_deselected_image,
-                              leave_selected_image,
-                              leave_click,
-                              self.background_pane.rect.x + 135,
-                              self.background_pane.rect.y + 170)
+        accept_button = Button(accept_deselected_image,
+                               accept_selected_image,
+                               accept_click,
+                               self.background_pane.rect.x + 265,
+                               self.background_pane.rect.y + 160)
         map_up_arrow = Button(small_up_arrow_regular,
                               small_up_arrow_selected,
                               map_up_click,
-                              (self.background_pane.rect.x + 20),
-                              (self.background_pane.rect.y + 35))
+                              (self.background_pane.rect.x + 4),
+                              (self.background_pane.rect.y + 20))
         map_down_arrow = Button(small_down_arrow_regular,
                                 small_down_arrow_selected,
                                 map_down_click,
-                                (self.background_pane.rect.x + 150),
-                                (self.background_pane.rect.y + 35))
+                                (self.background_pane.rect.x + 4),
+                                (self.background_pane.rect.y + 45))
 
-        x_up_arrow = Button(small_up_arrow_regular,
-                            small_up_arrow_selected,
+        x_up_arrow = Button(small_right_arrow_regular,
+                            small_right_arrow_selected,
                             x_up_click,
-                            (self.background_pane.rect.x + 60),
-                            (self.background_pane.rect.y + 100))
-        x_down_arrow = Button(small_down_arrow_regular,
-                              small_down_arrow_selected,
+                            (self.background_pane.rect.x + 83),
+                            (self.background_pane.rect.y + 107))
+        x_down_arrow = Button(small_left_arrow_regular,
+                              small_left_arrow_selected,
                               x_down_click,
-                              (self.background_pane.rect.x + 110),
-                              (self.background_pane.rect.y + 100))
-        y_up_arrow = Button(small_up_arrow_regular,
-                            small_up_arrow_selected,
+                              (self.background_pane.rect.x + 3),
+                              (self.background_pane.rect.y + 107))
+        y_up_arrow = Button(small_right_arrow_regular,
+                            small_left_arrow_selected,
                             y_up_click,
-                            (self.background_pane.rect.x + 60),
-                            (self.background_pane.rect.y + 170))
-        y_down_arrow = Button(small_down_arrow_regular,
-                              small_down_arrow_selected,
+                            (self.background_pane.rect.x + 83),
+                            (self.background_pane.rect.y + 164))
+        y_down_arrow = Button(small_left_arrow_regular,
+                              small_left_arrow_selected,
                               y_down_click,
-                              (self.background_pane.rect.x + 110),
-                              (self.background_pane.rect.y + 170))
+                              (self.background_pane.rect.x + 3),
+                              (self.background_pane.rect.y + 164))
 
-        self.buttons = [leave_button, map_up_arrow, map_down_arrow, x_up_arrow, x_down_arrow, y_up_arrow, y_down_arrow]
+        self.buttons = [accept_button, map_up_arrow, map_down_arrow, x_up_arrow, x_down_arrow, y_up_arrow, y_down_arrow]
 
     def menu_onscreen(self):
         small_font = pygame.font.SysFont('Calibri', 18, True, False)
@@ -1564,21 +1886,21 @@ class DoorEditMenu(Menu):
                                              button.sprite.rect.y,
                                              button.sprite.rect.bottom,
                                              mouse_pos):
-                    button.sprite.image = button.selected
+                    button.sprite.image = button.selected 
                     if click:
                         button.click()
                 else:
                     button.sprite.image = button.regular
 
             self.screen.blit(self.background_pane.image, [self.background_pane.rect.left, self.background_pane.rect.top])
-            self.screen.blit(small_font.render(str(self.maps_list[self.selected_map]), True, utilities.colors.black),
-                             [self.background_pane.rect.x + 70, self.background_pane.rect.y + 35])
-            self.screen.blit(small_font.render(str(self.entity.destination_x), True, utilities.colors.black),
-                             [self.background_pane.rect.x + 80, self.background_pane.rect.y + 100])
-            self.screen.blit(small_font.render(str(self.entity.destination_y), True, utilities.colors.black),
-                             [self.background_pane.rect.x + 80, self.background_pane.rect.y + 170])
-            self.screen.blit(small_font.render("{0}, {1}".format(self.entity.tile_x, self.entity.tile_y), True, utilities.colors.black),
-                             [self.background_pane.rect.x + 2, self.background_pane.rect.y + 176])
+            self.screen.blit(small_font.render(str(self.maps_list[self.selected_map]), True, utilities.colors.border_gold),
+                             [self.background_pane.rect.x + 30, self.background_pane.rect.y + 40])
+            self.screen.blit(small_font.render(str(self.entity.destination_x), True, utilities.colors.border_gold),
+                             [self.background_pane.rect.x + 40, self.background_pane.rect.y + 111])
+            self.screen.blit(small_font.render(str(self.entity.destination_y), True, utilities.colors.border_gold),
+                             [self.background_pane.rect.x + 40, self.background_pane.rect.y + 167])
+            self.screen.blit(small_font.render("{0}, {1}".format(self.entity.tile_x, self.entity.tile_y), True, utilities.colors.border_gold),
+                             [self.background_pane.rect.x + 296, self.background_pane.rect.y + 86])
             for button in self.buttons:
                 self.screen.blit(button.sprite.image, [button.sprite.rect.x, button.sprite.rect.y])
 

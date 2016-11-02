@@ -11,9 +11,12 @@ class Item(object):
         self.value = value
         self.weight = weight
 
+    def set_surfaces(self):
+        pass
+
 
 def get_gold_ingot():
-    return Item("Gold Ingot", 100, 1)
+     return Item("Gold Ingot", 100, 1)
 
 
 def get_iron_ingot():
@@ -35,9 +38,16 @@ def get_calipers():
 def get_lockpick():
     return Item("Lockpick", 5, 1)
 
+def get_burnt_bread():
+    return Item("Burnt Bread", 1, 2)
 
-rubbish = [("Scrap Paper", 1, 1), ("Broken Sword", 2, 5), ("Burnt Bread", 1, 2)]
-treasures = [("Gold Bar", 30, 1), ("Ye Flaske", 1000, 1)]
+def get_broken_sword():
+    return Item("Broken Sword", 1, 5)
+
+def get_scrap_paper():
+    return Item("Scrap Paper", 1, 1)
+
+
 
 qualities = ["Worthless ", "Shabby ", "Acceptable ", "Ordinary ", "Fine ", "Resplendent ", "Titanic "]
 quality_colors = {"Worthless ": utilities.colors.worthless,
@@ -102,4 +112,19 @@ def choose_material(value, player_level):
     return materials[material]
 
 
-item_functions = [get_wheat, get_calipers, get_lockpick, get_gold_ingot, get_iron_ingot, get_steel_ingot]
+commodity_functions = [get_iron_ingot, get_steel_ingot, get_wheat]
+
+
+junk_functions = [get_calipers, get_scrap_paper, get_broken_sword, get_burnt_bread]
+
+
+treasure_functions = [get_gold_ingot]
+
+
+tool_functions = [get_lockpick]
+
+
+item_functions = [junk_functions +
+                  treasure_functions + 
+                  commodity_functions + 
+                  tool_functions]

@@ -10,9 +10,12 @@ import avatar
 
 tile_strings = ["Dirt",
                 "Flagstone",
+                "Flagstone 2",
                 "Wood 1",
+                "Wood 1 Large",
                 "Wood 2",
                 "Wood 3",
+                "Brown Cobblestones",
                 "Grass 1",
                 "Grass 2",
                 "Grass 3",
@@ -20,6 +23,7 @@ tile_strings = ["Dirt",
                 "Grass 5",
                 "Marble 1",
                 "Stone Block",
+                "Stone Block 2",
                 "Stone Floor Grey",
                 "Stone Floor Brown",
                 "Dirt Path T UP",
@@ -41,6 +45,18 @@ entities = {"Avatar": avatar.Avatar,
             "Door": structure.Door,
             "Wall Stone": structure.StoneWall,
             "Wall Interior": structure.HouseInteriorWall,
+            "Wall Interior Wide": structure.HouseInteriorWallWide,
+            "Wall Interior Tall": structure.HouseInteriorWallTall,
+            "Wall Topper": structure.WallTopBottom,
+            "Wall Topper 2x2": structure.WallTopLarge,
+            "Wall Topper 1x2": structure.WallTopTall,
+            "Wall Topper 1x1": structure.WallTopFull,
+            "Wall Topper Right": structure.WallTopRight,
+            "Wall Topper Left": structure.WallTopLeft,
+            "Stone Wall": structure.StoneWall,
+            "Stone Wall Tall": structure.StoneWallTall,
+            "Stone Wall Chains": structure.StoneWallChains,
+            "Stone Wall Torch": structure.StoneWallTorch,
             "Palisade Vertical": structure.VerticalPalisade,
             "Palisade Horizontal": structure.HorizontalPalisade,
             "Palisade Corner LL": structure.LLCornerPalisade,
@@ -54,6 +70,13 @@ entities = {"Avatar": avatar.Avatar,
             "House Shingle Small": structure.SmallShingleHouse,
             "House Shingle Medium": structure.MediumShingleHouse,
             "House Shingle Large": structure.LargeShingleHouse,
+            "Dungeon Entrance": structure.DungeonEntrance,
+            "Stairs Up": structure.StairsUp,
+            "Stairs Down": structure.StairsDown,
+            "Altar Empty": structure.AltarEmpty,
+            "Altar Empty Writing": structure.AltarEmptyWriting,
+            "Altar": structure.Altar,
+            "Candelabra": structure.Candelabra,
             "Signpost": structure.Signpost,
             "Chest": structure.Chest,
             "Pot": structure.Pot,
@@ -67,16 +90,51 @@ entities = {"Avatar": avatar.Avatar,
             "Bookshelf Narrow Empty": structure.EmptyNarrowBookshelf,
             "Bookshelf Wide": structure.WideBookshelf,
             "Bookshelf Wide Empty": structure.EmptyWideBookshelf,
+            "Wood Crate": structure.WoodCrate,
+            "Desk Forward": structure.DeskForward,
+            "Desk Backward": structure.DeskBackward,
+            "Wardrobe Short": structure.WardrobeShort,
+            "Wardrobe Narrow": structure.WardrobeNarrowTall,
+            "Wardrobe Narrow Short": structure.WardrobeNarrowShort,
+            "Bookshelf Wide Short Empty": structure.ShortEmptyWideBookshelf,
+            "Bookshelf Narrow Short Empty": structure.ShortEmptyNarrowBookshelf,
             "Wardrobe": structure.Wardrobe,
             "Guard": npc.Guard,
+            "Lord": npc.Lord,
             "Villager": npc.Villager,
+            "Sage": npc.Sage,
             "Merchant": npc.Merchant,
             "Wheat": flora.Wheat,
-            "Tree": flora.Tree,
+            "Pine Tree": flora.PineTree,
+            "Small Oak Tree": flora.SmallOakTree,
+            "Small Bare Oak Tree": flora.SmallOakTreeBare,
+            "Small Fall Oak Tree": flora.SmallOakTreeFall,
+            "Large Oak Tree": flora.LargeOakTree,
+            "Large Bare Oak Tree": flora.LargeBareOakTree,
+            "Large Bare Oak Tree Dark": flora.LargeBareDarkOakTree,
+            "Large Yellow Oak Tree": flora.LargeYellowOakTree,
+            "Large Fall Oak Tree": flora.LargeFallOakTree,
             "Skeleton": creature.Skeleton,
             "Grievebeast": creature.GrieveBeast,
             "Doompaw": creature.DoomPaw,
-            "Shadebrute": creature.ShadeBrute}
+            "Shadebrute": creature.ShadeBrute,
+            "Cindermask": creature.CinderMask,
+            "Cow": creature.Cow,
+            "Wood Fence Vertical": structure.WoodFenceV,
+            "Wood Fence Horizontal": structure.WoodFenceH,
+            "Wood Fence Left": structure.WoodFenceL,
+            "Wood Fence Right": structure.WoodFenceR,
+            "Wood Fence Down": structure.WoodFenceD,
+            "Wood Fence Up": structure.WoodFenceU,
+            "Wood Fence Upper Left": structure.WoodFenceUL,
+            "Wood Fence Upper Right": structure.WoodFenceUR,
+            "Wood Fence Lower Left": structure.WoodFenceDL,
+            "Wood Fence Lower Right": structure.WoodFenceDR,
+            "Wood Fence 4 Way": structure.WoodFence4way,
+            "Wood Fence Vertical Left": structure.WoodFenceVL,
+            "Wood Fence Vertical Right": structure.WoodFenceVR,
+            "Wood Fence Horizontal Up": structure.WoodFenceHU,
+            "Wood Fence Horizontal Down": structure.WoodFenceHD}
 
 entity_groups = ["Structures",
                  "Furniture",
@@ -88,14 +146,32 @@ entity_groups = ["Structures",
 structure_strings = ["Forge",
                      "Anvil",
                      "Door",
-                     "Wall Stone",
                      "Wall Interior",
+                     "Wall Interior Tall",
+                     "Wall Interior Wide",
                      "Palisade Horizontal",
                      "Palisade Vertical",
                      "Palisade Corner UL",
                      "Palisade Corner UR",
                      "Palisade Corner LL",
                      "Palisade Corner LR",
+                     "Stairs Up",
+                     "Stairs Down",
+                     "Wood Fence Vertical",
+                     "Wood Fence Horizontal",
+                     "Wood Fence Left",
+                     "Wood Fence Right",
+                     "Wood Fence Up",
+                     "Wood Fence Down",
+                     "Wood Fence Upper Left",
+                     "Wood Fence Upper Right",
+                     "Wood Fence Lower Left",
+                     "Wood Fence Lower Right",
+                     "Wood Fence 4 Way",
+                     "Wood Fence Vertical Left",
+                     "Wood Fence Vertical Right",
+                     "Wood Fence Horizontal Up",
+                     "Wood Fence Horizontal Down",
                      "Gate Vertical",
                      "Gate Horizontal",
                      "House Thatch Small",
@@ -103,36 +179,71 @@ structure_strings = ["Forge",
                      "House Shingle Small",
                      "House Shingle Medium",
                      "House Shingle Large",
-                     "Signpost"
+                     "Signpost",
+                     "Stone Wall",
+                     "Stone Wall Tall",
+                     "Stone Wall Chains",
+                     "Stone Wall Torch",
+                     "Dungeon Entrance",
+                     "Wall Topper",
+                     "Wall Topper 1x1",
+                     "Wall Topper Left",
+                     "Wall Topper Right",
+                     "Wall Topper 2x2",
+                     "Wall Topper 1x2"
                      ]
 
 furniture_strings = ["Table Empty",
                      "Table",
                      "Chair Forward",
                      "Chair Backward",
+                     "Desk Forward",
+                     "Desk Backward",
+                     "Wood Crate",
                      "Bookshelf Narrow",
                      "Bookshelf Narrow Empty",
+                     "Bookshelf Narrow Short Empty",
                      "Bookshelf Wide",
                      "Bookshelf Wide Empty",
+                     "Bookshelf Wide Short Empty",
                      "Wardrobe",
+                     "Wardrobe Short",
+                     "Wardrobe Narrow",
+                     "Wardrobe Narrow Short",
                      "Pot",
                      "Chest",
                      "Barrel Vertical",
-                     "Barrel Horizontal"
+                     "Barrel Horizontal",
+                     "Candelabra",
+                     "Altar",
+                     "Altar Empty",
+                     "Altar Empty Writing"
                      ]
 
 creature_strings = ["Doompaw",
                     "Skeleton",
                     "Grievebeast",
-                    "Shadebrute"]
+                    "Shadebrute",
+                    "Cindermask",
+                    "Cow"]
 
 npc_strings = ["Guard",
                "Villager",
+               "Lord",
+               "Sage",
                "Merchant"]
 
 
 flora_strings = ["Wheat",
-                 "Tree"]
+                 "Pine Tree",
+                 "Large Oak Tree",
+                 "Large Fall Oak Tree",
+                 "Large Yellow Oak Tree",
+                 "Large Bare Oak Tree",
+                 "Large Bare Oak Tree Dark",
+                 "Small Oak Tree",
+                 "Small Fall Oak Tree",
+                 "Small Bare Oak Tree"]
 
 avatar_strings = ["Avatar"]
 
@@ -247,6 +358,30 @@ def f_key(debug_status):
     debug_status.paint = not debug_status.paint
 
 
+def u_key(debug_status):
+    if debug_status.paint:
+        if debug_status.brush_size[1] < 10:
+            debug_status.brush_size = (debug_status.brush_size[0], debug_status.brush_size[1] + 1)
+
+
+def i_key(debug_status):
+    if debug_status.paint:
+        if debug_status.brush_size[0] < 10:
+            debug_status.brush_size = (debug_status.brush_size[0] + 1, debug_status.brush_size[1])
+
+
+def j_key(debug_status):
+    if debug_status.paint:
+        if debug_status.brush_size[1] > 1:
+            debug_status.brush_size = (debug_status.brush_size[0], debug_status.brush_size[1] - 1)
+
+
+def k_key(debug_status):
+    if debug_status.paint:
+        if debug_status.brush_size[0] > 1:
+            debug_status.brush_size = (debug_status.brush_size[0] - 1, debug_status.brush_size[1])
+
+
 def z_key(debug_status):
     if debug_status.place:
         if not debug_status.current_entity_type_number == 0:
@@ -294,6 +429,10 @@ key_functions = {pygame.K_c: c_key,
                  pygame.K_z: z_key,
                  pygame.K_x: x_key,
                  pygame.K_f: f_key,
+                 pygame.K_u: u_key,
+                 pygame.K_i: i_key,
+                 pygame.K_j: j_key,
+                 pygame.K_k: k_key,
                  pygame.K_COMMA: comma_key,
                  pygame.K_PERIOD: period_key}
 
@@ -310,25 +449,30 @@ def place_click(game_state, debug_status, current_map, selected_tile):
             if entity_to_place.my_type == "Avatar":
                 game_state.player.tile_x = selected_tile.column
                 game_state.player.tile_y = selected_tile.row
-                game_state.player.leave_tile()
+                #game_state.player.leave_tile()
                 game_state.player.assign_map(current_map)
                 game_state.player.assign_tile()
+                game_state.player.set_images()
+                game_state.player.set_frame(game_state.player.action)
                 game_state.player.sprite.rect.x = game_state.player.tile_x * 20
                 game_state.player.sprite.rect.y = (game_state.player.tile_y - 1) * 20
+                for each in game_state.player.items_list:
+                    each.set_surfaces()
             else:
                 entity_to_place(selected_tile.column, selected_tile.row, current_map)
         else:
             print("BLOCKED!")
     else:
         entity_to_place(selected_tile.column, selected_tile.row, current_map)
+    current_map.update_object_layer()
 
 
 def edit_click(game_state, debug_status, selected_tile, mouse_pos):
     if selected_tile.entity_group["Npc"]:
-        new_dialogue_edit_menu = ui.DialogueEditor(game_state,
-                                                   mouse_pos,
-                                                   selected_tile.entity_group["Npc"][0])
-        new_dialogue_edit_menu.menu_onscreen()
+        new_npc_edit_menu = ui.NpcEditor(game_state,
+                                         mouse_pos,
+                                         selected_tile.entity_group["Npc"][0])
+        new_npc_edit_menu.menu_onscreen()
     if selected_tile.entity_group["Structure"]:
         for each in selected_tile.entity_group["Structure"]:
             if each.display_name == "Signpost":
@@ -351,13 +495,18 @@ def edit_click(game_state, debug_status, selected_tile, mouse_pos):
 def remove_click(current_map, current_tile):
     for entity_type in current_tile.entity_group:
         for entity in current_tile.entity_group[entity_type]:
-            entity.expire()
+            entity.expire(1, False)
+    current_map.update_object_layer()
 
 
-def paint_click(current_map, current_tile, tile_string):
-    current_map.background.image.blit(art.tile_images[tile_string], [current_tile.column * 20,
-                                                                     current_tile.row * 20])
-
+def paint_click(current_map, current_tile, tile_string, brush_size):
+    footprint = brush_size
+    initial_x = current_tile.column
+    initial_y = current_tile.row - (footprint[1] - 1)
+    for tile_y in range(initial_y, initial_y + (footprint[1])):
+        for tile_x in range(initial_x, initial_x + footprint[0]):
+            current_map.background.image.blit(art.tile_images[tile_string], [tile_x * 20,
+                                                                             tile_y * 20])
 
 def mouse_processing(current_map, debug_status, mouse_pos, event, game_state):
     tile_x = int((mouse_pos[0] - current_map.x_shift) / 20)
@@ -372,7 +521,8 @@ def mouse_processing(current_map, debug_status, mouse_pos, event, game_state):
         if debug_status.edit:
             edit_click(game_state, debug_status, selected_tile, mouse_pos)
         if debug_status.paint:
-            paint_click(current_map, selected_tile, tile_strings[debug_status.tile_number])
+            paint_click(current_map, selected_tile, tile_strings[debug_status.tile_number], debug_status.brush_size)
+
 
 class DebugStatus(object):
     def __init__(self, current_map, game_state):
@@ -385,6 +535,7 @@ class DebugStatus(object):
         self.remove = False
         self.paint = False
 
+        self.brush_size = (1, 1)
         self.tile_number = 0
         self.current_entity_group_number = 0
         self.current_entity_type_number = 0
@@ -396,25 +547,29 @@ class DebugStatus(object):
 
     def reset_surfaces(self):
         self.font = pygame.font.SysFont('Calibri', 18, True, False)
-        self.path_stamp = self.font.render("Drawing Paths", True, utilities.colors.black)
-        debug_mode_stamp = self.font.render("Debug Mode", True, utilities.colors.black)
-        clear_stamp = self.font.render("Clear Items: All [E]ntities / All [A]nimals / All [V]egetation / All [T]errain", True, utilities.colors.black)
-        removal_stamp = self.font.render("Click to remove from tile at cursor: ", True, utilities.colors.black)
-        place_stamp = self.font.render("Click to place items at cursor", True, utilities.colors.black)
-        paint_stamp = self.font.render("Click to paint background terrain", True, utilities.colors.black)
-        self.stamps = [((210, self.game_state.screen_height - 70), debug_mode_stamp),
-                       ((210, self.game_state.screen_height - 55), place_stamp),
-                       ((210, self.game_state.screen_height - 55), clear_stamp),
-                       ((210, self.game_state.screen_height - 55), removal_stamp),
-                       ((210, self.game_state.screen_height - 55), paint_stamp)]
+        self.tiny_font = pygame.font.SysFont('Calibri', 12, True, False)
+        self.path_stamp = self.tiny_font.render("Drawing Paths", True, utilities.colors.border_gold)
+        debug_mode_stamp = self.font.render("Debug Mode", True, utilities.colors.border_gold)
+        clear_stamp = self.tiny_font.render("Clear Items: All [E]ntities / All [A]nimals / All [V]egetation / All [T]errain",
+                                            True, utilities.colors.border_gold)
+        removal_stamp = self.tiny_font.render("Click to remove from tile at cursor: ", True, utilities.colors.border_gold)
+        place_stamp = self.tiny_font.render("Click to place items at cursor", True, utilities.colors.border_gold)
+        paint_stamp = self.tiny_font.render("Click to paint background terrain", True, utilities.colors.border_gold)
+        self.stamps = [((10, self.game_state.screen_height - 70), debug_mode_stamp),
+                       ((10, self.game_state.screen_height - 50), place_stamp),
+                       ((10, self.game_state.screen_height - 50), clear_stamp),
+                       ((10, self.game_state.screen_height - 50), removal_stamp),
+                       ((10, self.game_state.screen_height - 50), paint_stamp)]
         self.update_entity_group_stamp()
         self.update_entity_stamp()
 
     def update_entity_group_stamp(self):
-        self.entity_group_stamp = self.font.render(self.current_entity_group, True, utilities.colors.black)
+        self.entity_group_stamp = self.tiny_font.render(self.current_entity_group, True, utilities.colors.border_gold)
 
     def update_entity_stamp(self):
-        self.entity_stamp = self.font.render(string_lists[self.current_entity_group][self.current_entity_type_number], True, utilities.colors.black)
+        self.entity_stamp = self.tiny_font.render(string_lists[self.current_entity_group][self.current_entity_type_number],
+                                                  True,
+                                                  utilities.colors.border_gold)
 
     def print_to_screen(self, screen):
         screen.blit(self.stamps[0][1], self.stamps[0][0])
@@ -423,22 +578,25 @@ class DebugStatus(object):
         if self.place:
             self.update_entity_stamp()
             screen.blit(self.stamps[1][1], self.stamps[1][0])
-            screen.blit(self.entity_group_stamp, [210, self.game_state.screen_height - 40])
-            screen.blit(self.entity_stamp, [210, self.game_state.screen_height - 25])
+            screen.blit(self.entity_group_stamp, [10, self.game_state.screen_height - 40])
+            screen.blit(self.entity_stamp, [10, self.game_state.screen_height - 30])
         if self.remove:
             screen.blit(self.stamps[3][1], self.stamps[3][0])
         if self.edit:
-            screen.blit(self.font.render("Editing", True, utilities.colors.black), [210, self.game_state.screen_height - 55])
+            screen.blit(self.font.render("Editing", True, utilities.colors.border_gold), [10, self.game_state.screen_height - 50])
         if self.paint:
             screen.blit(self.stamps[4][1], self.stamps[4][0])
-            screen.blit(self.font.render(tile_strings[self.tile_number], True, utilities.colors.black), [210, self.game_state.screen_height - 40])
+            screen.blit(self.font.render(tile_strings[self.tile_number],
+                                         True,
+                                         utilities.colors.border_gold),
+                        [10, self.game_state.screen_height - 40])
         if self.draw_search_areas:
             for each in self.current_map.entity_group["Creature"]:
                 new_search_area_graphic = FoodSearchRadius(self.current_map, each)
                 new_search_area_graphic.update_stats()
                 pygame.draw.circle(screen, (0, 0, 0), new_search_area_graphic.center, new_search_area_graphic.radius, 1)
         if self.draw_paths:
-            screen.blit(self.path_stamp, [210, self.game_state.screen_height - 40])
+            screen.blit(self.path_stamp, [10, self.game_state.screen_height - 40])
             for each in self.current_map.entity_group["Creature"]:
                 if each.path:
                     for tile in each.path.tiles:

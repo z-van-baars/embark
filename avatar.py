@@ -30,7 +30,7 @@ class Avatar(entity.SentientEntity):
         self.time_since_last_move = 0
         self.time_since_last_attack = 0
 
-        self.speed = 10
+        self.speed = 100
         self.accuracy = 60
         self.level = 1
         self.health = 100
@@ -43,6 +43,9 @@ class Avatar(entity.SentientEntity):
         self.attack = 1
         self.combat_magic = 1
         self.healing_magic = 1
+
+        self.sell_multiplier = 0.7
+        self.buy_multiplier = 1.3
 
         self.armor = 0
         self.melee_damage = 0
@@ -59,7 +62,7 @@ class Avatar(entity.SentientEntity):
         self.walk_frame_number = 0
         self.fight_frame = 0
 
-        self.set_images()
+        self.set_images(self.image_key)
 
     def set_frame(self, action):
         self.set_action_sprite(action)
@@ -112,7 +115,7 @@ class Avatar(entity.SentientEntity):
         elif action == Action.attack:
             self.equipped_weapon.set_frame(self.fight_frame - 1)
 
-    def set_images(self):
+    def set_images(self, image_key):
         self.healthbar = ui.HealthBar(self.current_map, self.tile_x, self.tile_y, self.health, self.max_health)
         self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
         avatar_spritesheet = spritesheet.Spritesheet("art/avatar/avatar.png")
@@ -137,7 +140,22 @@ class Avatar(entity.SentientEntity):
                                avatar_spritesheet.get_image(80, 0, 20, 40),
                                avatar_spritesheet.get_image(80, 0, 20, 40),
                                avatar_spritesheet.get_image(80, 0, 20, 40),
-                               avatar_spritesheet.get_image(80, 0, 20, 40)]
+                               avatar_spritesheet.get_image(80, 0, 20, 40),
+                               avatar_spritesheet.get_image(100, 0, 20, 40),
+                               avatar_spritesheet.get_image(100, 0, 20, 40),
+                               avatar_spritesheet.get_image(100, 0, 20, 40),
+                               avatar_spritesheet.get_image(100, 0, 20, 40),
+                               avatar_spritesheet.get_image(120, 0, 20, 40),
+                               avatar_spritesheet.get_image(120, 0, 20, 40),
+                               avatar_spritesheet.get_image(120, 0, 20, 40),
+                               avatar_spritesheet.get_image(120, 0, 20, 40),
+                               avatar_spritesheet.get_image(120, 0, 20, 40),
+                               avatar_spritesheet.get_image(120, 0, 20, 40),
+                               avatar_spritesheet.get_image(140, 0, 20, 40),
+                               avatar_spritesheet.get_image(140, 0, 20, 40),
+                               avatar_spritesheet.get_image(140, 0, 20, 40),
+                               avatar_spritesheet.get_image(140, 0, 20, 40),
+                               avatar_spritesheet.get_image(140, 0, 20, 40)]
         self.melee_fight_frames = []
         for x in range(3):
             self.melee_fight_frames.append(avatar_spritesheet.get_image(0, 80, 20, 40))

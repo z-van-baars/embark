@@ -3,6 +3,8 @@ import utilities
 from enum import Enum
 import combat
 import navigate
+import art
+import random
 
 
 class Action(Enum):
@@ -15,6 +17,8 @@ class Action(Enum):
 class Entity(object):
     occupies_tile = False
     gateway = False
+    height = 1
+    width = 1
 
     def __init__(self, x, y, current_map):
         super().__init__()
@@ -24,7 +28,8 @@ class Entity(object):
         self.current_tile = None
         self.age = 0
         self.sprite = pygame.sprite.Sprite()
-        self.display_name = "-N/A-"
+        self.display_name = None
+        self.image_key = None
 
         self.current_map.entity_group[self.my_type].append(self)
         self.assign_tile()
@@ -37,7 +42,7 @@ class Entity(object):
         else:
             return False
 
-    def expire(self):
+    def expire(self, player_level, natural_death):
         self.leave_tile()
         self.current_map.entity_group[self.my_type].remove(self)
         self.current_map = None
@@ -79,10 +84,24 @@ class MovingEntity(Entity):
 
 
 class SentientEntity(MovingEntity):
+    width = 1
+
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
+        self.healthbar = None
 
-    def expire(self):
+    def set_images(self, image_key):
+        if not self.image_index:
+            if len(image_key) > 1:
+                self.image_index = random.randint(0, len(art.image_dict[image_key]) - 1)
+            else:
+                self.image_index = 0
+        self.sprite.image = art.image_dict[image_key][self.image_index]
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20 + int((self.footprint[0] * 20 - self.width * 20) / 2)
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+
+    def expire(self, player_level, natural_death):
         self.leave_tile()
         self.current_map.entity_group[self.my_type].remove(self)
         if self.healthbar:
@@ -177,6 +196,7 @@ class SentientEntity(MovingEntity):
         self.assign_tile()
         self.sprite.rect.x = self.tile_x * 20
         self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+
         self.change_x = 0
         self.change_y = 0
 
@@ -188,8 +208,21 @@ class SentientEntity(MovingEntity):
 
 
 class StationaryEntity(Entity):
+    width = 1
+
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
+
+    def set_images(self, image_key):
+        if not self.image_index:
+            if len(image_key) > 1:
+                self.image_index = random.randint(0, len(art.image_dict[image_key]) - 1)
+            else:
+                self.image_index = 0
+        self.sprite.image = art.image_dict[image_key][self.image_index]
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20 + int((self.footprint[0] * 20 - self.width * 20) / 2)
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
 
 
 

@@ -3,9 +3,10 @@ import math
 import random
 import pickle
 
+
 pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.init()
-pygame.display.set_caption("Embark v 0.3")
+pygame.display.set_caption("Embark v 0.4")
 
 
 class GameState(object):
@@ -30,7 +31,7 @@ class Colors(object):
     def __init__(self):
         self.black = (0, 0, 0)
         self.white = (255, 255, 255)
-        self.light_grey = (194, 194, 194)
+        self.light_gray = (194, 194, 194)
         self.light_green = (0, 210, 0)
         self.dark_green = (0, 200, 0)
         self.red = (255, 0, 0)
@@ -42,6 +43,7 @@ class Colors(object):
         self.key = (255, 0, 128)
         self.brown = (112, 87, 46)
         self.equipped_item_red = (110, 0, 0)
+        self.border_gold = (227, 195, 20)
 
         self.worthless = (148, 25, 25)
         self.shabby = (148, 82, 25)
@@ -52,7 +54,6 @@ class Colors(object):
         self.titanic = (148, 25, 146)
 
 colors = Colors()
-
 
 class Path(object):
     def __init__(self):
@@ -67,6 +68,24 @@ def on_screen(screen_width, screen_height, x_position, y_position, x_shift, y_sh
         return False
 
 
+def get_image(source_image, x, y, width, height):
+    """ Grab a single image out of a larger spritesheet
+        Pass in the x, y location of the sprite
+        and the width and height of the sprite. """
+
+    # Create a new blank image
+    image = pygame.Surface([width, height]).convert()
+    image.fill(colors.key)
+
+    # Copy the sprite from the large sheet onto the smaller image
+    image.blit(source_image, (0, 0), (x, y, width, height))
+    image.set_colorkey(colors.key)
+
+    # Return the image
+    return image
+
+
+
 def any_tile_visible(screen_width, screen_height, x_shift, y_shift, entity):
     initial_x = entity.tile_x
     initial_y = entity.tile_y - (entity.footprint[1] - 1)
@@ -78,17 +97,24 @@ def any_tile_visible(screen_width, screen_height, x_shift, y_shift, entity):
 
 
 def get_random_coordinates(x_lower, x_upper, y_lower, y_upper):
-        x_position = random.randint(x_lower, x_upper)
-        y_position = random.randint(y_lower, y_upper)
-        return (x_position, y_position)
+    x_position = random.randint(x_lower, x_upper)
+    y_position = random.randint(y_lower, y_upper)
+    return (x_position, y_position)
 
 
 def export_game_state(game_state):
+    save_string = "save_1"
     print("Exporting Game State......")
     game_state.clock = None
-    pickle.dump(game_state, open("saves/save_1.p", "wb"))
+    export_map_surfaces(game_state)
+    pickle.dump(game_state, open("saves/{0}.p".format(save_string), "wb"))
     game_state.clock = pygame.time.Clock()
     print("Done")
+
+
+def export_map_surfaces(game_state):
+    for each in game_state.maps:
+        pygame.image.save(game_state.maps[each].background.image, "maps/surface_data/{0}.png".format(game_state.maps[each].name))
 
 
 def import_game_state():
@@ -97,6 +123,7 @@ def import_game_state():
     imported_game_state.clock = pygame.time.Clock()
     imported_game_state.reset_surfaces()
     imported_game_state.debug_status.reset_surfaces()
+    imported_game_state.debug_status.brush_size = (1, 1)
     for each in imported_game_state.maps:
         restore_surfaces(imported_game_state.maps[each])
     print("Done")
@@ -107,12 +134,15 @@ def restore_surfaces(imported_map):
     imported_map.map_generation()
     for entity_list in imported_map.entity_group:
         for entity in imported_map.entity_group[entity_list]:
-            entity.set_images()
+            print(entity.display_name)
+            entity.set_images(entity.image_key)
             if hasattr(entity, 'items_list'):
                 for each in entity.items_list:
                     each.set_surfaces()
             entity.current_tile = None
             entity.assign_tile()
+    imported_map.background.image = pygame.image.load("maps/surface_data/{0}.png".format(imported_map.name))
+    imported_map.update_object_layer()
 
 
 def any_tile_blocked(tile, active_map, entity):

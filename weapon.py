@@ -9,6 +9,7 @@ import utilities
 
 class Projectile(entity.MovingEntity):
     footprint = (1, 1)
+    interactable = False
     my_type = "Projectile"
 
     def __init__(self, current_map, x, y, x2, y2, speed, damage, target):
@@ -49,10 +50,10 @@ class Projectile(entity.MovingEntity):
         self.target_check()
 
     def target_check(self):
-        target_top = self.target_y - ((self.target.height / 2) * 20)
-        target_bottom = self.target_y + 20
-        target_left = self.target_x
-        target_right = self.target_x + (20 * self.target.footprint[0])
+        target_top = self.target.tile_y * 20 - ((self.target.height / 2) * 20)
+        target_bottom = self.target.tile_y * 20 + 20
+        target_left = self.target.tile_x * 20
+        target_right = self.target.tile_x * 20 + (20 * self.target.footprint[0])
         if utilities.check_if_inside(target_left,
                                      target_right,
                                      target_top,
@@ -70,6 +71,102 @@ class Arrow(Projectile):
 
     def set_surfaces(self):
         self.sprite.image = art.arrow_image
+
+
+class BlueFireball(Projectile):
+    def __init__(self, current_map, x, y, x2, y2, target):
+        self.casting = True
+        self.frame = 0
+        self.impacting = False
+        super().__init__(current_map, x, y, x2, y2, 5, 5, target)
+        self.sprite.rect.x = x2
+        self.sprite.rect.y = y2 - 10
+        self.true_x = x2
+        self.true_y = y2 - 10
+
+    def set_surfaces(self):
+        self.travel_frames = []
+        self.cast_frames = []
+        self.impact_frames = []
+        for x in range(2):
+            self.travel_frames.append(art.blue_fireball_spritesheet.get_image(0, 0, 20, 20))
+        for x in range(2):
+            self.travel_frames.append(art.blue_fireball_spritesheet.get_image(20, 0, 20, 20))
+        for x in range(2):
+            self.travel_frames.append(art.blue_fireball_spritesheet.get_image(40, 0, 20, 20))
+        for x in range(2):
+            self.travel_frames.append(art.blue_fireball_spritesheet.get_image(60, 0, 20, 20))
+
+        for x in range(5):
+            self.cast_frames.append(art.blue_fireball_spritesheet.get_image(0, 20, 20, 20))
+        for x in range(5):
+            self.cast_frames.append(art.blue_fireball_spritesheet.get_image(20, 20, 20, 20))
+        for x in range(5):
+            self.cast_frames.append(art.blue_fireball_spritesheet.get_image(40, 20, 20, 20))
+        for x in range(5):
+            self.cast_frames.append(art.blue_fireball_spritesheet.get_image(60, 20, 20, 20))
+
+        for x in range(5):
+            self.impact_frames.append(art.blue_fireball_spritesheet.get_image(0, 40, 20, 20))
+        for x in range(5):
+            self.impact_frames.append(art.blue_fireball_spritesheet.get_image(20, 40, 20, 20))
+        for x in range(5):
+            self.impact_frames.append(art.blue_fireball_spritesheet.get_image(40, 40, 20, 20))
+        for x in range(5):
+            self.impact_frames.append(art.blue_fireball_spritesheet.get_image(60, 40, 20, 20))
+        self.get_image()
+
+    def get_image(self):
+        if self.casting:
+            self.frame += 1
+            self.sprite.image = self.cast_frames[self.frame]
+            if self.frame == len(self.cast_frames) - 1:
+                self.casting = False
+                self.frame = 0
+        elif not self.casting and not self.impacting:
+            self.frame += 1
+            self.sprite.image = self.travel_frames[self.frame]
+            if self.frame == len(self.travel_frames) - 1:
+                self.frame = 0
+        elif not self.casting and self.impacting:
+            self.frame += 1
+            self.sprite.image = self.impact_frames[self.frame]
+            if self.frame == len(self.impact_frames) - 1:
+                self.impacting = False
+                self.current_map.entity_group["Projectile"].remove(self)
+
+    def travel(self):
+        if self.casting or self.impacting:
+            self.get_image()
+        else:
+            if not self.change_x:
+                self.get_vector()
+            self.true_x -= self.change_x
+            self.true_y -= self.change_y
+            self.sprite.rect.x = round(self.true_x)
+            self.sprite.rect.y = round(self.true_y)
+            self.tile_x = int(self.sprite.rect.x / 20)
+            self.tile_y = int(self.sprite.rect.y / 20)
+            if not utilities.within_map(self.tile_x, self.tile_y, self.current_map):
+                self.current_map.entity_group["Projectile"].remove(self)
+            self.target_check()
+            self.get_image()
+
+    def target_check(self):
+        target_top = self.target.tile_y * 20 - ((self.target.height / 2) * 20)
+        target_bottom = self.target.tile_y * 20 + 20
+        target_left = self.target.tile_x * 20
+        target_right = self.target.tile_x * 20 + (20 * self.target.footprint[0])
+        if utilities.check_if_inside(target_left,
+                                     target_right,
+                                     target_top,
+                                     target_bottom,
+                                     (self.sprite.rect.x + 20, self.sprite.rect.y)):
+            self.target.health -= self.damage
+            ui.HitBox(self.current_map, self.target.sprite.rect.x, self.target.sprite.rect.y, self.damage, "Other")
+            self.target.healthbar.active = True
+            self.impacting = True
+            self.frame = 0
 
 
 class Weapon(item.Item):
@@ -277,6 +374,14 @@ class Bow(Weapon):
         self.ammunition_type(current_map, x, y, x2, y2, target_object)
 
 
+class MagicBow(Bow):
+    def __init__(self, name, material, value, weight, melee_damage, ranged_damage, attack_speed):
+        super().__init__(name, material, value, weight, melee_damage, ranged_damage, attack_speed)
+        self.ammunition_type = BlueFireball
+
+        self.sprite.image = art.shadebrute_spritesheet.get_image(100, 100, 10, 10)
+
+
 def get_longsword(value, level):
     material = item.choose_material(value, level)
     # quality = item.choose_quality(value, level)
@@ -313,5 +418,9 @@ def get_dagger(value, level):
     return Dagger("Dagger", material, 10, 3, 3, 0, 8)
 
 
-weapon_functions = [get_longsword, get_bow, get_axe, get_dagger, get_mace, get_spear]
+def get_magic_bow(value, level):
+    return MagicBow("Magic Bow", "", 15, 4, 0, 10, 10)
+
+
+weapon_functions = [get_longsword, get_bow, get_axe, get_dagger, get_mace, get_spear, get_magic_bow]
 

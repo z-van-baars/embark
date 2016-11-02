@@ -6,6 +6,8 @@ import pygame
 import ui
 import art
 import combat
+import weapon
+import corpse
 from entity import Action
 
 pygame.init()
@@ -28,6 +30,22 @@ class Creature(entity.SentientEntity):
         self.time_since_last_move = 0
         self.equipped_weapon = None
 
+    def expire(self, player_level, natural_death):
+        if natural_death:
+            corpse.Corpse(self.tile_x, self.tile_y, self.current_map, self, player_level)
+            self.current_map.update_object_layer()
+        self.leave_tile()
+        self.current_map.entity_group[self.my_type].remove(self)
+        if self.healthbar:
+            self.current_map.healthbars.remove(self.healthbar)
+        self.current_map = None
+
+    def get_facing(self, my_coordinates, target_coordinates):
+        pass
+
+    def idle(self):
+        pass
+
     def pursue_player(self, player, player_coordinates):
         my_position = (self.tile_x, self.tile_y)
         if not self.target_coordinates:
@@ -40,7 +58,7 @@ class Creature(entity.SentientEntity):
         self.time_since_last_move += 1
         self.age += 1
         if self.health <= 0:
-            self.expire()
+            self.expire(player.level, True)
         self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
         if self.health < self.max_health:
             self.healthbar.active = True
@@ -52,10 +70,12 @@ class Creature(entity.SentientEntity):
         my_coordinates = (self.tile_x, self.tile_y)
 
         if self.action == Action.idle:
-            pass
+            self.idle()
         elif self.action == Action.move:
+            self.get_facing(my_coordinates, target_coordinates)
             self.moving(my_coordinates, target, target_coordinates)
         elif self.action == Action.attack:
+            self.get_facing(my_coordinates, target_coordinates)
             if target.health > 0:
                 self.attacking(my_coordinates, target_coordinates, target)
             else:
@@ -106,23 +126,6 @@ class Skeleton(Creature):
         self.sprite.rect.x = self.tile_x * 20
         self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
 
-    def idle(self):
-        my_position = (self.tile_x, self.tile_y)
-        if not self.target_coordinates:
-            action = random.randint(0, 1000)
-            if action >= 100:
-                self.target_coordinates = self.choose_random_target_tile(self.current_map)
-                self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
-        else:
-            if self.time_since_last_move >= self.speed:
-                self.time_since_last_move = 0
-                self.change_x, self.change_y = navigate.calculate_step(my_position, self.path.tiles[0])
-                if self.path.tiles[0].is_occupied():
-                    print("occupado")
-                    self.path, self.target_coordinates = navigate.get_path(my_position, self.current_map, self.target_coordinates)
-                    self.change_x, self.change_y = navigate.calculate_step(my_position, self.path.tiles[0])
-                self.move()
-
 
 class GrieveBeast(Creature):
     occupies_tile = True
@@ -157,7 +160,6 @@ class GrieveBeast(Creature):
     def set_frame(self, action):
         pass
 
-
     def use(self, game_state):
         self.fighting = True
         player = game_state.player
@@ -165,6 +167,186 @@ class GrieveBeast(Creature):
         player.healthbar.active = True
         self.healthbar.active = True
         self.activated = False
+
+
+class Cow(Creature):
+    occupies_tile = True
+    interactable = False
+    footprint = (2, 1)
+    height = 2
+    width = 2
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.speed = 30
+        self.accuracy = 20
+        self.strength = 8
+        self.melee_damage = 1
+        self.health = 200
+        self.max_health = 200
+        self.sight_range = 10
+
+        self.time_since_last_attack = 0
+        self.post = (self.tile_x, self.tile_y)
+        self.walk_frame_number = 0
+        self.fight_frame = 0
+        self.display_name = "Cow"
+        self.set_images()
+
+    def set_images(self):
+        self.healthbar = ui.HealthBar(self.current_map, self.tile_x, self.tile_y, self.health, self.max_health)
+        self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
+        self.rest_frame_l = art.cow_spritesheet.get_image(0, 0, 40, 40)
+        self.rest_frame_r = art.cow_spritesheet.get_image(0, 40, 40, 40)
+        self.rest_frame = self.rest_frame_l
+        self.walking_frames_l = [art.cow_spritesheet.get_image(40, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(40, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(40, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(40, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(40, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(40, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(40, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(40, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(80, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(80, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(80, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(80, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(80, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(80, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(80, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(80, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(120, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(120, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(120, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(120, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(120, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(120, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(120, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(120, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(160, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(160, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(160, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(160, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(160, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(160, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(160, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(160, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(200, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(200, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(200, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(200, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(200, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(200, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(200, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(200, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(240, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(240, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(240, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(240, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(240, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(240, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(240, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(240, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(0, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(0, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(0, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(0, 0, 40, 40),
+                                 art.cow_spritesheet.get_image(0, 0, 40, 40)]
+        self.walking_frames_r = [art.cow_spritesheet.get_image(40, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(40, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(40, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(40, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(40, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(40, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(40, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(40, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(80, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(80, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(80, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(80, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(80, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(80, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(80, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(80, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(120, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(120, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(120, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(120, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(120, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(120, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(120, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(120, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(160, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(160, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(160, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(160, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(160, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(160, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(160, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(160, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(200, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(200, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(200, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(200, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(200, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(200, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(200, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(200, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(240, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(240, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(240, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(240, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(240, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(240, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(240, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(240, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(0, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(0, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(0, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(0, 40, 40, 40),
+                                 art.cow_spritesheet.get_image(0, 40, 40, 40)]
+        self.walking_frames = self.walking_frames_l
+        self.sprite.image = self.rest_frame
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+
+    def get_facing(self, my_coordinates, target_coordinates):
+        if target_coordinates is not None:
+            if target_coordinates[0] > my_coordinates[0]:
+                self.walking_frames = self.walking_frames_r
+                self.rest_frame = self.rest_frame_r
+            else:
+                self.walking_frames = self.walking_frames_l
+                self.rest_frame = self.rest_frame_l
+
+    def set_frame(self, action):
+        self.set_action_sprite(action)
+
+    def set_action_sprite(self, action):
+        if action == Action.move or action == Action.attack:
+            self.walk_frame_number += 1
+            if self.walk_frame_number > len(self.walking_frames) - 1:
+                self.walk_frame_number = 0
+            self.sprite.image = self.walking_frames[self.walk_frame_number]
+        else:
+            self.sprite.image = self.rest_frame
+
+    def idle(self):
+        action = random.randint(0, 800)
+        if action <= 5:
+            self.action = Action.move
+            nearby_tiles = utilities.get_nearby_tiles(self.current_map, self.post, 4)
+            valid_tiles = []
+            for each in nearby_tiles:
+                if not each.is_occupied():
+                    valid_tiles.append(each)
+            if len(valid_tiles) > 0:
+                target_tile = random.choice(valid_tiles)
+                self.target_coordinates = (target_tile.column, target_tile.row)
+
+    def use(self, game_state):
+        pass
 
 
 class DoomPaw(Creature):
@@ -200,7 +382,6 @@ class DoomPaw(Creature):
     def set_frame(self, action):
         pass
 
-
     def use(self, game_state):
         self.fighting = True
         player = game_state.player
@@ -209,6 +390,41 @@ class DoomPaw(Creature):
         self.healthbar.active = True
         self.activated = False
 
+
+class CinderMask(Creature):
+    occupies_tile = True
+    interactable = True
+    footprint = (1, 1)
+    height = 2
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.speed = 10
+        self.accuracy = 30
+        self.strength = 3
+        self.melee_damage = 0
+        self.health = 200
+        self.max_health = 200
+        self.sight_range = 14
+
+        self.time_since_last_attack = 0
+        self.post = (self.tile_x, self.tile_y)
+        self.fight_frame = 0
+        self.display_name = "Cindermask"
+        self.walk_frame_number = 0
+        self.set_images()
+        self.equipped_weapon = weapon.weapon_functions[6](1, 1)
+
+    def set_images(self):
+        self.healthbar = ui.HealthBar(self.current_map, self.tile_x, self.tile_y, self.health, self.max_health)
+        self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
+        self.sprite.image = art.cindermask_image
+        self.sprite.rect = self.sprite.image.get_rect()
+        self.sprite.rect.x = self.tile_x * 20
+        self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20
+
+    def set_frame(self, action):
+        pass
 
 
 class ShadeBrute(Creature):
@@ -265,7 +481,6 @@ class ShadeBrute(Creature):
 
     def set_frame(self, action):
         self.set_action_sprite(action)
-
 
     def set_action_sprite(self, action):
         if action == Action.move or action == Action.attack:
