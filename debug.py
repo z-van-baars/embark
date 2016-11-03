@@ -452,7 +452,7 @@ def place_click(game_state, debug_status, current_map, selected_tile):
                 #game_state.player.leave_tile()
                 game_state.player.assign_map(current_map)
                 game_state.player.assign_tile()
-                game_state.player.set_images()
+                game_state.player.set_images(game_state.player.image_key)
                 game_state.player.set_frame(game_state.player.action)
                 game_state.player.sprite.rect.x = game_state.player.tile_x * 20
                 game_state.player.sprite.rect.y = (game_state.player.tile_y - 1) * 20

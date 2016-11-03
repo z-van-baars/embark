@@ -78,6 +78,7 @@ class Map(object):
 
             self.build_object_layer_z_level(int(self.width / 20), int(self.height / 20), new_z_level, z)
             self.object_layer.z_levels.append(new_z_level)
+        print("z_levels: {0}".format(max_height))
 
     def build_object_layer_z_level(self, width, height, background_layer, z_level):
         # get_image(x pixels, y pixels, width pixels, height pixels)
@@ -162,8 +163,17 @@ class Map(object):
                     screen.blit(image_slice, [entity.tile_x * 20 + int((entity.footprint[0] * 20 - entity.width * 20) / 2) + self.x_shift,
                                               (entity.tile_y - z_level + 1) * 20 + self.y_shift])
                     if entity.my_type == "Avatar" or entity.my_type == "Npc" or entity.my_type == "Creature":
-                        if entity.equipped_weapon:
-                            screen.blit(entity.equipped_weapon.sprite.image,
+                        if entity.equipped["Body Armor"]:
+                            screen.blit(entity.equipped["Body Armor"].sprite.image,
+                                        [entity.sprite.rect.x + self.x_shift, entity.sprite.rect.y + self.y_shift])
+                        if entity.equipped["Helmet"]:
+                            screen.blit(entity.equipped["Helmet"].sprite.image,
+                                        [entity.sprite.rect.x + self.x_shift, entity.sprite.rect.y + self.y_shift])
+                        if entity.equipped["Boots"]:
+                            screen.blit(entity.equipped["Boots"].sprite.image,
+                                        [entity.sprite.rect.x + self.x_shift, entity.sprite.rect.y + self.y_shift])
+                        if entity.equipped["Weapon"]:
+                            screen.blit(entity.equipped["Weapon"].sprite.image,
                                         [(entity.sprite.rect.x + self.x_shift - 1),
                                          (entity.sprite.rect.y + self.y_shift - 42)])
 

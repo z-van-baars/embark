@@ -1358,8 +1358,8 @@ class TradeMenu(Menu):
         self.background_pane = pygame.sprite.Sprite()
         self.background_pane.image = trade_background
         self.background_pane.rect = self.background_pane.image.get_rect()
-        self.background_pane.rect.x = 100
-        self.background_pane.rect.y = 40
+        self.background_pane.rect.x = self.screen_width / 2 - 300
+        self.background_pane.rect.y = self.screen_height / 2 - 200
         x = self.background_pane.rect.x
         y = self.background_pane.rect.y
 
@@ -1413,6 +1413,24 @@ class TradeMenu(Menu):
                         r_up_arrow,
                         r_down_arrow]
 
+    def in_merchant_box(self, mouse_pos):
+        if utilities.check_if_inside(self.background_pane.rect.left + 0,
+                                     self.background_pane.rect.left + 291,
+                                     self.background_pane.rect.top + 83,
+                                     self.background_pane.rect.top + 345,
+                                     mouse_pos):
+            return True
+        return False
+
+    def in_player_box(self, mouse_pos):
+        if utilities.check_if_inside(self.background_pane.rect.left + 311,
+                                     self.background_pane.rect.right,
+                                     self.background_pane.rect.top + 83,
+                                     self.background_pane.rect.top + 345,
+                                     mouse_pos):
+            return True
+        return False
+
     def menu_onscreen(self):
         player_selection_box = pygame.sprite.Sprite()
         merchant_selection_box = pygame.sprite.Sprite()
@@ -1429,28 +1447,43 @@ class TradeMenu(Menu):
                     pygame.quit()
 
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    click = True
-                    count = 0
-                    spacer = 18
-                    for each in player_visible_items:
-                        x1 = self.background_pane.rect.left + 405
-                        x2 = x1 + 170
-                        y1 = (self.background_pane.rect.top + 84 + (count * spacer))
-                        y2 = y1 + 19
-                        if utilities.check_if_inside(x1, x2, y1, y2, mouse_pos):
-                            if count + self.player_list_top <= len(self.player.items_list):
-                                self.player_selected = count + self.player_list_top
-                        count += 1
-                    count = 0
-                    for each in merchant_visible_items:
-                        x1 = self.background_pane.rect.left + 115
-                        x2 = x1 + 170
-                        y1 = (self.background_pane.rect.top + 84 + (count * spacer))
-                        y2 = y1 + 19
-                        if utilities.check_if_inside(x1, x2, y1, y2, mouse_pos):
-                            if count + self.merchant_list_top <= len(self.entity.items_list):
-                                self.merchant_selected = count + self.merchant_list_top
-                        count += 1
+                    if event.button == 4:
+                        if self.in_merchant_box(mouse_pos):
+                            if self.merchant_list_top - 1 >= 0:
+                                self.merchant_list_top -= 1
+                        if self.in_player_box(mouse_pos):
+                            if self.player_list_top - 1 >= 0:
+                                self.player_list_top -= 1
+                    elif event.button == 5:
+                        if self.in_merchant_box(mouse_pos):
+                            if self.merchant_list_top + 14 < len(self.entity.items_list):
+                                self.merchant_list_top += 1
+                        if self.in_player_box(mouse_pos):
+                            if self.player_list_top + 14 < len(self.player.items_list):
+                                self.player_list_top += 1
+                    else:
+                        click = True
+                        count = 0
+                        spacer = 18
+                        for each in player_visible_items:
+                            x1 = self.background_pane.rect.left + 405
+                            x2 = x1 + 170
+                            y1 = (self.background_pane.rect.top + 84 + (count * spacer))
+                            y2 = y1 + 19
+                            if utilities.check_if_inside(x1, x2, y1, y2, mouse_pos):
+                                if count + self.player_list_top <= len(self.player.items_list):
+                                    self.player_selected = count + self.player_list_top
+                            count += 1
+                        count = 0
+                        for each in merchant_visible_items:
+                            x1 = self.background_pane.rect.left + 115
+                            x2 = x1 + 170
+                            y1 = (self.background_pane.rect.top + 84 + (count * spacer))
+                            y2 = y1 + 19
+                            if utilities.check_if_inside(x1, x2, y1, y2, mouse_pos):
+                                if count + self.merchant_list_top <= len(self.entity.items_list):
+                                    self.merchant_selected = count + self.merchant_list_top
+                            count += 1
 
             player_selection_box.image = pygame.Rect(self.background_pane.rect.left + 395,
                                                      self.background_pane.rect.top + 84 + ((self.player_selected - self.player_list_top) * 18),
@@ -1609,6 +1642,24 @@ class LootMenu(Menu):
                         r_up_arrow,
                         r_down_arrow]
 
+    def in_container_box(self, mouse_pos):
+        if utilities.check_if_inside(self.background_pane.rect.left + 0,
+                                     self.background_pane.rect.left + 291,
+                                     self.background_pane.rect.top + 83,
+                                     self.background_pane.rect.top + 345,
+                                     mouse_pos):
+            return True
+        return False
+
+    def in_player_box(self, mouse_pos):
+        if utilities.check_if_inside(self.background_pane.rect.left + 311,
+                                     self.background_pane.rect.right,
+                                     self.background_pane.rect.top + 83,
+                                     self.background_pane.rect.top + 345,
+                                     mouse_pos):
+            return True
+        return False
+
     def menu_onscreen(self):
         player_selection_box = pygame.sprite.Sprite()
         container_selection_box = pygame.sprite.Sprite()
@@ -1624,28 +1675,43 @@ class LootMenu(Menu):
                     self.looting = False
 
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    click = True
-                    count = 0
-                    spacer = 18
-                    for each in player_visible_items:
-                        x1 = self.background_pane.rect.left + 405
-                        x2 = x1 + 170
-                        y1 = (self.background_pane.rect.top + 84 + (count * spacer))
-                        y2 = y1 + 19
-                        if utilities.check_if_inside(x1, x2, y1, y2, mouse_pos):
-                            if count + self.player_list_top <= len(self.player.items_list):
-                                self.player_selected = count + self.player_list_top
-                        count += 1
-                    count = 0
-                    for each in container_visible_items:
-                        x1 = self.background_pane.rect.left + 115
-                        x2 = x1 + 170
-                        y1 = (self.background_pane.rect.top + 84 + (count * spacer))
-                        y2 = y1 + 19
-                        if utilities.check_if_inside(x1, x2, y1, y2, mouse_pos):
-                            if count + self.container_list_top <= len(self.entity.items_list):
-                                self.container_selected = count + self.container_list_top
-                        count += 1
+                    if event.button == 4:
+                        if self.in_container_box(mouse_pos):
+                            if self.container_list_top - 1 >= 0:
+                                self.container_list_top -= 1
+                        if self.in_player_box(mouse_pos):
+                            if self.player_list_top - 1 >= 0:
+                                self.player_list_top -= 1
+                    elif event.button == 5:
+                        if self.in_container_box(mouse_pos):
+                            if self.container_list_top + 14 < len(self.entity.items_list):
+                                self.container_list_top += 1
+                        if self.in_player_box(mouse_pos):
+                            if self.player_list_top + 14 < len(self.player.items_list):
+                                self.player_list_top += 1
+                    else:
+                        click = True
+                        count = 0
+                        spacer = 18
+                        for each in player_visible_items:
+                            x1 = self.background_pane.rect.left + 405
+                            x2 = x1 + 170
+                            y1 = (self.background_pane.rect.top + 84 + (count * spacer))
+                            y2 = y1 + 19
+                            if utilities.check_if_inside(x1, x2, y1, y2, mouse_pos):
+                                if count + self.player_list_top <= len(self.player.items_list):
+                                    self.player_selected = count + self.player_list_top
+                            count += 1
+                        count = 0
+                        for each in container_visible_items:
+                            x1 = self.background_pane.rect.left + 115
+                            x2 = x1 + 170
+                            y1 = (self.background_pane.rect.top + 84 + (count * spacer))
+                            y2 = y1 + 19
+                            if utilities.check_if_inside(x1, x2, y1, y2, mouse_pos):
+                                if count + self.container_list_top <= len(self.entity.items_list):
+                                    self.container_selected = count + self.container_list_top
+                            count += 1
 
             player_selection_box.image = pygame.Rect(self.background_pane.rect.left + 405,
                                                      self.background_pane.rect.top + 84 + ((self.player_selected - self.player_list_top) * 18),

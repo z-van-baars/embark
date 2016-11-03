@@ -30,7 +30,7 @@ class Avatar(entity.SentientEntity):
         self.time_since_last_move = 0
         self.time_since_last_attack = 0
 
-        self.speed = 100
+        self.speed = 30
         self.accuracy = 60
         self.level = 1
         self.health = 100
@@ -53,9 +53,6 @@ class Avatar(entity.SentientEntity):
         self.block = 0
 
         self.gold = 100
-        self.equipped_weapon = None
-        self.equipped_armor = None
-        self.equipped_helmet = None
         self.action = Action.idle
         self.target_type = 0
         self.fighting = False
@@ -66,12 +63,20 @@ class Avatar(entity.SentientEntity):
 
     def set_frame(self, action):
         self.set_action_sprite(action)
-        if self.equipped_weapon:
+        if self.equipped["Weapon"]:
             self.set_weapon_sprite(action)
+        if self.equipped["Body Armor"]:
+            self.set_armor_sprite(action, self.equipped["Body Armor"])
+        if self.equipped["Boots"]:
+            self.set_armor_sprite(action, self.equipped["Boots"])
+        if self.equipped["Helmet"]:
+            self.set_armor_sprite(action, self.equipped["Helmet"])
+        if self.equipped["Gloves"]:
+            self.set_armor_sprite(action, self.equipped["Gloves"])
 
     def set_action_sprite(self, action):
-        if self.equipped_weapon:
-            weapon_range = self.equipped_weapon.range
+        if self.equipped["Weapon"]:
+            weapon_range = self.equipped["Weapon"].range
         else:
             weapon_range = 1.5
         if action == Action.idle:
@@ -86,15 +91,15 @@ class Avatar(entity.SentientEntity):
                 self.sprite.image = self.rest_frame
         elif action == Action.move or action == Action.use:
             self.walk_frame_number += 1
-            if self.walk_frame_number > len(self.walking_frames) - 1:
+            if self.walk_frame_number > len(self.walk_frames) - 1:
                 self.walk_frame_number = 0
-            self.sprite.image = self.walking_frames[self.walk_frame_number]
+            self.sprite.image = self.walk_frames[self.walk_frame_number]
         elif action == Action.attack:
             if self.fight_frame > 1:
                 self.fight_frame += 1
                 if self.fight_frame > 21:
                     self.fight_frame = 1
-                if self.equipped_weapon.ranged:
+                if self.equipped["Weapon"].ranged:
                     self.sprite.image = self.ranged_fight_frames[self.fight_frame]
                 else:
                     self.sprite.image = self.melee_fight_frames[self.fight_frame]
@@ -103,59 +108,47 @@ class Avatar(entity.SentientEntity):
                     self.walk_frame_number = 0
                 else:
                     self.walk_frame_number += 1
-                if self.walk_frame_number > len(self.walking_frames) - 1:
+                if self.walk_frame_number > len(self.walk_frames) - 1:
                     self.walk_frame_number = 0
-                self.sprite.image = self.walking_frames[self.walk_frame_number]
+                self.sprite.image = self.walk_frames[self.walk_frame_number]
 
     def set_weapon_sprite(self, action):
         if action == Action.idle:
-            self.equipped_weapon.set_frame(0)
+            self.equipped["Weapon"].set_frame(0)
         elif action == Action.move or action == Action.use:
-            self.equipped_weapon.set_frame(0)
+            self.equipped["Weapon"].set_frame(0)
         elif action == Action.attack:
-            self.equipped_weapon.set_frame(self.fight_frame - 1)
+            self.equipped["Weapon"].set_frame(self.fight_frame - 1)
+
+    def set_armor_sprite(self, action, armor):
+        if action == Action.idle:
+            self.equipped[armor.armor_type].set_frame(0, 0)
+        elif action == Action.move or action == Action.use:
+            self.equipped[armor.armor_type].set_frame(self.walk_frame_number, 0)
+        elif action == Action.attack:
+            if self.has_ranged_attack():
+                self.equipped[armor.armor_type].set_frame(self.fight_frame - 1, 2)
+            else:
+                self.equipped[armor.armor_type].set_frame(self.fight_frame - 1, 1)
 
     def set_images(self, image_key):
         self.healthbar = ui.HealthBar(self.current_map, self.tile_x, self.tile_y, self.health, self.max_health)
         self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
         avatar_spritesheet = spritesheet.Spritesheet("art/avatar/avatar.png")
         self.rest_frame = avatar_spritesheet.get_image(0, 0, 20, 40)
-        self.walking_frames = [avatar_spritesheet.get_image(0, 0, 20, 40),
-                               avatar_spritesheet.get_image(20, 0, 20, 40),
-                               avatar_spritesheet.get_image(20, 0, 20, 40),
-                               avatar_spritesheet.get_image(20, 0, 20, 40),
-                               avatar_spritesheet.get_image(20, 0, 20, 40),
-                               avatar_spritesheet.get_image(20, 0, 20, 40),
-                               avatar_spritesheet.get_image(40, 0, 20, 40),
-                               avatar_spritesheet.get_image(40, 0, 20, 40),
-                               avatar_spritesheet.get_image(40, 0, 20, 40),
-                               avatar_spritesheet.get_image(40, 0, 20, 40),
-                               avatar_spritesheet.get_image(40, 0, 20, 40),
-                               avatar_spritesheet.get_image(60, 0, 20, 40),
-                               avatar_spritesheet.get_image(60, 0, 20, 40),
-                               avatar_spritesheet.get_image(60, 0, 20, 40),
-                               avatar_spritesheet.get_image(60, 0, 20, 40),
-                               avatar_spritesheet.get_image(60, 0, 20, 40),
-                               avatar_spritesheet.get_image(80, 0, 20, 40),
-                               avatar_spritesheet.get_image(80, 0, 20, 40),
-                               avatar_spritesheet.get_image(80, 0, 20, 40),
-                               avatar_spritesheet.get_image(80, 0, 20, 40),
-                               avatar_spritesheet.get_image(80, 0, 20, 40),
-                               avatar_spritesheet.get_image(100, 0, 20, 40),
-                               avatar_spritesheet.get_image(100, 0, 20, 40),
-                               avatar_spritesheet.get_image(100, 0, 20, 40),
-                               avatar_spritesheet.get_image(100, 0, 20, 40),
-                               avatar_spritesheet.get_image(120, 0, 20, 40),
-                               avatar_spritesheet.get_image(120, 0, 20, 40),
-                               avatar_spritesheet.get_image(120, 0, 20, 40),
-                               avatar_spritesheet.get_image(120, 0, 20, 40),
-                               avatar_spritesheet.get_image(120, 0, 20, 40),
-                               avatar_spritesheet.get_image(120, 0, 20, 40),
-                               avatar_spritesheet.get_image(140, 0, 20, 40),
-                               avatar_spritesheet.get_image(140, 0, 20, 40),
-                               avatar_spritesheet.get_image(140, 0, 20, 40),
-                               avatar_spritesheet.get_image(140, 0, 20, 40),
-                               avatar_spritesheet.get_image(140, 0, 20, 40)]
+        self.walk_frames = [avatar_spritesheet.get_image(0, 0, 20, 40)]
+        for x in range(5):
+            self.walk_frames.append(avatar_spritesheet.get_image(20, 0, 20, 40))
+        for x in range(5):
+            self.walk_frames.append(avatar_spritesheet.get_image(60, 0, 20, 40))
+        for x in range(5):
+            self.walk_frames.append(avatar_spritesheet.get_image(80, 0, 20, 40))
+        for x in range(5):
+            self.walk_frames.append(avatar_spritesheet.get_image(100, 0, 20, 40))
+        for x in range(5):
+            self.walk_frames.append(avatar_spritesheet.get_image(120, 0, 20, 40))
+        for x in range(5):
+            self.walk_frames.append(avatar_spritesheet.get_image(140, 0, 20, 40))
         self.melee_fight_frames = []
         for x in range(3):
             self.melee_fight_frames.append(avatar_spritesheet.get_image(0, 80, 20, 40))

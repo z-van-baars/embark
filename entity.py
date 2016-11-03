@@ -89,6 +89,11 @@ class SentientEntity(MovingEntity):
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
         self.healthbar = None
+        self.equipped = {"Helmet": None,
+                         "Body Armor": None,
+                         "Weapon": None,
+                         "Gloves": None,
+                         "Boots": None}
 
     def set_images(self, image_key):
         if not self.image_index:
@@ -113,8 +118,8 @@ class SentientEntity(MovingEntity):
         self.target_object = None
 
     def has_ranged_attack(self):
-        if self.equipped_weapon:
-            return self.equipped_weapon.ranged
+        if self.equipped["Weapon"]:
+            return self.equipped["Weapon"].ranged
         return False
 
     def melee_attack(self, attack_timer, accuracy, speed, target):
@@ -152,16 +157,16 @@ class SentientEntity(MovingEntity):
     def attacking(self, my_coordinates, target_coordinates, target):
         attack_timer = self.time_since_last_attack
         accuracy = self.accuracy
-        if self.equipped_weapon:
-            speed = self.equipped_weapon.attack_speed
+        if self.equipped["Weapon"]:
+            speed = self.equipped["Weapon"].attack_speed
             weapon_range = 1.5
         else:
             speed = self.speed
             weapon_range = 1.5
         if self.has_ranged_attack():
-            weapon_range = self.equipped_weapon.range
+            weapon_range = self.equipped["Weapon"].range
             if self.within_range(my_coordinates, target_coordinates, weapon_range):
-                self.ranged_attack(my_coordinates, attack_timer, self.equipped_weapon, accuracy, speed, target)
+                self.ranged_attack(my_coordinates, attack_timer, self.equipped["Weapon"], accuracy, speed, target)
             else:
                 self.moving(my_coordinates, target, target_coordinates)
         else:

@@ -56,7 +56,7 @@ def set_bottom_pane_stamp(current_map, mouse_pos):
 
 
 def create_new_world(game_state):
-    map_1 = Map("Swindon", (60, 60), (game_state.screen_width, game_state.screen_height))
+    map_1 = Map("Swindon", (100, 100), (game_state.screen_width, game_state.screen_height))
     map_1.map_generation()
 
     Avatar(5, 5, map_1)
@@ -70,16 +70,20 @@ def create_new_world(game_state):
     debug_stats.tile_selector_graphic = ui.TileSelectorGraphic(0, 0, game_state.active_map)
     game_state.debug_status = debug_stats
 
-    item_1 = weapon.weapon_functions[0](1, game_state.player.level)
+    item_1 = weapon.weapon_functions[0](1, game_state.player.level, "Iron ")
 
-    initial_equipment = [item_1, armor.armor_functions[0]()]
+    initial_equipment = [item_1, armor.armor_functions[3](1, game_state.player.level, "Iron "),
+                         armor.clothing_functions[0](1, game_state.player.level),
+                         armor.clothing_functions[1](1, game_state.player.level),
+                         armor.clothing_functions[3](1, game_state.player.level)]
     game_state.player.items_list = initial_equipment
-    game_state.player.items_list[0].equip(game_state.player)
+    for each in game_state.player.items_list:
+        each.equip(game_state.player)
     map_1.update_object_layer()
 
 
 def main(game_state):
-    #game_state = utilities.import_game_state()
+    # game_state = utilities.import_game_state()
     create_new_world(game_state)
     debug_stats = game_state.debug_status
 
@@ -99,7 +103,6 @@ def main(game_state):
                             menu_button_click,
                             game_state.screen_width - 32,
                             0)
-    game_state.player.equipped_armor = None
     while not done:
 
         mouse_pos = pygame.mouse.get_pos()
@@ -294,6 +297,6 @@ def main(game_state):
         game_state.time += 1
 
 
-game_state = GameState(800, 500 + 80, 20)
+game_state = GameState(1400, 800 + 80, 20)
 
 main(game_state)

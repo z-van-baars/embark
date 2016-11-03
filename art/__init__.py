@@ -7,7 +7,7 @@ pygame.display.set_mode([0, 0])
 
 image_dict = {}
 
-#NPCs
+# NPCs
 m_villager_image_1 = pygame.image.load("art/npc/villagers/male_villager_1.png").convert()
 m_villager_image_2 = pygame.image.load("art/npc/villagers/male_villager_2.png").convert()
 m_villager_image_3 = pygame.image.load("art/npc/villagers/male_villager_3.png").convert()
@@ -36,7 +36,7 @@ for each in sage_images:
   each.set_colorkey(utilities.colors.key)
 image_dict['Sage'] = sage_images
 
-# Structures
+# STRUCTURES
 wall_topper_right = pygame.image.load("art/structures/wall_top_right.png").convert()
 wall_topper_right.set_colorkey(utilities.colors.key)
 image_dict["Wall Top Right"] = [wall_topper_right]
@@ -390,7 +390,7 @@ wide_bookshelf_images = [wide_bookshelf_image_1,
 image_dict["Bookshelf Wide"] = wide_bookshelf_images
 
 
-#Flora
+# FLORA
 pine_tree_images = [pygame.image.load("art/flora/trees/pine/pine_1.png").convert(),
                     pygame.image.load("art/flora/trees/pine/pine_2.png").convert(),
                     pygame.image.load("art/flora/trees/pine/pine_3.png").convert(),
@@ -502,14 +502,6 @@ master_large_oak_image_list = (large_oak_regular_images +
 for each in master_large_oak_image_list:
     each.set_colorkey(utilities.colors.key)
 
-
-
-
-
-
-
-
-
 wheat_image_1 = pygame.image.load("art/flora/wheat/wheat_1.png").convert()
 wheat_image_1.set_colorkey(utilities.colors.key)
 wheat_image_2 = pygame.image.load("art/flora/wheat/wheat_2.png").convert()
@@ -526,7 +518,7 @@ wheat_images = [wheat_image_1,
                 wheat_image_2,
                 wheat_image_3]
 
-#creatures
+# CREATURES
 cow_spritesheet = spritesheet.Spritesheet("art/creatures/cow.png")
 skeleton_image = pygame.image.load("art/creatures/skeleton.png").convert()
 skeleton_image.set_colorkey(utilities.colors.key)
@@ -538,7 +530,7 @@ shadebrute_spritesheet = spritesheet.Spritesheet("art/creatures/shadebrute.png")
 cindermask_image = pygame.image.load("art/creatures/cindermask.png").convert()
 cindermask_image.set_colorkey(utilities.colors.key)
 
-#corpses
+# CORPSES
 cindermask_corpse = pygame.image.load("art/creatures/corpses/corpse_cindermask.png").convert()
 skeleton_corpse = pygame.image.load("art/creatures/corpses/corpse_skeleton.png").convert()
 cindermask_corpse.set_colorkey(utilities.colors.key)
@@ -550,7 +542,7 @@ image_dict["Shadebrute Corpse"] = [skeleton_corpse]
 image_dict["Grievebeast Corpse"] = [skeleton_corpse]
 image_dict["Doompaw Corpse"] = skeleton_corpse
 
-#weapons
+# WEAPONS
 axe_spritesheet = spritesheet.Spritesheet("art/weapons/melee/axe.png")
 sword_spritesheet = spritesheet.Spritesheet("art/weapons/melee/sword.png")
 bow_spritesheet = spritesheet.Spritesheet("art/weapons/ranged/bow.png")
@@ -558,12 +550,61 @@ mace_spritesheet = spritesheet.Spritesheet("art/weapons/melee/mace.png")
 spear_spritesheet = spritesheet.Spritesheet("art/weapons/melee/spear.png")
 dagger_spritesheet = spritesheet.Spritesheet("art/weapons/melee/dagger.png")
 
-#projectiles
+axe = {}
+sword = {}
+bow = {}
+mace = {}
+spear = {}
+dagger = {}
+
+# ARMOR
+med_helmet = {"Bronze ": spritesheet.Spritesheet("art/armor/helmet/med_helm/bronze_med.png"),
+              "Iron ": spritesheet.Spritesheet("art/armor/helmet/med_helm/iron_med.png"),
+              "Steel ": spritesheet.Spritesheet("art/armor/helmet/med_helm/steel_med.png"),
+              "Mithril ": spritesheet.Spritesheet("art/armor/helmet/med_helm/mithril_med.png"),
+              "Adamantine ": spritesheet.Spritesheet("art/armor/helmet/med_helm/adamantine_med.png")}
+full_helmet = {"Bronze ": spritesheet.Spritesheet("art/armor/helmet/full_helm/bronze_full.png"),
+               "Iron ": spritesheet.Spritesheet("art/armor/helmet/full_helm/iron_full.png"),
+               "Steel ": spritesheet.Spritesheet("art/armor/helmet/full_helm/steel_full.png"),
+               "Mithril ": spritesheet.Spritesheet("art/armor/helmet/full_helm/mithril_full.png"),
+               "Adamantine ": spritesheet.Spritesheet("art/armor/helmet/full_helm/adamantine_full.png")}
+breastplate = {"Bronze ": spritesheet.Spritesheet("art/armor/body_armor/breastplate/bronze_breastplate.png"),
+               "Iron ": spritesheet.Spritesheet("art/armor/body_armor/breastplate/iron_breastplate.png"),
+               "Steel ": spritesheet.Spritesheet("art/armor/body_armor/breastplate/steel_breastplate.png"),
+               "Mithril ": spritesheet.Spritesheet("art/armor/body_armor/breastplate/mithril_breastplate.png"),
+               "Adamantine ": spritesheet.Spritesheet("art/armor/body_armor/breastplate/adamantine_breastplate.png")}
+gauntlets = {"Bronze ": spritesheet.Spritesheet("art/armor/gloves/gauntlets/bronze_gauntlets.png"),
+             "Iron ": spritesheet.Spritesheet("art/armor/gloves/gauntlets/iron_gauntlets.png"),
+             "Steel ": spritesheet.Spritesheet("art/armor/gloves/gauntlets/steel_gauntlets.png"),
+             "Mithril ": spritesheet.Spritesheet("art/armor/gloves/gauntlets/mithril_gauntlets.png"),
+             "Adamantine ": spritesheet.Spritesheet("art/armor/gloves/gauntlets/adamantine_gauntlets.png")}
+tunic = {"": spritesheet.Spritesheet("art/armor/body_armor/tunic/brown_tunic.png")}
+gloves = {"": spritesheet.Spritesheet("art/armor/gloves/gloves/leather_gloves.png")}
+helmet_type = {"Hood": None,
+               "Full Helm": full_helmet,
+               "Helm": med_helmet}
+body_armor_type = {"Breastplate": breastplate,
+                   "Tunic": tunic}
+gloves_type = {"Gauntlets": gauntlets,
+               "Gloves": gloves}
+boots = {"": spritesheet.Spritesheet("art/armor/boots/leather_boots.png"),
+         "Bronze ": spritesheet.Spritesheet("art/armor/boots/bronze_boots.png"),
+         "Iron ": spritesheet.Spritesheet("art/armor/boots/iron_boots.png"),
+         "Steel ": spritesheet.Spritesheet("art/armor/boots/steel_boots.png"),
+         "Mithril ": spritesheet.Spritesheet("art/armor/boots/mithril_boots.png"),
+         "Adamantine ": spritesheet.Spritesheet("art/armor/boots/adamantine_boots.png")}
+boots_type = {"Boots": boots}
+armor_spritesheets = {"Helmet": helmet_type,
+                      "Body Armor": body_armor_type,
+                      "Gloves": gloves_type,
+                      "Boots": boots_type}
+
+# PROJECTILES
 arrow_image = pygame.image.load("art/weapons/projectiles/arrow.png").convert()
 arrow_image.set_colorkey(utilities.colors.key)
 blue_fireball_spritesheet = spritesheet.Spritesheet("art/weapons/projectiles/blue_fireball_spritesheet.png")
 
-#ui
+# UI
 npc_edit_window = pygame.image.load("art/ui_elements/npc_editor/npc_edit_window.png").convert()
 
 edit_dialogue_deselected = pygame.image.load("art/ui_elements/npc_editor/edit_dialogue_deselected.png").convert()
@@ -579,11 +620,6 @@ edit_quests_selected = pygame.image.load("art/ui_elements/npc_editor/edit_quests
 edit_stock_deselected = pygame.image.load("art/ui_elements/npc_editor/edit_stock_deselected.png").convert()
 edit_stock_selected = pygame.image.load("art/ui_elements/npc_editor/edit_stock_selected.png").convert()
 
-
-
-
-
-
 inventory_background = pygame.image.load("art/ui_elements/inventory/inventory_window.png").convert()
 equip_deselected_image = pygame.image.load("art/ui_elements/inventory/equip_deselected.png").convert()
 equip_deselected_image.set_colorkey(utilities.colors.key)
@@ -592,22 +628,76 @@ equip_selected_image.set_colorkey(utilities.colors.key)
 stats_selected_image = pygame.image.load("art/ui_elements/inventory/stats_selected.png").convert()
 stats_deselected_image = pygame.image.load("art/ui_elements/inventory/stats_deselected.png").convert()
 
-weapon_icon = pygame.image.load("art/ui_elements/inventory/icon_weapon.png").convert()
+# ICONS
+
+sword_icon = pygame.image.load("art/weapons/melee/icon_sword.png").convert()
+sword_icon.set_colorkey(utilities.colors.key)
+spear_icon = pygame.image.load("art/weapons/melee/icon_spear.png").convert()
+spear_icon.set_colorkey(utilities.colors.key)
+dagger_icon = pygame.image.load("art/weapons/melee/icon_dagger.png").convert()
+dagger_icon.set_colorkey(utilities.colors.key)
+bow_icon = pygame.image.load("art/ui_elements/inventory/icons/icon_bow.png").convert()
+mace_icon = pygame.image.load("art/weapons/melee/icon_mace.png").convert()
+mace_icon.set_colorkey(utilities.colors.key)
+axe_icon = pygame.image.load("art/weapons/melee/icon_axe.png").convert()
+axe_icon.set_colorkey(utilities.colors.key)
+
+breastplate_icon = pygame.image.load("art/armor/body_armor/breastplate/icon_breastplate.png").convert()
+breastplate_icon.set_colorkey(utilities.colors.key)
+
+brown_tunic_icon = pygame.image.load("art/armor/body_armor/tunic/icon_brown_tunic.png").convert()
+brown_tunic_icon.set_colorkey(utilities.colors.key)
+
+helmet_icon = pygame.image.load("art/armor/helmet/med_helm/icon_med_helm.png").convert()
+helmet_icon.set_colorkey(utilities.colors.key)
+
+full_helmet_icon = pygame.image.load("art/armor/helmet/full_helm/icon_full_helm.png").convert()
+full_helmet_icon.set_colorkey(utilities.colors.key)
+
+gauntlets_icon = pygame.image.load("art/armor/gloves/gauntlets/icon_gauntlets.png").convert()
+gauntlets_icon.set_colorkey(utilities.colors.key)
+
+boots_icon = pygame.image.load("art/armor/boots/icon_boots.png").convert()
+boots_icon.set_colorkey(utilities.colors.key)
+
+leather_boots_icon = pygame.image.load("art/armor/boots/icon_boots.png").convert()
+leather_boots_icon.set_colorkey(utilities.colors.key)
+
 old_bow_icon = pygame.image.load("art/ui_elements/inventory/icon_bow.png").convert()
 shield_icon = pygame.image.load("art/ui_elements/inventory/icon_shield.png").convert()
 spell_icon = pygame.image.load("art/ui_elements/inventory/icon_spell.png").convert()
-armor_icon = pygame.image.load("art/ui_elements/inventory/icon_armor.png").convert()
+body_armor_icons = {"": brown_tunic_icon,
+                    "Bronze ": breastplate_icon,
+                    "Iron ": breastplate_icon,
+                    "Steel ": breastplate_icon,
+                    "Mithril ": breastplate_icon,
+                    "Adamantine ": breastplate_icon}
+boots_icons = {"": boots_icon,
+               "Bronze ": boots_icon,
+               "Iron ": boots_icon,
+               "Steel ": boots_icon,
+               "Mithril ": boots_icon,
+               "Adamantine ": boots_icon}
+helmet_icons = {"": helmet_icon,
+                "Bronze ": helmet_icon,
+                "Iron ": helmet_icon,
+                "Steel ": helmet_icon,
+                "Mithril ": helmet_icon,
+                "Adamantine ": helmet_icon}
+gloves_icons = {"": gauntlets_icon,
+                "Bronze ": gauntlets_icon,
+                "Iron ": gauntlets_icon,
+                "Steel ": gauntlets_icon,
+                "Mithril ": gauntlets_icon,
+                "Adamantine ": gauntlets_icon}
+armor_icons = {"Boots": boots_icons,
+               "Body Armor": body_armor_icons,
+               "Helmet": helmet_icons,
+               "Gloves": gloves_icons}
 
-sword_icon = pygame.image.load("art/ui_elements/inventory/icons/icon_sword.png").convert()
-spear_icon = pygame.image.load("art/ui_elements/inventory/icons/icon_spear.png").convert()
-dagger_icon = pygame.image.load("art/ui_elements/inventory/icons/icon_dagger.png").convert()
-bow_icon = pygame.image.load("art/ui_elements/inventory/icons/icon_bow.png").convert()
-mace_icon = pygame.image.load("art/ui_elements/inventory/icons/icon_mace.png").convert()
-axe_icon = pygame.image.load("art/ui_elements/inventory/icons/icon_axe.png").convert()
 
-boots_icon = pygame.image.load("art/ui_elements/inventory/icons/icon_boots.png").convert()
 
-# terrain
+# TERRAIN
 dirt_tile_image = pygame.image.load("art/tiles/dirt_1.png").convert()
 flagstone_tile_image = pygame.image.load("art/tiles/flagstone_1.png").convert()
 flagstone_tile_2_image = pygame.image.load("art/tiles/flagstone_2.png").convert()

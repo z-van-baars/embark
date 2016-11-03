@@ -26,7 +26,6 @@ class Npc(entity.SentientEntity):
         self.speed = 1
         self.time_since_last_move = 0
         self.activated = False
-        self.equipped_weapon = None
         self.image_index = None
 
         self.gold = 10

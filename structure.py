@@ -97,10 +97,6 @@ class WallTopLarge(Structure):
         self.set_images(self.image_key)
         self.display_name = ""
 
-    def set_images(self):
-        self.sprite.image = art.wall_topper_large
-        self.set_image_state()
-
 
 class DungeonEntrance(Structure):
     interactable = False

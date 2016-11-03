@@ -191,17 +191,17 @@ class Weapon(item.Item):
         self.is_equipped = False
 
     def equip(self, player):
-        if player.equipped_weapon:
-            player.equipped_weapon.unequip(player)
+        if player.equipped["Weapon"]:
+            player.equipped["Weapon"].unequip(player)
         player.melee_damage += self.melee_damage
         player.ranged_damage += self.ranged_damage
-        player.equipped_weapon = self
+        player.equipped["Weapon"] = self
         self.is_equipped = True
 
     def unequip(self, player):
         player.melee_damage -= self.melee_damage
         player.ranged_damage -= self.ranged_damage
-        player.equipped_weapon = None
+        player.equipped["Weapon"] = None
         self.is_equipped = False
 
 
@@ -382,43 +382,46 @@ class MagicBow(Bow):
         self.sprite.image = art.shadebrute_spritesheet.get_image(100, 100, 10, 10)
 
 
-def get_longsword(value, level):
-    material = item.choose_material(value, level)
+def get_longsword(value, level, material=None):
+    if material is None:
+        material = item.choose_material(value, level)
     # quality = item.choose_quality(value, level)
     return Sword("Longsword", material, 30, 5, 10, 0, 5)
 
 
-def get_bow(value, level):
-    material = item.choose_material(value, level)
-    # quality = item.choose_quality(value, level)
-    return Bow("Bow", material, 15, 3, 0, 10, 10)
+def get_bow(value, level, material=None):
+    return Bow("Bow", "", 15, 3, 0, 10, 10)
 
 
-def get_axe(value, level):
-    material = item.choose_material(value, level)
+def get_axe(value, level, material=None):
+    if material is None:
+        material = item.choose_material(value, level)
     # quality = item.choose_quality(value, level)
     return Axe("Battleaxe", material, 25, 7, 13, 0, 10)
 
 
-def get_mace(value, level):
-    material = item.choose_material(value, level)
+def get_mace(value, level, material=None):
+    if material is None:
+        material = item.choose_material(value, level)
     # quality = item.choose_quality(value, level)
     return Mace("Mace", material, 20, 7, 15, 0, 12)
 
 
-def get_spear(value, level):
-    material = item.choose_material(value, level)
+def get_spear(value, level, material=None):
+    if material is None:
+        material = item.choose_material(value, level)
     # quality = item.choose_quality(value, level)
     return Spear("Spear", material, 15, 6, 10, 0, 15)
 
 
-def get_dagger(value, level):
-    material = item.choose_material(value, level)
+def get_dagger(value, level, material=None):
+    if material is None:
+        material = item.choose_material(value, level)
     # quality = item.choose_quality(value, level)
     return Dagger("Dagger", material, 10, 3, 3, 0, 8)
 
 
-def get_magic_bow(value, level):
+def get_magic_bow(value, level, material=None):
     return MagicBow("Magic Bow", "", 15, 4, 0, 10, 10)
 
 

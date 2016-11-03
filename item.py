@@ -16,7 +16,7 @@ class Item(object):
 
 
 def get_gold_ingot():
-     return Item("Gold Ingot", 100, 1)
+    return Item("Gold Ingot", 100, 1)
 
 
 def get_iron_ingot():
@@ -38,11 +38,14 @@ def get_calipers():
 def get_lockpick():
     return Item("Lockpick", 5, 1)
 
+
 def get_burnt_bread():
     return Item("Burnt Bread", 1, 2)
 
+
 def get_broken_sword():
     return Item("Broken Sword", 1, 5)
+
 
 def get_scrap_paper():
     return Item("Scrap Paper", 1, 1)

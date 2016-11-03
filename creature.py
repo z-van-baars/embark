@@ -28,7 +28,6 @@ class Creature(entity.SentientEntity):
         self.action = Action.idle
         self.fighting = False
         self.time_since_last_move = 0
-        self.equipped_weapon = None
 
     def expire(self, player_level, natural_death):
         if natural_death:
@@ -413,7 +412,7 @@ class CinderMask(Creature):
         self.display_name = "Cindermask"
         self.walk_frame_number = 0
         self.set_images()
-        self.equipped_weapon = weapon.weapon_functions[6](1, 1)
+        self.equipped["Weapon"] = weapon.weapon_functions[6](1, 1)
 
     def set_images(self):
         self.healthbar = ui.HealthBar(self.current_map, self.tile_x, self.tile_y, self.health, self.max_health)
