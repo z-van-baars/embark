@@ -18,12 +18,14 @@ bag_selected = pygame.image.load("art/ui_elements/bag_highlight.png").convert()
 
 
 def open_inventory(game_state, mouse_pos):
+    """ Opens an inventory loop """
     inventory_window = inventory.InventoryMenu(game_state, mouse_pos)
     inventory_window.open = True
     inventory_window.menu_onscreen()
 
 
 def menu_button_click(game_state):
+    """ Opens a menu button loop """
     menu_window = ui.OptionsMenu(game_state)
     menu_window.open = True
     game_state = menu_window.menu_onscreen()
@@ -31,9 +33,11 @@ def menu_button_click(game_state):
 
 
 def set_bottom_pane_stamp(current_map, mouse_pos):
+    """ Draws a rendered font surface to the lower left corner UI widget """
     font = pygame.font.SysFont('Calibri', 18, True, False)
 
     def get_name_stamp(selected_tile):
+        """ Renders a pygame image surface from a string pulled from a tile object """
         for entity_type in selected_tile.entity_group:
             if selected_tile.entity_group[entity_type]:
                 if selected_tile.entity_group[entity_type][0].occupies_tile:
@@ -56,7 +60,7 @@ def set_bottom_pane_stamp(current_map, mouse_pos):
 
 
 def create_new_world(game_state):
-    map_1 = Map("Swindon", (100, 100), (game_state.screen_width, game_state.screen_height))
+    map_1 = Map("Swindon", (60, 50), (game_state.screen_width, game_state.screen_height))
     map_1.map_generation()
 
     Avatar(5, 5, map_1)
@@ -70,15 +74,19 @@ def create_new_world(game_state):
     debug_stats.tile_selector_graphic = ui.TileSelectorGraphic(0, 0, game_state.active_map)
     game_state.debug_status = debug_stats
 
-    item_1 = weapon.weapon_functions[0](1, game_state.player.level, "Iron ")
-
-    initial_equipment = [item_1, armor.armor_functions[3](1, game_state.player.level, "Iron "),
+    # Sets player's inventory at start to basic starting equipment
+    initial_equipment = [weapon.weapon_functions[0](1, game_state.player.level, "Iron "),
+                         armor.armor_functions[3](1, game_state.player.level, "Iron "),
                          armor.clothing_functions[0](1, game_state.player.level),
                          armor.clothing_functions[1](1, game_state.player.level),
                          armor.clothing_functions[3](1, game_state.player.level)]
-    game_state.player.items_list = initial_equipment
-    for each in game_state.player.items_list:
-        each.equip(game_state.player)
+
+    for each in initial_equipment:
+        game_state.player.items[each.my_type].append(each)
+
+    for each_category in game_state.player.items:
+        for each in game_state.player.items[each_category]:
+            each.equip(game_state.player)
     map_1.update_object_layer()
 
 
@@ -103,10 +111,13 @@ def main(game_state):
                             menu_button_click,
                             game_state.screen_width - 32,
                             0)
+    bottom_pane_stamp = set_bottom_pane_stamp(game_state.active_map, (0, 0))
+
     while not done:
 
         mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
+            bottom_pane_stamp = set_bottom_pane_stamp(game_state.active_map, mouse_pos)
             if event.type == pygame.QUIT:
                 pygame.display.quit()
                 pygame.quit()
@@ -212,17 +223,23 @@ def main(game_state):
         for each in game_state.active_map.entity_group["Creature"]:
             each.tick_cycle(game_state.player, (game_state.player.tile_x, game_state.player.tile_y))
 
-        bottom_pane_stamp = set_bottom_pane_stamp(game_state.active_map, mouse_pos)
         game_state.screen.fill(utilities.colors.black)
 
         game_state.screen.blit(game_state.active_map.background.image, [0 + game_state.active_map.x_shift, 0 + game_state.active_map.y_shift])
+        current_z_level = 0
         for each in game_state.active_map.object_layer.z_levels:
-            game_state.screen.blit(each.image, [0 + game_state.active_map.x_shift, 0 + game_state.active_map.y_shift])
+            game_state.active_map.draw_object_layer(game_state.screen,
+                                                    game_state.screen_width,
+                                                    game_state.screen_height,
+                                                    each)
 
-            game_state.active_map.draw_actors(game_state.screen,
-                                              game_state.screen_width,
-                                              game_state.screen_height,
-                                              game_state.active_map.object_layer.z_levels.index(each) + 1)
+            if current_z_level < 2:
+                game_state.active_map.draw_actors(game_state.screen,
+                                                  game_state.screen_width,
+                                                  game_state.screen_height,
+                                                  game_state.active_map.object_layer.z_levels.index(each) + 1)
+
+            current_z_level += 1
 
         if utilities.check_if_inside(bag_button.sprite.rect.x,
                                      bag_button.sprite.rect.right,
@@ -293,7 +310,10 @@ def main(game_state):
                         pygame.draw.rect(game_state.screen, (255, 255, 255), new_graphic.image, 1)
 
         pygame.display.flip()
-        game_state.clock.tick(60)
+        game_state.clock.tick()
+        print("FPS: {0}  Creatures: {1}  Z Levels {2}".format(round(game_state.clock.get_fps()),
+                                                              len(game_state.active_map.entity_group["Creature"]),
+                                                              len(game_state.active_map.object_layer.z_levels)))
         game_state.time += 1
 
 

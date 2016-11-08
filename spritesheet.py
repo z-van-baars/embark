@@ -19,6 +19,7 @@ class Spritesheet(object):
         image.blit(self.sprite_sheet, (0, 0), (x, y, width, height))
 
         image.set_colorkey(utilities.colors.key)
+        image = image.convert_alpha()
 
         # Return the image
         return image

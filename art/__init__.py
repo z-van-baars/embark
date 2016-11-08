@@ -537,7 +537,7 @@ cindermask_corpse.set_colorkey(utilities.colors.key)
 skeleton_corpse.set_colorkey(utilities.colors.key)
 
 image_dict["Cindermask Corpse"] = [cindermask_corpse]
-image_dict["Skeleton Corpse"] = [skeleton_corpse]
+image_dict["Spoopy Skellington Corpse"] = [skeleton_corpse]
 image_dict["Shadebrute Corpse"] = [skeleton_corpse]
 image_dict["Grievebeast Corpse"] = [skeleton_corpse]
 image_dict["Doompaw Corpse"] = skeleton_corpse

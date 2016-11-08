@@ -7,7 +7,7 @@ import ui
 import art
 import combat
 import weapon
-import corpse
+import container
 from entity import Action
 
 pygame.init()
@@ -31,7 +31,7 @@ class Creature(entity.SentientEntity):
 
     def expire(self, player_level, natural_death):
         if natural_death:
-            corpse.Corpse(self.tile_x, self.tile_y, self.current_map, self, player_level)
+            container.Corpse(self.tile_x, self.tile_y, self.current_map, self, player_level)
             self.current_map.update_object_layer()
         self.leave_tile()
         self.current_map.entity_group[self.my_type].remove(self)
@@ -111,13 +111,14 @@ class Skeleton(Creature):
         self.time_since_last_attack = 0
         self.post = (self.tile_x, self.tile_y)
         self.fight_frame = 0
+        self.image_key = "Spoopy Skellington"
         self.display_name = "Spoopy Skellington"
-        self.set_images()
+        self.set_images(self.image_key)
 
     def set_frame(self, action):
         pass
 
-    def set_images(self):
+    def set_images(self, image_key):
         self.healthbar = ui.HealthBar(self.current_map, self.tile_x, self.tile_y, self.health, self.max_health)
         self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
         self.sprite.image = art.skeleton_image
@@ -190,9 +191,10 @@ class Cow(Creature):
         self.walk_frame_number = 0
         self.fight_frame = 0
         self.display_name = "Cow"
-        self.set_images()
+        self.image_key = "Cow"
+        self.set_images(self.image_key)
 
-    def set_images(self):
+    def set_images(self, image_key):
         self.healthbar = ui.HealthBar(self.current_map, self.tile_x, self.tile_y, self.health, self.max_health)
         self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
         self.rest_frame_l = art.cow_spritesheet.get_image(0, 0, 40, 40)
@@ -445,11 +447,12 @@ class ShadeBrute(Creature):
         self.time_since_last_attack = 0
         self.post = (self.tile_x, self.tile_y)
         self.fight_frame = 0
+        self.image_key = "Shadebrute"
         self.display_name = "Shadebrute"
         self.walk_frame_number = 0
-        self.set_images()
+        self.set_images(self.image_key)
 
-    def set_images(self):
+    def set_images(self, image_key):
         self.healthbar = ui.HealthBar(self.current_map, self.tile_x, self.tile_y, self.health, self.max_health)
         self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
         self.rest_frame = art.shadebrute_spritesheet.get_image(0, 0, 20, 40)

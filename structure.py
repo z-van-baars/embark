@@ -799,46 +799,6 @@ class Signpost(Structure):
         self.activated = False
 
 
-class Container(Structure):
-    interactable = True
-    footprint = (1, 1)
-    height = 1
-
-    def __init__(self, x, y, current_map):
-        super().__init__(x, y, current_map)
-        self.image_key = "Chest"
-        self.set_images(self.image_key)
-        self.display_name = "Container"
-        self.items_list = []
-        self.value = 10
-        self.opened = False
-
-    def use(self, game_state):
-        if not self.opened:
-            self.items_list = []
-            self.fill(game_state.player.level)
-            self.opened = True
-        new_loot_window = ui.LootMenu(game_state, (0, 0), self)
-        new_loot_window.menu_onscreen()
-        self.activated = False
-
-
-class Chest(Container):
-    interactable = True
-    footprint = (1, 1)
-    height = 1
-
-    def __init__(self, x, y, current_map):
-        super().__init__(x, y, current_map)
-        self.image_key = "Chest"
-        self.display_name = "Chest"
-        self.set_images(self.image_key)
-
-    def fill(self, player_level):
-        for x in range(random.randint(2, 10)):
-            self.items_list.append(random.choice(weapon.weapon_functions)(self.value, player_level))
-
-
 class Door(Structure):
     interactable = True
     footprint = (1, 1)

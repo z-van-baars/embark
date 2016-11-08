@@ -33,7 +33,7 @@ class Colors(object):
         self.white = (255, 255, 255)
         self.light_gray = (194, 194, 194)
         self.light_green = (0, 210, 0)
-        self.dark_green = (0, 200, 0)
+        self.dark_green = (0, 100, 0)
         self.red = (255, 0, 0)
         self.blue = (0, 0, 255)
         self.bright_blue = (8, 248, 252)
@@ -136,9 +136,11 @@ def restore_surfaces(imported_map):
         for entity in imported_map.entity_group[entity_list]:
             print(entity.display_name)
             entity.set_images(entity.image_key)
-            if hasattr(entity, 'items_list'):
-                for each in entity.items_list:
-                    each.set_surfaces()
+            if hasattr(entity, 'items'):
+                for category in entity.items:
+                    for each in entity.items[category]:
+
+                        each.set_surfaces()
             entity.current_tile = None
             entity.assign_tile()
     imported_map.background.image = pygame.image.load("maps/surface_data/{0}.png".format(imported_map.name))

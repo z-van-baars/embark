@@ -9,7 +9,7 @@ import utilities
 
 class Armor(item.Item):
     equippable = True
-    my_type = "Weapon"
+    my_type = "Armor"
     ranged = False
 
     def __init__(self, name, material, value, weight, armor_value, armor_type):

@@ -4,6 +4,7 @@ import utilities
 
 class Item(object):
     equippable = False
+    my_type = "Misc"
 
     def __init__(self, name, value, weight):
         super().__init__()
@@ -15,41 +16,40 @@ class Item(object):
         pass
 
 
-def get_gold_ingot():
+def get_gold_ingot(value, player_level):
     return Item("Gold Ingot", 100, 1)
 
 
-def get_iron_ingot():
+def get_iron_ingot(value, player_level):
     return Item("Iron Ingot", 10, 1)
 
 
-def get_steel_ingot():
+def get_steel_ingot(value, player_level):
     return Item("Steel Ingot", 20, 1)
 
 
-def get_wheat():
+def get_wheat(value, player_level):
     return Item("Wheat", 5, 1)
 
 
-def get_calipers():
+def get_calipers(value, player_level):
     return Item("Calipers", 1, 1)
 
 
-def get_lockpick():
+def get_lockpick(value, player_level):
     return Item("Lockpick", 5, 1)
 
 
-def get_burnt_bread():
+def get_burnt_bread(value, player_level):
     return Item("Burnt Bread", 1, 2)
 
 
-def get_broken_sword():
+def get_broken_sword(value, player_level):
     return Item("Broken Sword", 1, 5)
 
 
-def get_scrap_paper():
+def get_scrap_paper(value, player_level):
     return Item("Scrap Paper", 1, 1)
-
 
 
 qualities = ["Worthless ", "Shabby ", "Acceptable ", "Ordinary ", "Fine ", "Resplendent ", "Titanic "]
@@ -128,6 +128,6 @@ tool_functions = [get_lockpick]
 
 
 item_functions = [junk_functions +
-                  treasure_functions + 
-                  commodity_functions + 
+                  treasure_functions +
+                  commodity_functions +
                   tool_functions]

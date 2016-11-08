@@ -3,6 +3,7 @@ import utilities
 import creature
 import flora
 import structure
+import container
 import npc
 import art
 import ui
@@ -78,7 +79,7 @@ entities = {"Avatar": avatar.Avatar,
             "Altar": structure.Altar,
             "Candelabra": structure.Candelabra,
             "Signpost": structure.Signpost,
-            "Chest": structure.Chest,
+            "Chest": container.Chest,
             "Pot": structure.Pot,
             "Table Empty": structure.TableEmpty,
             "Table": structure.Table,

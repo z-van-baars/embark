@@ -86,7 +86,7 @@ class LargeOakTree(Flora):
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
         self.image_key = "Large Oak Tree"
-        self.set_images()
+        self.set_images(self.image_key)
         self.display_name = "Tree"
 
 

@@ -30,7 +30,7 @@ class Avatar(entity.SentientEntity):
         self.time_since_last_move = 0
         self.time_since_last_attack = 0
 
-        self.speed = 30
+        self.speed = 5
         self.accuracy = 60
         self.level = 1
         self.health = 100
@@ -52,6 +52,9 @@ class Avatar(entity.SentientEntity):
         self.ranged_damage = 0
         self.block = 0
 
+        self.items = {"Weapon": [],
+                      "Armor": [],
+                      "Misc": []}
         self.gold = 100
         self.action = Action.idle
         self.target_type = 0
@@ -135,49 +138,49 @@ class Avatar(entity.SentientEntity):
         self.healthbar = ui.HealthBar(self.current_map, self.tile_x, self.tile_y, self.health, self.max_health)
         self.healthbar.get_state(self.health, self.tile_x, self.tile_y)
         avatar_spritesheet = spritesheet.Spritesheet("art/avatar/avatar.png")
-        self.rest_frame = avatar_spritesheet.get_image(0, 0, 20, 40)
-        self.walk_frames = [avatar_spritesheet.get_image(0, 0, 20, 40)]
+        self.rest_frame = avatar_spritesheet.get_image(0, 0, 20, 40).convert_alpha()
+        self.walk_frames = [avatar_spritesheet.get_image(0, 0, 20, 40).convert_alpha()]
         for x in range(5):
-            self.walk_frames.append(avatar_spritesheet.get_image(20, 0, 20, 40))
+            self.walk_frames.append(avatar_spritesheet.get_image(20, 0, 20, 40).convert_alpha())
         for x in range(5):
-            self.walk_frames.append(avatar_spritesheet.get_image(60, 0, 20, 40))
+            self.walk_frames.append(avatar_spritesheet.get_image(60, 0, 20, 40).convert_alpha())
         for x in range(5):
-            self.walk_frames.append(avatar_spritesheet.get_image(80, 0, 20, 40))
+            self.walk_frames.append(avatar_spritesheet.get_image(80, 0, 20, 40).convert_alpha())
         for x in range(5):
-            self.walk_frames.append(avatar_spritesheet.get_image(100, 0, 20, 40))
+            self.walk_frames.append(avatar_spritesheet.get_image(100, 0, 20, 40).convert_alpha())
         for x in range(5):
-            self.walk_frames.append(avatar_spritesheet.get_image(120, 0, 20, 40))
+            self.walk_frames.append(avatar_spritesheet.get_image(120, 0, 20, 40).convert_alpha())
         for x in range(5):
-            self.walk_frames.append(avatar_spritesheet.get_image(140, 0, 20, 40))
+            self.walk_frames.append(avatar_spritesheet.get_image(140, 0, 20, 40).convert_alpha())
         self.melee_fight_frames = []
         for x in range(3):
-            self.melee_fight_frames.append(avatar_spritesheet.get_image(0, 80, 20, 40))
+            self.melee_fight_frames.append(avatar_spritesheet.get_image(0, 80, 20, 40).convert_alpha())
         for x in range(3):
-            self.melee_fight_frames.append(avatar_spritesheet.get_image(20, 80, 20, 40))
+            self.melee_fight_frames.append(avatar_spritesheet.get_image(20, 80, 20, 40).convert_alpha())
         for x in range(3):
-            self.melee_fight_frames.append(avatar_spritesheet.get_image(40, 80, 20, 40))
+            self.melee_fight_frames.append(avatar_spritesheet.get_image(40, 80, 20, 40).convert_alpha())
         for x in range(4):
-            self.melee_fight_frames.append(avatar_spritesheet.get_image(60, 80, 20, 40))
+            self.melee_fight_frames.append(avatar_spritesheet.get_image(60, 80, 20, 40).convert_alpha())
         for x in range(4):
-            self.melee_fight_frames.append(avatar_spritesheet.get_image(80, 80, 40, 40))
+            self.melee_fight_frames.append(avatar_spritesheet.get_image(80, 80, 40, 40).convert_alpha())
         for x in range(5):
-            self.melee_fight_frames.append(avatar_spritesheet.get_image(120, 80, 40, 40))
+            self.melee_fight_frames.append(avatar_spritesheet.get_image(120, 80, 40, 40).convert_alpha())
 
         self.ranged_fight_frames = []
         for x in range(1):
-            self.ranged_fight_frames.append(avatar_spritesheet.get_image(0, 160, 40, 40))
+            self.ranged_fight_frames.append(avatar_spritesheet.get_image(0, 160, 40, 40).convert_alpha())
         for x in range(6):
-            self.ranged_fight_frames.append(avatar_spritesheet.get_image(40, 160, 40, 40))
+            self.ranged_fight_frames.append(avatar_spritesheet.get_image(40, 160, 40, 40).convert_alpha())
         for x in range(6):
-            self.ranged_fight_frames.append(avatar_spritesheet.get_image(80, 160, 40, 40))
+            self.ranged_fight_frames.append(avatar_spritesheet.get_image(80, 160, 40, 40).convert_alpha())
         for x in range(4):
-            self.ranged_fight_frames.append(avatar_spritesheet.get_image(120, 160, 40, 40))
+            self.ranged_fight_frames.append(avatar_spritesheet.get_image(120, 160, 40, 40).convert_alpha())
         for x in range(3):
-            self.ranged_fight_frames.append(avatar_spritesheet.get_image(160, 160, 40, 40))
+            self.ranged_fight_frames.append(avatar_spritesheet.get_image(160, 160, 40, 40).convert_alpha())
         for x in range(4):
-            self.ranged_fight_frames.append(avatar_spritesheet.get_image(0, 160, 40, 40))
+            self.ranged_fight_frames.append(avatar_spritesheet.get_image(0, 160, 40, 40).convert_alpha())
 
-        self.sprite.image = avatar_spritesheet.get_image(0, 0, 20, 40)
+        self.sprite.image = avatar_spritesheet.get_image(0, 0, 20, 40).convert_alpha()
         self.sprite.rect = self.sprite.image.get_rect()
         self.sprite.rect.x = self.tile_x * 20
         self.sprite.rect.y = (self.tile_y - (self.height - 1)) * 20

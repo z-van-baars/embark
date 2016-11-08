@@ -63,6 +63,7 @@ class Map(object):
                 this_row.append(GameTile(x_column, y_row))
                 self.background.image.blit(grass_1, (x, y))
             self.game_tile_rows.append(this_row)
+        self.background.image = self.background.image.convert()
 
     def update_object_layer(self):
         self.object_layer = ObjectLayer()
@@ -78,7 +79,6 @@ class Map(object):
 
             self.build_object_layer_z_level(int(self.width / 20), int(self.height / 20), new_z_level, z)
             self.object_layer.z_levels.append(new_z_level)
-        print("z_levels: {0}".format(max_height))
 
     def build_object_layer_z_level(self, width, height, background_layer, z_level):
         # get_image(x pixels, y pixels, width pixels, height pixels)
@@ -110,6 +110,7 @@ class Map(object):
                 background_layer.image.blit(image_slice, [entity.tile_x * 20 + int((entity.footprint[0] * 20 - entity.width * 20) / 2),
                                                           (entity.tile_y - z_level + 1) * 20])
         background_layer.image.set_colorkey(utilities.colors.key)
+        background_layer.image = background_layer.image.convert_alpha()
 
     def scroll_check(self, x, y):
         if x + self.x_shift < 200:
@@ -133,6 +134,9 @@ class Map(object):
         elif self.y_shift < -(self.height - screen_height + 80) and self.height > screen_height:
             self.y_shift = -(self.height - screen_height + 80)
 
+    def draw_object_layer(self, screen, screen_width, screen_height, z_level):
+        screen.blit(z_level.image, [0 + self.x_shift, 0 + self.y_shift])
+
     def draw_actors(self, screen, screen_width, screen_height, z_level):
         actors_to_draw = []
         for each in self.entity_group["Avatar"]:
@@ -147,7 +151,7 @@ class Map(object):
         for each in self.entity_group["Projectile"]:
             actors_to_draw.append(each)
         rows_to_draw = []
-        for y_level in range(self.height):
+        for y_level in range(int(self.height / 20)):
             this_row = []
             for entity in actors_to_draw:
                 if entity.tile_y == y_level:
@@ -163,11 +167,14 @@ class Map(object):
                     screen.blit(image_slice, [entity.tile_x * 20 + int((entity.footprint[0] * 20 - entity.width * 20) / 2) + self.x_shift,
                                               (entity.tile_y - z_level + 1) * 20 + self.y_shift])
                     if entity.my_type == "Avatar" or entity.my_type == "Npc" or entity.my_type == "Creature":
-                        if entity.equipped["Body Armor"]:
-                            screen.blit(entity.equipped["Body Armor"].sprite.image,
-                                        [entity.sprite.rect.x + self.x_shift, entity.sprite.rect.y + self.y_shift])
                         if entity.equipped["Helmet"]:
                             screen.blit(entity.equipped["Helmet"].sprite.image,
+                                        [entity.sprite.rect.x + self.x_shift, entity.sprite.rect.y + self.y_shift])
+                        if entity.equipped["Gloves"]:
+                            screen.blit(entity.equipped["Gloves"].sprite.image, [entity.sprite.rect.x + self.x_shift,
+                                                                                 entity.sprite.rect.y + self.y_shift])
+                        if entity.equipped["Body Armor"]:
+                            screen.blit(entity.equipped["Body Armor"].sprite.image,
                                         [entity.sprite.rect.x + self.x_shift, entity.sprite.rect.y + self.y_shift])
                         if entity.equipped["Boots"]:
                             screen.blit(entity.equipped["Boots"].sprite.image,

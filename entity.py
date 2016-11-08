@@ -85,6 +85,7 @@ class MovingEntity(Entity):
 
 class SentientEntity(MovingEntity):
     width = 1
+    is_merchant = False
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
