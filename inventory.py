@@ -1,9 +1,23 @@
 import pygame
-import item
 import ui
 import art
 import utilities
-import weapon
+
+
+class Inventory(object):
+    def __init__(self):
+        self.items = {"Weapon": [],
+                      "Armor": [],
+                      "Commodity": [],
+                      "Misc": []}
+
+    def add_item(self, item_to_add):
+        category = item_to_add.item_type
+        self.items[category].append(item_to_add)
+
+    def remove_item(self, item_to_remove):
+        category = item_to_remove.item_type
+        self.items[category].remove(item_to_remove)
 
 
 class InventoryMenu(ui.Menu):
@@ -15,7 +29,7 @@ class InventoryMenu(ui.Menu):
         self.open = False
         self.inventory_categories = {}
         self.current_category = 0
-        self.categories = ["All", "Weapons", "Armor", "Misc"]
+        self.categories = ["All", "Weapons", "Armor", "Commodities", "Misc"]
         self.player_cache = {}
 
         def exit_clicked():
@@ -26,7 +40,7 @@ class InventoryMenu(ui.Menu):
                 self.player_list_top -= 1
 
         def r_down_clicked():
-            if self.player_list_top + 14 < len(self.player.items[self.categories[self.current_category]]):
+            if self.player_list_top + 14 < len(self.player.inventory.items[self.categories[self.current_category]]):
                 self.player_list_top += 1
 
         def category_r_clicked():
@@ -47,12 +61,13 @@ class InventoryMenu(ui.Menu):
             pass
 
         def equip_clicked():
-            selected_item = self.player.items[self.player_selected_tuple[1]][self.player_selected_tuple[2]]
+            selected_item = self.player.inventory.items[self.player_selected_tuple[1]][self.player_selected_tuple[2]]
             if selected_item.equippable:
                 if selected_item.is_equipped:
-                    selected_item.unequip(self.player)
+                    self.player.unequip(selected_item)
                 else:
-                    selected_item.equip(self.player)
+                    print("equipping")
+                    self.player.equip(selected_item)
                     self.player.action = 0
                     self.player.fight_frame = 0
 
@@ -113,20 +128,25 @@ class InventoryMenu(ui.Menu):
                         stats_button,
                         equip_button]
 
-    def update_player_cache(self):
+    def update_player_cache(self, inventory):
         self.player_cache = {"All": [],
                              "Weapons": [],
                              "Armor": [],
+                             "Commodities": [],
                              "Misc": []}
-        for each in self.player.items["Weapon"]:
-            self.player_cache["Weapons"].append((each, "Weapon", self.player.items["Weapon"].index(each)))
-            self.player_cache["All"].append((each, "Weapon", self.player.items["Weapon"].index(each)))
-        for each in self.player.items["Armor"]:
-            self.player_cache["Armor"].append((each, "Armor", self.player.items["Armor"].index(each)))
-            self.player_cache["All"].append((each, "Armor", self.player.items["Armor"].index(each)))
-        for each in self.player.items["Misc"]:
-            self.player_cache["Misc"].append((each, "Misc", self.player.items["Misc"].index(each)))
-            self.player_cache["All"].append((each, "Misc", self.player.items["Misc"].index(each)))
+
+        for index, each in enumerate(inventory.items["Weapon"]):
+            self.player_cache["Weapons"].append((each, "Weapon", index))
+            self.player_cache["All"].append((each, "Weapon", index))
+        for index, each in enumerate(inventory.items["Armor"]):
+            self.player_cache["Armor"].append((each, "Armor", index))
+            self.player_cache["All"].append((each, "Armor", index))
+        for index, each in enumerate(inventory.items["Commodity"]):
+            self.player_cache["Commodities"].append((each, "Commodity", index))
+            self.player_cache["All"].append((each, "Commodity", index))
+        for index, each in enumerate(inventory.items["Misc"]):
+            self.player_cache["Misc"].append((each, "Misc", index))
+            self.player_cache["All"].append((each, "Misc", index))
 
     def draw_buff_box(self, mouse_pos):
         tiny_font = pygame.font.SysFont('Sitka', 12, True, False)
@@ -211,7 +231,7 @@ class InventoryMenu(ui.Menu):
         player_selection_box = pygame.sprite.Sprite()
         font = pygame.font.SysFont('Sitka', 26, True, False)
         small_font = pygame.font.SysFont('Sitka', 18, True, False)
-        self.update_player_cache()
+        self.update_player_cache(self.player.inventory)
 
         while self.open:
             active_player_list = self.player_cache[self.categories[self.current_category]]

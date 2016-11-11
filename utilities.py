@@ -144,6 +144,7 @@ def restore_surfaces(imported_map):
             entity.current_tile = None
             entity.assign_tile()
     imported_map.background.image = pygame.image.load("maps/surface_data/{0}.png".format(imported_map.name))
+    imported_map.background.image = imported_map.background.image.convert_alpha()
     imported_map.update_object_layer()
 
 

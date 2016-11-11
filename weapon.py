@@ -171,7 +171,7 @@ class BlueFireball(Projectile):
 
 class Weapon(item.Item):
     equippable = True
-    my_type = "Weapon"
+    item_type = "Weapon"
     ranged = False
 
     def __init__(self, name, material, value, weight, melee_damage, ranged_damage, attack_speed):
@@ -180,6 +180,7 @@ class Weapon(item.Item):
                                item.material_value_multipliers[material]),
                          weight)
         self.material = material
+        self.equipment_type = "Weapon"
         self.attack_speed = attack_speed
         self.melee_damage = round(melee_damage *
                                   item.material_damage_multipliers[material])
@@ -188,20 +189,6 @@ class Weapon(item.Item):
         self.sprite = pygame.sprite.Sprite()
         self.set_surfaces()
         self.sprite.rect = self.sprite.image.get_rect()
-        self.is_equipped = False
-
-    def equip(self, player):
-        if player.equipped["Weapon"]:
-            player.equipped["Weapon"].unequip(player)
-        player.melee_damage += self.melee_damage
-        player.ranged_damage += self.ranged_damage
-        player.equipped["Weapon"] = self
-        self.is_equipped = True
-
-    def unequip(self, player):
-        player.melee_damage -= self.melee_damage
-        player.ranged_damage -= self.ranged_damage
-        player.equipped["Weapon"] = None
         self.is_equipped = False
 
 

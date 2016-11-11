@@ -82,11 +82,11 @@ def create_new_world(game_state):
                          armor.clothing_functions[3](1, game_state.player.level)]
 
     for each in initial_equipment:
-        game_state.player.items[each.my_type].append(each)
+        game_state.player.inventory.add_item(each)
 
-    for each_category in game_state.player.items:
-        for each in game_state.player.items[each_category]:
-            each.equip(game_state.player)
+    for category in game_state.player.inventory.items:
+        for each in game_state.player.inventory.items[category]:
+            game_state.player.equip(each)
     map_1.update_object_layer()
 
 
@@ -195,6 +195,7 @@ def main(game_state):
                                                    menu_button.sprite.rect.bottom,
                                                    mouse_pos):
                         game_state = menu_button.click(game_state)
+                        debug_stats = game_state.debug_status
                     else:
                         if len(game_state.active_map.entity_group["Avatar"]) > 0:
                             game_state.active_map.entity_group["Avatar"][0].assign_target(game_state,
@@ -206,22 +207,23 @@ def main(game_state):
                     super_scroll = 1
                 elif event.key == pygame.K_LCTRL:
                     control_on = False
+        if not debug_stats.debug:
 
-        for projectile in game_state.active_map.entity_group["Projectile"]:
-            projectile.travel()
-        for each in game_state.active_map.entity_group["Structure"]:
-            each.tick_cycle()
-        for flora in game_state.active_map.entity_group["Flora"]:
-            flora.tick_cycle()
+            for projectile in game_state.active_map.entity_group["Projectile"]:
+                projectile.travel()
+            for each in game_state.active_map.entity_group["Structure"]:
+                each.tick_cycle()
+            for flora in game_state.active_map.entity_group["Flora"]:
+                flora.tick_cycle()
 
-        for npc in game_state.active_map.entity_group["Npc"]:
-            npc.tick_cycle()
+            for npc in game_state.active_map.entity_group["Npc"]:
+                npc.tick_cycle()
 
-        for avatar in game_state.active_map.entity_group["Avatar"]:
-            avatar.tick_cycle(game_state)
+            for avatar in game_state.active_map.entity_group["Avatar"]:
+                avatar.tick_cycle(game_state)
 
-        for each in game_state.active_map.entity_group["Creature"]:
-            each.tick_cycle(game_state.player, (game_state.player.tile_x, game_state.player.tile_y))
+            for each in game_state.active_map.entity_group["Creature"]:
+                each.tick_cycle(game_state.player, (game_state.player.tile_x, game_state.player.tile_y))
 
         game_state.screen.fill(utilities.colors.black)
 
@@ -310,7 +312,7 @@ def main(game_state):
                         pygame.draw.rect(game_state.screen, (255, 255, 255), new_graphic.image, 1)
 
         pygame.display.flip()
-        game_state.clock.tick()
+        game_state.clock.tick(60)
         print("FPS: {0}  Creatures: {1}  Z Levels {2}".format(round(game_state.clock.get_fps()),
                                                               len(game_state.active_map.entity_group["Creature"]),
                                                               len(game_state.active_map.object_layer.z_levels)))

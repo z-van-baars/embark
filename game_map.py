@@ -164,8 +164,7 @@ class Map(object):
                     # screen.blit(entity.sprite.image, [(entity.sprite.rect.x + self.x_shift), (entity.sprite.rect.y + self.y_shift)])
                     image_height = entity.height * 20
                     image_slice = utilities.get_image(entity.sprite.image, 0, image_height - (z_level * 20), entity.width * 20, 20)
-                    screen.blit(image_slice, [entity.tile_x * 20 + int((entity.footprint[0] * 20 - entity.width * 20) / 2) + self.x_shift,
-                                              (entity.tile_y - z_level + 1) * 20 + self.y_shift])
+                    screen.blit(image_slice, [entity.sprite.rect.x + self.x_shift, entity.sprite.rect.y - (z_level - 2) * 20 + self.y_shift])
                     if entity.my_type == "Avatar" or entity.my_type == "Npc" or entity.my_type == "Creature":
                         if entity.equipped["Helmet"]:
                             screen.blit(entity.equipped["Helmet"].sprite.image,

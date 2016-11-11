@@ -4,7 +4,7 @@ import utilities
 
 class Item(object):
     equippable = False
-    my_type = "Misc"
+    item_type = "Misc"
 
     def __init__(self, name, value, weight):
         super().__init__()
@@ -14,6 +14,10 @@ class Item(object):
 
     def set_surfaces(self):
         pass
+
+
+def get_ye_flaske(value, player_level):
+    return Item("Ye Flaske", 100, 1)
 
 
 def get_gold_ingot(value, player_level):
@@ -121,7 +125,7 @@ commodity_functions = [get_iron_ingot, get_steel_ingot, get_wheat]
 junk_functions = [get_calipers, get_scrap_paper, get_broken_sword, get_burnt_bread]
 
 
-treasure_functions = [get_gold_ingot]
+treasure_functions = [get_gold_ingot, get_ye_flaske]
 
 
 tool_functions = [get_lockpick]

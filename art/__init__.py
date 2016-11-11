@@ -33,7 +33,7 @@ sage_image_2 = pygame.image.load("art/npc/sage_2.png").convert()
 sage_image_3 = pygame.image.load("art/npc/sage_3.png").convert()
 sage_images = [sage_image_1, sage_image_2, sage_image_3]
 for each in sage_images:
-  each.set_colorkey(utilities.colors.key)
+    each.set_colorkey(utilities.colors.key)
 image_dict['Sage'] = sage_images
 
 # STRUCTURES
@@ -73,22 +73,22 @@ wood_fence_upper_right.set_colorkey(utilities.colors.key)
 image_dict["Wood Fence UR"] = [wood_fence_upper_right]
 wood_fence_lower_left = pygame.image.load("art/structures/walls/wood_fence_dl.png").convert()
 wood_fence_lower_left.set_colorkey(utilities.colors.key)
-image_dict["Wood Fence LL"] = [wood_fence_lower_left]
+image_dict["Wood Fence DL"] = [wood_fence_lower_left]
 wood_fence_lower_right = pygame.image.load("art/structures/walls/wood_fence_dr.png").convert()
 wood_fence_lower_right.set_colorkey(utilities.colors.key)
-image_dict["Wood Fence LR"] = [wood_fence_lower_right]
+image_dict["Wood Fence DR"] = [wood_fence_lower_right]
 wood_fence_down = pygame.image.load("art/structures/walls/wood_fence_dt.png").convert()
 wood_fence_down.set_colorkey(utilities.colors.key)
-image_dict["Wood Fence Down"] = [wood_fence_down]
+image_dict["Wood Fence D"] = [wood_fence_down]
 wood_fence_up = pygame.image.load("art/structures/walls/wood_fence_ut.png").convert()
 wood_fence_up.set_colorkey(utilities.colors.key)
-image_dict["Wood Fence Up"] = [wood_fence_up]
+image_dict["Wood Fence U"] = [wood_fence_up]
 wood_fence_left = pygame.image.load("art/structures/walls/wood_fence_l.png").convert()
 wood_fence_left.set_colorkey(utilities.colors.key)
-image_dict["Wood Fence Left"] = [wood_fence_left]
+image_dict["Wood Fence L"] = [wood_fence_left]
 wood_fence_right = pygame.image.load("art/structures/walls/wood_fence_r.png").convert()
 wood_fence_right.set_colorkey(utilities.colors.key)
-image_dict["Wood Fence Right"] = [wood_fence_right]
+image_dict["Wood Fence R"] = [wood_fence_right]
 wood_fence_4_way = pygame.image.load("art/structures/walls/wood_fence_4way.png").convert()
 wood_fence_4_way.set_colorkey(utilities.colors.key)
 image_dict["Wood Fence 4 Way"] = [wood_fence_4_way]
@@ -112,7 +112,7 @@ image_dict["Stone Wall Tall"] = [stone_wall_tall]
 stone_wall_chains = pygame.image.load("art/structures/walls/interior_stone_wall_tall_chains.png").convert()
 image_dict["Stone Wall Chains"] = [stone_wall_chains]
 stone_wall_torch = pygame.image.load("art/structures/walls/interior_stone_wall_tall_torch.png").convert()
-image_dict["Stone Wall Torch"] = [stone_wall_chains]
+image_dict["Stone Wall Torch"] = [stone_wall_torch]
 
 house_interior_wall = pygame.image.load("art/structures/walls/house_interior_1.png").convert()
 image_dict["House Interior Wall"] = [house_interior_wall]
@@ -127,7 +127,7 @@ vertical_palisade_1.set_colorkey(utilities.colors.key)
 vertical_palisade_2.set_colorkey(utilities.colors.key)
 
 vertical_palisade_images = [vertical_palisade_1, vertical_palisade_2]
-image_dict["Palisade Vertical"] = vertical_palisade_images
+image_dict["Vertical Palisade"] = vertical_palisade_images
 
 horizontal_palisade_1 = pygame.image.load("art/structures/walls/h_palisade_1.png").convert()
 horizontal_palisade_2 = pygame.image.load("art/structures/walls/h_palisade_2.png").convert()
@@ -136,7 +136,7 @@ horizontal_palisade_1.set_colorkey(utilities.colors.key)
 horizontal_palisade_2.set_colorkey(utilities.colors.key)
 horizontal_palisade_3.set_colorkey(utilities.colors.key)
 horizontal_palisade_images = [horizontal_palisade_1, horizontal_palisade_2, horizontal_palisade_3]
-image_dict["Palisade Horizontal"] = horizontal_palisade_images
+image_dict["Horizontal Palisade"] = horizontal_palisade_images
 ul_palisade = pygame.image.load("art/structures/walls/ul_palisade_corner.png").convert()
 ul_palisade.set_colorkey(utilities.colors.key)
 image_dict["UL Palisade"] = [ul_palisade]
@@ -173,16 +173,108 @@ door_image = pygame.image.load("art/structures/door.png").convert()
 door_image.set_colorkey(utilities.colors.key)
 image_dict["Door"] = [door_image]
 
-vert_door_image = pygame.Surface([20, 40])
-image_dict["Vert Gate"] = [vert_door_image]
-horiz_gate_image = pygame.Surface([40, 20])
+vert_gate_image = pygame.image.load("art/structures/gate_v.png").convert()
+vert_gate_image.set_colorkey(utilities.colors.key)
+image_dict["Vert Gate"] = [vert_gate_image]
+horiz_gate_image = pygame.image.load("art/structures/gate_h.png").convert()
+horiz_gate_image.set_colorkey(utilities.colors.key)
 image_dict["Horiz Gate"] = [horiz_gate_image]
 
-small_thatch_house_image_1 = pygame.image.load("art/structures/houses/small_thatch_house_1.png").convert()
-small_thatch_house_image_2 = pygame.image.load("art/structures/houses/small_thatch_house_2.png").convert()
-small_thatch_house_image_3 = pygame.image.load("art/structures/houses/small_thatch_house_3.png").convert()
-small_thatch_house_image_4 = pygame.image.load("art/structures/houses/small_thatch_house_4.png").convert()
-small_thatch_house_image_5 = pygame.image.load("art/structures/houses/small_thatch_house_5.png").convert()
+castle_door_image = pygame.image.load("art/structures/castle/door.png").convert()
+castle_door_image.set_colorkey(utilities.colors.key)
+image_dict["Castle Door"] = [castle_door_image]
+
+castle_wall_narrow = pygame.image.load("art/structures/castle/wall_1.png").convert()
+castle_door_image.set_colorkey(utilities.colors.key)
+image_dict["Castle Wall Narrow"] = [castle_wall_narrow]
+castle_wall_wide = pygame.image.load("art/structures/castle/wall_2.png").convert()
+castle_door_image.set_colorkey(utilities.colors.key)
+image_dict["Castle Wall Wide"] = [castle_wall_wide]
+castle_wall_tall_narrow = pygame.image.load("art/structures/castle/wall_1_tall.png").convert()
+castle_door_image.set_colorkey(utilities.colors.key)
+image_dict["Castle Wall Tall Narrow"] = [castle_wall_tall_narrow]
+castle_wall_tall_wide = pygame.image.load("art/structures/castle/wall_2_tall.png").convert()
+castle_door_image.set_colorkey(utilities.colors.key)
+image_dict["Castle Wall Tall Wide"] = [castle_wall_tall_wide]
+
+castle_tower_1 = pygame.image.load("art/structures/castle/tower_1.png").convert()
+castle_tower_2 = pygame.image.load("art/structures/castle/tower_2.png").convert()
+castle_tower_3 = pygame.image.load("art/structures/castle/tower_3.png").convert()
+castle_tower_4 = pygame.image.load("art/structures/castle/tower_4.png").convert()
+castle_tower_5 = pygame.image.load("art/structures/castle/tower_5.png").convert()
+castle_tower_6 = pygame.image.load("art/structures/castle/tower_6.png").convert()
+
+castle_tower_images = [castle_tower_1,
+                       castle_tower_2,
+                       castle_tower_3,
+                       castle_tower_4,
+                       castle_tower_5,
+                       castle_tower_6]
+for each in castle_tower_images:
+    each.set_colorkey(utilities.colors.key)
+
+image_dict["Castle Tower"] = castle_tower_images
+
+small_stone_thatch_house_image_1 = pygame.image.load("art/structures/houses/stone/thatch/small_1.png").convert()
+small_stone_thatch_house_image_2 = pygame.image.load("art/structures/houses/stone/thatch/small_2.png").convert()
+small_stone_thatch_house_image_3 = pygame.image.load("art/structures/houses/stone/thatch/small_3.png").convert()
+small_stone_thatch_house_image_4 = pygame.image.load("art/structures/houses/stone/thatch/small_4.png").convert()
+small_stone_thatch_house_image_1.set_colorkey(utilities.colors.key)
+small_stone_thatch_house_image_2.set_colorkey(utilities.colors.key)
+small_stone_thatch_house_image_3.set_colorkey(utilities.colors.key)
+small_stone_thatch_house_image_4.set_colorkey(utilities.colors.key)
+small_stone_thatch_house_images = [small_stone_thatch_house_image_1,
+                                   small_stone_thatch_house_image_2,
+                                   small_stone_thatch_house_image_3,
+                                   small_stone_thatch_house_image_4]
+image_dict["Stone House Small Thatch"] = small_stone_thatch_house_images
+small_stone_shingle_house_image_1 = pygame.image.load("art/structures/houses/stone/shingle/small_1.png").convert()
+small_stone_shingle_house_image_2 = pygame.image.load("art/structures/houses/stone/shingle/small_2.png").convert()
+small_stone_shingle_house_image_3 = pygame.image.load("art/structures/houses/stone/shingle/small_3.png").convert()
+small_stone_shingle_house_image_4 = pygame.image.load("art/structures/houses/stone/shingle/small_4.png").convert()
+small_stone_shingle_house_image_1.set_colorkey(utilities.colors.key)
+small_stone_shingle_house_image_2.set_colorkey(utilities.colors.key)
+small_stone_shingle_house_image_3.set_colorkey(utilities.colors.key)
+small_stone_shingle_house_image_4.set_colorkey(utilities.colors.key)
+small_stone_shingle_house_images = [small_stone_shingle_house_image_1,
+                                    small_stone_shingle_house_image_2,
+                                    small_stone_shingle_house_image_3,
+                                    small_stone_shingle_house_image_4]
+image_dict["Stone House Small Shingle"] = small_stone_shingle_house_images
+
+medium_stone_shingle_house_image_1 = pygame.image.load("art/structures/houses/stone/shingle/medium_1.png").convert()
+medium_stone_shingle_house_image_2 = pygame.image.load("art/structures/houses/stone/shingle/medium_2.png").convert()
+medium_stone_shingle_house_image_3 = pygame.image.load("art/structures/houses/stone/shingle/medium_3.png").convert()
+medium_stone_shingle_house_image_4 = pygame.image.load("art/structures/houses/stone/shingle/medium_4.png").convert()
+medium_stone_shingle_house_image_1.set_colorkey(utilities.colors.key)
+medium_stone_shingle_house_image_2.set_colorkey(utilities.colors.key)
+medium_stone_shingle_house_image_3.set_colorkey(utilities.colors.key)
+medium_stone_shingle_house_image_4.set_colorkey(utilities.colors.key)
+medium_stone_shingle_house_images = [medium_stone_shingle_house_image_1,
+                                     medium_stone_shingle_house_image_2,
+                                     medium_stone_shingle_house_image_3,
+                                     medium_stone_shingle_house_image_4]
+image_dict["Stone House Medium Shingle"] = medium_stone_shingle_house_images
+medium_stone_thatch_house_image_1 = pygame.image.load("art/structures/houses/stone/thatch/medium_1.png").convert()
+medium_stone_thatch_house_image_2 = pygame.image.load("art/structures/houses/stone/thatch/medium_2.png").convert()
+medium_stone_thatch_house_image_3 = pygame.image.load("art/structures/houses/stone/thatch/medium_3.png").convert()
+medium_stone_thatch_house_image_4 = pygame.image.load("art/structures/houses/stone/thatch/medium_4.png").convert()
+medium_stone_thatch_house_image_1.set_colorkey(utilities.colors.key)
+medium_stone_thatch_house_image_2.set_colorkey(utilities.colors.key)
+medium_stone_thatch_house_image_3.set_colorkey(utilities.colors.key)
+medium_stone_thatch_house_image_4.set_colorkey(utilities.colors.key)
+medium_stone_thatch_house_images = [medium_stone_thatch_house_image_1,
+                                    medium_stone_thatch_house_image_2,
+                                    medium_stone_thatch_house_image_3,
+                                    medium_stone_thatch_house_image_4]
+image_dict["Stone House Medium Thatch"] = medium_stone_thatch_house_images
+
+
+small_thatch_house_image_1 = pygame.image.load("art/structures/houses/plaster/thatch/small_1.png").convert()
+small_thatch_house_image_2 = pygame.image.load("art/structures/houses/plaster/thatch/small_2.png").convert()
+small_thatch_house_image_3 = pygame.image.load("art/structures/houses/plaster/thatch/small_3.png").convert()
+small_thatch_house_image_4 = pygame.image.load("art/structures/houses/plaster/thatch/small_4.png").convert()
+small_thatch_house_image_5 = pygame.image.load("art/structures/houses/plaster/thatch/small_5.png").convert()
 small_thatch_house_image_1.set_colorkey(utilities.colors.key)
 small_thatch_house_image_2.set_colorkey(utilities.colors.key)
 small_thatch_house_image_3.set_colorkey(utilities.colors.key)
@@ -194,11 +286,11 @@ small_thatch_house_images = [small_thatch_house_image_1,
                              small_thatch_house_image_4,
                              small_thatch_house_image_5]
 image_dict["House Small Thatch"] = small_thatch_house_images
-small_shingle_house_image_1 = pygame.image.load("art/structures/houses/small_shingle_house_1.png").convert()
-small_shingle_house_image_2 = pygame.image.load("art/structures/houses/small_shingle_house_2.png").convert()
-small_shingle_house_image_3 = pygame.image.load("art/structures/houses/small_shingle_house_3.png").convert()
-small_shingle_house_image_4 = pygame.image.load("art/structures/houses/small_shingle_house_4.png").convert()
-small_shingle_house_image_5 = pygame.image.load("art/structures/houses/small_shingle_house_5.png").convert()
+small_shingle_house_image_1 = pygame.image.load("art/structures/houses/plaster/shingle/small_1.png").convert()
+small_shingle_house_image_2 = pygame.image.load("art/structures/houses/plaster/shingle/small_2.png").convert()
+small_shingle_house_image_3 = pygame.image.load("art/structures/houses/plaster/shingle/small_3.png").convert()
+small_shingle_house_image_4 = pygame.image.load("art/structures/houses/plaster/shingle/small_4.png").convert()
+small_shingle_house_image_5 = pygame.image.load("art/structures/houses/plaster/shingle/small_5.png").convert()
 small_shingle_house_image_1.set_colorkey(utilities.colors.key)
 small_shingle_house_image_2.set_colorkey(utilities.colors.key)
 small_shingle_house_image_3.set_colorkey(utilities.colors.key)
@@ -211,10 +303,10 @@ small_shingle_house_images = [small_shingle_house_image_1,
                               small_shingle_house_image_5]
 image_dict["House Small Shingle"] = small_shingle_house_images
 
-medium_shingle_house_image_1 = pygame.image.load("art/structures/houses/medium_shingle_house_1.png").convert()
-medium_shingle_house_image_2 = pygame.image.load("art/structures/houses/medium_shingle_house_2.png").convert()
-medium_shingle_house_image_3 = pygame.image.load("art/structures/houses/medium_shingle_house_3.png").convert()
-medium_shingle_house_image_4 = pygame.image.load("art/structures/houses/medium_shingle_house_4.png").convert()
+medium_shingle_house_image_1 = pygame.image.load("art/structures/houses/plaster/shingle/medium_1.png").convert()
+medium_shingle_house_image_2 = pygame.image.load("art/structures/houses/plaster/shingle/medium_2.png").convert()
+medium_shingle_house_image_3 = pygame.image.load("art/structures/houses/plaster/shingle/medium_3.png").convert()
+medium_shingle_house_image_4 = pygame.image.load("art/structures/houses/plaster/shingle/medium_4.png").convert()
 medium_shingle_house_image_1.set_colorkey(utilities.colors.key)
 medium_shingle_house_image_2.set_colorkey(utilities.colors.key)
 medium_shingle_house_image_3.set_colorkey(utilities.colors.key)
@@ -224,10 +316,10 @@ medium_shingle_house_images = [medium_shingle_house_image_1,
                                medium_shingle_house_image_3,
                                medium_shingle_house_image_4]
 image_dict["House Medium Shingle"] = medium_shingle_house_images
-medium_thatch_house_image_1 = pygame.image.load("art/structures/houses/medium_thatch_house_1.png").convert()
-medium_thatch_house_image_2 = pygame.image.load("art/structures/houses/medium_thatch_house_2.png").convert()
-medium_thatch_house_image_3 = pygame.image.load("art/structures/houses/medium_thatch_house_3.png").convert()
-medium_thatch_house_image_4 = pygame.image.load("art/structures/houses/medium_thatch_house_4.png").convert()
+medium_thatch_house_image_1 = pygame.image.load("art/structures/houses/plaster/thatch/medium_1.png").convert()
+medium_thatch_house_image_2 = pygame.image.load("art/structures/houses/plaster/thatch/medium_2.png").convert()
+medium_thatch_house_image_3 = pygame.image.load("art/structures/houses/plaster/thatch/medium_3.png").convert()
+medium_thatch_house_image_4 = pygame.image.load("art/structures/houses/plaster/thatch/medium_4.png").convert()
 medium_thatch_house_image_1.set_colorkey(utilities.colors.key)
 medium_thatch_house_image_2.set_colorkey(utilities.colors.key)
 medium_thatch_house_image_3.set_colorkey(utilities.colors.key)
@@ -238,7 +330,7 @@ medium_thatch_house_images = [medium_thatch_house_image_1,
                               medium_thatch_house_image_4]
 image_dict["House Medium Thatch"] = medium_thatch_house_images
 
-large_shingle_house_image = pygame.image.load("art/structures/houses/large_house_1.png").convert()
+large_shingle_house_image = pygame.image.load("art/structures/houses/plaster/shingle/large_1.png").convert()
 large_shingle_house_image.set_colorkey(utilities.colors.key)
 image_dict["House Large Shingle"] = [large_shingle_house_image]
 
@@ -288,10 +380,18 @@ wide_bookshelf_image_4 = pygame.image.load("art/structures/furniture/wide_booksh
 wide_bookshelf_image_5 = pygame.image.load("art/structures/furniture/wide_bookshelf_5.png").convert()
 wide_bookshelf_image_6 = pygame.image.load("art/structures/furniture/wide_bookshelf_6.png").convert()
 wood_crate_1_image = pygame.image.load("art/structures/furniture/wood_crate_1.png").convert()
+stool_round_image = pygame.image.load("art/structures/furniture/stool_round.png").convert()
+stool_square_image = pygame.image.load("art/structures/furniture/stool_square.png").convert()
+empty_table_long_image = pygame.image.load("art/structures/furniture/table_long_empty.png").convert()
+table_long_1 = pygame.image.load("art/structures/furniture/table_long_1.png").convert()
+table_long_2 = pygame.image.load("art/structures/furniture/table_long_2.png").convert()
+table_long_3 = pygame.image.load("art/structures/furniture/table_long_3.png").convert()
 
 
 furniture_images = [chair_forward_image,
                     chair_backward_image,
+                    stool_square_image,
+                    stool_round_image,
                     empty_table_image,
                     table_image_1,
                     table_image_2,
@@ -330,6 +430,8 @@ for each in furniture_images:
 
 image_dict["Chair Forward"] = [chair_forward_image]
 image_dict["Chair Backward"] = [chair_backward_image]
+image_dict["Stool Square"] = [stool_square_image]
+image_dict["Stool Round"] = [stool_round_image]
 image_dict["Wood Crate"] = [wood_crate_1_image]
 image_dict["Pot"] = [pot_image_1,
                      pot_image_2,
@@ -338,6 +440,10 @@ image_dict["Pot"] = [pot_image_1,
 image_dict["Barrel Horizontal"] = [barrel_horizontal_image]
 image_dict["Barrel Vertical"] = [barrel_vertical_image]
 image_dict["Table Empty"] = [empty_table_image]
+image_dict["Table Long Empty"] = [empty_table_long_image]
+image_dict["Table Long"] = [table_long_1,
+                            table_long_2,
+                            table_long_3]
 image_dict["Table"] = [table_image_1,
                        table_image_2,
                        table_image_3,
@@ -379,7 +485,7 @@ narrow_bookshelf_images = [narrow_bookshelf_image_1,
                            narrow_bookshelf_image_2,
                            narrow_bookshelf_image_3,
                            narrow_bookshelf_image_4]
-image_dict["Bookshelf"] = narrow_bookshelf_images
+image_dict["Bookshelf Narrow"] = narrow_bookshelf_images
 
 wide_bookshelf_images = [wide_bookshelf_image_1,
                          wide_bookshelf_image_2,
@@ -518,6 +624,8 @@ wheat_images = [wheat_image_1,
                 wheat_image_2,
                 wheat_image_3]
 
+image_dict["Wheat"] = wheat_images
+
 # CREATURES
 cow_spritesheet = spritesheet.Spritesheet("art/creatures/cow.png")
 skeleton_image = pygame.image.load("art/creatures/skeleton.png").convert()
@@ -606,6 +714,7 @@ blue_fireball_spritesheet = spritesheet.Spritesheet("art/weapons/projectiles/blu
 
 # UI
 npc_edit_window = pygame.image.load("art/ui_elements/npc_editor/npc_edit_window.png").convert()
+stock_window = pygame.image.load("art/ui_elements/stock_menu/stock_window.png").convert()
 
 edit_dialogue_deselected = pygame.image.load("art/ui_elements/npc_editor/edit_dialogue_deselected.png").convert()
 edit_dialogue_selected = pygame.image.load("art/ui_elements/npc_editor/edit_dialogue_selected.png").convert()
@@ -716,7 +825,9 @@ stone_block_tile_image = pygame.image.load("art/tiles/stone_block.png").convert(
 stone_block_tile_image_2 = pygame.image.load("art/tiles/stone_block_2.png").convert()
 stone_floor_tile_gray_image = pygame.image.load("art/tiles/stone_floor.png").convert()
 stone_floor_tile_brown_image = pygame.image.load("art/tiles/stone_floor_brown.png").convert()
-water_tile_image = pygame.image.load("art/tiles/water_1.png").convert()
+water_tile_image_1 = pygame.image.load("art/tiles/water_1.png").convert()
+water_tile_image_2 = pygame.image.load("art/tiles/water_2.png").convert()
+water_tile_image_3 = pygame.image.load("art/tiles/water_3.png").convert()
 dirt_path_elbow_1 = pygame.image.load("art/tiles/dirt_path_elbow_1.png").convert()
 dirt_path_elbow_2 = pygame.image.load("art/tiles/dirt_path_elbow_2.png").convert()
 dirt_path_elbow_3 = pygame.image.load("art/tiles/dirt_path_elbow_3.png").convert()
@@ -782,4 +893,6 @@ tile_images = {"Dirt": dirt_tile_image,
                "Dirt Path T Left": dirt_path_t_left,
                "Dirt Path T Right": dirt_path_t_right,
                "Dirt Path 4 Way": dirt_path_4_way,
-               "Water": water_tile_image}
+               "Water 1": water_tile_image_1,
+               "Water 2": water_tile_image_2,
+               "Water 3": water_tile_image_3}

@@ -9,15 +9,15 @@ import utilities
 
 class Armor(item.Item):
     equippable = True
-    my_type = "Armor"
+    item_type = "Armor"
     ranged = False
 
-    def __init__(self, name, material, value, weight, armor_value, armor_type):
+    def __init__(self, name, material, value, weight, armor_value, equipment_type):
         super().__init__(material + name,
                          round(value *
                                item.material_value_multipliers[material]),
                          weight)
-        self.armor_type = armor_type
+        self.equipment_type = equipment_type
         self.armor_name = name
         self.material = material
         self.armor_value = armor_value
@@ -25,21 +25,9 @@ class Armor(item.Item):
         self.sprite = pygame.sprite.Sprite()
         self.set_surfaces()
 
-    def equip(self, player):
-        if player.equipped[self.armor_type] is not None:
-            player.equipped[self.armor_type].unequip(player)
-        player.armor += self.armor_value
-        player.equipped[self.armor_type] = self
-        self.is_equipped = True
-
-    def unequip(self, player):
-        player.armor -= self.armor_value
-        player.equipped[self.armor_type] = None
-        self.is_equipped = False
-
     def set_surfaces(self):
-        self.icon = art.armor_icons[self.armor_type][self.material]
-        self.spritesheet = art.armor_spritesheets[self.armor_type][self.armor_name][self.material]
+        self.icon = art.armor_icons[self.equipment_type][self.material]
+        self.spritesheet = art.armor_spritesheets[self.equipment_type][self.armor_name][self.material]
         self.walk_frames = [self.spritesheet.get_image(0, 0, 20, 40)]
         for x in range(5):
             self.walk_frames.append(self.spritesheet.get_image(20, 0, 20, 40))

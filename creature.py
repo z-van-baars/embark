@@ -132,6 +132,7 @@ class GrieveBeast(Creature):
     interactable = True
     footprint = (2, 1)
     height = 2
+    width = 2
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
@@ -355,6 +356,7 @@ class DoomPaw(Creature):
     interactable = True
     footprint = (2, 1)
     height = 2
+    width = 2
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)

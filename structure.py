@@ -111,6 +111,123 @@ class DungeonEntrance(Structure):
         self.display_name = "Dungeon Entrance"
 
 
+class CastleTower(Structure):
+    interactable = False
+    footprint = (4, 6)
+    height = 7
+    width = 4
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.image_key = "Castle Tower"
+        self.set_images(self.image_key)
+        self.display_name = "Castle"
+
+
+class CastleWallTallNarrow(Structure):
+    interactable = False
+    footprint = (1, 4)
+    height = 4
+    width = 1
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.image_key = "Castle Wall Tall Narrow"
+        self.set_images(self.image_key)
+        self.display_name = "Castle"
+
+
+class CastleWallTallWide(Structure):
+    interactable = False
+    footprint = (2, 4)
+    height = 4
+    width = 2
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.image_key = "Castle Wall Tall Wide"
+        self.set_images(self.image_key)
+        self.display_name = "Castle"
+
+
+class CastleWallNarrow(Structure):
+    interactable = False
+    footprint = (1, 3)
+    height = 3
+    width = 1
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.image_key = "Castle Wall Narrow"
+        self.set_images(self.image_key)
+        self.display_name = "Castle"
+
+
+class CastleWallWide(Structure):
+    interactable = False
+    footprint = (2, 3)
+    height = 3
+    width = 2
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.image_key = "Castle Wall Wide"
+        self.set_images(self.image_key)
+        self.display_name = "Castle"
+
+
+class SmallStoneThatchHouse(Structure):
+    interactable = False
+    footprint = (4, 3)
+    height = 4
+    width = 4
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.image_key = "Stone House Small Thatch"
+        self.set_images(self.image_key)
+        self.display_name = "House"
+
+
+class SmallStoneShingleHouse(Structure):
+    interactable = False
+    footprint = (4, 3)
+    height = 4
+    width = 4
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.image_key = "Stone House Small Shingle"
+        self.set_images(self.image_key)
+        self.display_name = "House"
+
+
+class MediumStoneThatchHouse(Structure):
+    interactable = False
+    footprint = (6, 3)
+    height = 4
+    width = 6
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.image_key = "Stone House Medium Thatch"
+        self.set_images(self.image_key)
+        self.display_name = "House"
+
+
+class MediumStoneShingleHouse(Structure):
+    interactable = False
+    footprint = (6, 3)
+    height = 4
+    width = 6
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.image_key = "Stone House Medium Shingle"
+        self.set_images(self.image_key)
+        self.display_name = "House"
+
+
 class SmallThatchHouse(Structure):
     interactable = False
     footprint = (4, 3)
@@ -200,6 +317,30 @@ class ChairBackward(Structure):
         self.set_images(self.image_key)
 
 
+class StoolRound(Structure):
+    interactable = False
+    footprint = (1, 1)
+    height = 1
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.image_key = "Stool Round"
+        self.display_name = "Stool"
+        self.set_images(self.image_key)
+
+
+class StoolSquare(Structure):
+    interactable = False
+    footprint = (1, 1)
+    height = 1
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.image_key = "Stool Square"
+        self.display_name = "Stool"
+        self.set_images(self.image_key)
+
+
 class WoodCrate(Structure):
     interactable = False
     footprint = (1, 1)
@@ -261,6 +402,32 @@ class TableEmpty(Structure):
         self.set_images(self.image_key)
 
 
+class TableLong(Structure):
+    interactable = False
+    footprint = (5, 1)
+    height = 2
+    width = 5
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.image_key = "Table Long"
+        self.display_name = "Table"
+        self.set_images(self.image_key)
+
+
+class TableLongEmpty(Structure):
+    interactable = False
+    footprint = (5, 1)
+    height = 2
+    width = 5
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.image_key = "Table Long Empty"
+        self.display_name = "Table"
+        self.set_images(self.image_key)
+
+
 class Table(Structure):
     interactable = False
     footprint = (2, 1)
@@ -269,7 +436,7 @@ class Table(Structure):
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.image_key = Table
+        self.image_key = "Table"
         self.display_name = "Table"
         self.set_images(self.image_key)
 
@@ -473,10 +640,6 @@ class StoneWall(Structure):
         self.display_name = "Wall"
         self.set_images(self.image_key)
 
-    def set_images(self):
-        self.sprite.image = art.stone_wall
-        self.set_image_state()
-
 
 class StoneWallTall(Structure):
     interactable = False
@@ -521,9 +684,7 @@ class Palisade(Structure):
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.image_key = "Vertical Palisade"
         self.display_name = "Palisade Wall"
-        self.set_images(self.image_key)
 
 
 class WoodFenceH(Structure):
@@ -533,7 +694,7 @@ class WoodFenceH(Structure):
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.image_key = "Wooden Fence H"
+        self.image_key = "Wood Fence H"
         self.display_name = "Wooden Fence"
         self.set_images(self.image_key)
 
@@ -545,7 +706,7 @@ class WoodFenceHU(Structure):
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.image_key = "Wooden Fence HU"
+        self.image_key = "Wood Fence HU"
         self.display_name = "Wooden Fence"
         self.set_images(self.image_key)
 
@@ -557,7 +718,7 @@ class WoodFenceHD(Structure):
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.image_key = "Wooden Fence HD"
+        self.image_key = "Wood Fence HD"
         self.display_name = "Wooden Fence"
         self.set_images(self.image_key)
 
@@ -569,7 +730,7 @@ class WoodFenceV(Structure):
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.image_key = "Wooden Fence V"
+        self.image_key = "Wood Fence V"
         self.display_name = "Wooden Fence"
         self.set_images(self.image_key)
 
@@ -581,7 +742,7 @@ class WoodFenceVR(Structure):
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.image_key = "Wooden Fence VR"
+        self.image_key = "Wood Fence VR"
         self.display_name = "Wooden Fence"
         self.set_images(self.image_key)
 
@@ -593,7 +754,7 @@ class WoodFenceVL(Structure):
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.image_key = "Wooden Fence R"
+        self.image_key = "Wood Fence VL"
         self.display_name = "Wooden Fence"
         self.set_images(self.image_key)
 
@@ -605,7 +766,7 @@ class WoodFenceL(Structure):
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.image_key = "Wooden Fence L"
+        self.image_key = "Wood Fence L"
         self.display_name = "Wooden Fence"
         self.set_images(self.image_key)
 
@@ -617,7 +778,7 @@ class WoodFenceR(Structure):
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.image_key = "Wooden Fence R"
+        self.image_key = "Wood Fence R"
         self.display_name = "Wooden Fence"
         self.set_images(self.image_key)
 
@@ -629,7 +790,7 @@ class WoodFenceU(Structure):
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.image_key = "Wooden Fence U"
+        self.image_key = "Wood Fence U"
         self.display_name = "Wooden Fence"
         self.set_images(self.image_key)
 
@@ -641,7 +802,7 @@ class WoodFenceD(Structure):
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.image_key = "Wooden Fence D"
+        self.image_key = "Wood Fence D"
         self.display_name = "Wooden Fence"
         self.set_images(self.image_key)
 
@@ -653,7 +814,7 @@ class WoodFenceUR(Structure):
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.image_key = "Wooden Fence UR"
+        self.image_key = "Wood Fence UR"
         self.display_name = "Wooden Fence"
         self.set_images(self.image_key)
 
@@ -665,7 +826,7 @@ class WoodFenceUL(Structure):
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.image_key = "Wooden Fence UL"
+        self.image_key = "Wood Fence UL"
         self.display_name = "Wooden Fence"
         self.set_images(self.image_key)
 
@@ -677,7 +838,7 @@ class WoodFenceDR(Structure):
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.image_key = "Wooden Fence DR"
+        self.image_key = "Wood Fence DR"
         self.display_name = "Wooden Fence"
         self.set_images(self.image_key)
 
@@ -689,7 +850,7 @@ class WoodFenceDL(Structure):
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.image_key = "Wooden Fence DL"
+        self.image_key = "Wood Fence DL"
         self.display_name = "Wooden Fence"
         self.set_images(self.image_key)
 
@@ -701,26 +862,22 @@ class WoodFence4way(Structure):
 
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.image_key = "Wooden Fence 4 Way"
+        self.image_key = "Wood Fence 4 Way"
         self.display_name = "Wooden Fence"
         self.set_images(self.image_key)
-
-    def set_images(self):
-        self.sprite.image = art.wood_fence_4_way
-        self.set_image_state()
 
 
 class VerticalPalisade(Palisade):
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.image_key = "Palisade Vertical"
+        self.image_key = "Vertical Palisade"
         self.set_images(self.image_key)
 
 
 class HorizontalPalisade(Palisade):
     def __init__(self, x, y, current_map):
         super().__init__(x, y, current_map)
-        self.image_key = "Palisade Horizontal"
+        self.image_key = "Horizontal Palisade"
         self.set_images(self.image_key)
 
 
@@ -799,6 +956,53 @@ class Signpost(Structure):
         self.activated = False
 
 
+class Altar(Structure):
+    footprint = (2, 1)
+    height = 2
+    width = 2
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.display_name = "Altar"
+        self.image_key = "Altar"
+        self.set_images(self.image_key)
+
+
+class AltarEmptyWriting(Structure):
+    footprint = (2, 1)
+    height = 2
+    width = 2
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.display_name = "Altar"
+        self.image_key = "Altar Empty Writing"
+        self.set_images(self.image_key)
+
+
+class AltarEmpty(Structure):
+    footprint = (2, 1)
+    height = 2
+    width = 2
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.display_name = "Altar"
+        self.image_key = "Altar Empty"
+        self.set_images(self.image_key)
+
+
+class Candelabra(Structure):
+    footprint = (1, 1)
+    height = 2
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.display_name = "Candelabra"
+        self.image_key = "Candelabra"
+        self.set_images(self.image_key)
+
+
 class Door(Structure):
     interactable = True
     footprint = (1, 1)
@@ -833,6 +1037,18 @@ class Door(Structure):
         self.activated = False
 
 
+class CastleDoor(Door):
+    footprint = (2, 3)
+    height = 3
+    width = 2
+
+    def __init__(self, x, y, current_map, x2=0, y2=1, twin_map=None):
+        super().__init__(x, y, current_map, x2, y2, twin_map)
+        self.display_name = "Door"
+        self.image_key = "Castle Door"
+        self.set_images(self.image_key)
+
+
 class StairsUp(Door):
     footprint = (1, 1)
     height = 2
@@ -863,7 +1079,7 @@ class VertGate(Door):
         super().__init__(x, y, current_map, x2, y2, twin_map)
         self.image_key = "Vert Gate"
         self.set_images(self.image_key)
-        self.display_name = "Vertical Gate"
+        self.display_name = "Gateway"
 
 
 class HorizGate(Door):
@@ -875,51 +1091,6 @@ class HorizGate(Door):
         super().__init__(x, y, current_map, x2, y2, twin_map)
         self.image_key = "Horiz Gate"
         self.set_images(self.image_key)
-        self.display_name = "Horizontal Gate"
+        self.display_name = "Gateway"
 
-
-class Altar(Door):
-    footprint = (2, 1)
-    height = 2
-    width = 2
-
-    def __init__(self, x, y, current_map, x2=0, y2=1, twin_map=None):
-        super().__init__(x, y, current_map, x2, y2, twin_map)
-        self.display_name = "Altar"
-        self.image_key = "Altar"
-        self.set_images(self.image_key)
-
-
-class AltarEmptyWriting(Door):
-    footprint = (2, 1)
-    height = 2
-    width = 2
-
-    def __init__(self, x, y, current_map, x2=0, y2=1, twin_map=None):
-        super().__init__(x, y, current_map, x2, y2, twin_map)
-        self.display_name = "Altar"
-        self.image_key = "Altar Empty Writing"
-        self.set_images(self.image_key)
-
-
-class AltarEmpty(Door):
-    footprint = (2, 1)
-    height = 2
-    width = 2
-
-    def __init__(self, x, y, current_map, x2=0, y2=1, twin_map=None):
-        super().__init__(x, y, current_map, x2, y2, twin_map)
-        self.display_name = "Altar"
-        self.image_key = "Altar Empty"
-
-
-class Candelabra(Door):
-    footprint = (1, 1)
-    height = 2
-
-    def __init__(self, x, y, current_map, x2=0, y2=1, twin_map=None):
-        super().__init__(x, y, current_map, x2, y2, twin_map)
-        self.display_name = "Candelabra"
-        self.image_key = "Candelabra"
-        self.set_images
 

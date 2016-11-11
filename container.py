@@ -9,7 +9,7 @@ import ui
 
 stock_references = {"Weapons": weapon.weapon_functions,
                     "Armor": armor.armor_functions, 
-                    "Swords": [weapon.weapon_functions[0], weapon.weapon_functions[3]], 
+                    "Swords": [weapon.weapon_functions[0], weapon.weapon_functions[3]],
                     "Spears": [weapon.weapon_functions[5]],
                     "Axes": [weapon.weapon_functions[2]],
                     "Maces": [weapon.weapon_functions[4]],
@@ -37,6 +37,7 @@ class Container(structure.Structure):
         self.display_name = "Container"
         self.items = {"Weapon": [],
                       "Armor": [],
+                      "Commodities": [],
                       "Misc": []}
         self.value = 10
         self.opened = False
@@ -73,6 +74,21 @@ class Chest(Container):
             items_to_stock.append(random.choice(possible_items)(20, player_level))
         for each in items_to_stock:
             self.items[each.my_type].append(each)
+
+
+class QuestChest(Container):
+    interactable = True
+    footprint = (1, 1)
+    height = 1
+
+    def __init__(self, x, y, current_map):
+        super().__init__(x, y, current_map)
+        self.image_key = "Chest"
+        self.display_name = "Chest"
+        self.set_images(self.image_key)
+
+    def fill(self, player_level):
+        self.items["Misc"].append(item.treasure_functions[1](1, 1))
 
 
 class Corpse(Container):

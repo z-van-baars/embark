@@ -668,6 +668,231 @@ class NewMapWindow(Menu):
             pygame.display.flip()
 
 
+stock_reference_strings = ["Swords",
+                           "Spears",
+                           "Axes",
+                           "Maces",
+                           "Bows",
+                           "Clothing",
+                           "Helmets",
+                           "Boots",
+                           "Breastplates",
+                           "Gauntlets",
+                           "Commodities",
+                           "Junk",
+                           "Tools",
+                           "Treasures"]
+
+
+class StockMenu(Menu):
+    def __init__(self, game_state, pos, entity):
+        super().__init__(game_state, pos, entity)
+        self.background_pane = pygame.sprite.Sprite()
+        self.background_pane.image = art.stock_window
+        self.background_pane.rect = self.background_pane.image.get_rect()
+        self.background_pane.rect.x = self.screen_width / 2 - 300
+        self.background_pane.rect.y = self.screen_height / 2 - 200
+        self.available_list_top = 0
+        self.stock_list_top = 0
+        self.available_selected = 0
+        self.available_stocks = []
+        for each in stock_reference_strings:
+            self.available_stocks.append(each)
+        for each in self.entity.stock_categories:
+            self.available_stocks.remove(each)
+        self.stock_selected = 0
+        self.available_cache = []
+        self.stock_cache = []
+
+        def x_click():
+            self.open = False
+            self.entity.restock_items(50)
+
+        def add_category():
+            if self.available_stocks:
+                self.entity.stock_categories.append(self.available_stocks[self.available_selected])
+                self.available_stocks.remove(self.available_stocks[self.available_selected])
+                self.available_selected = 0
+
+        def remove_category():
+            if self.entity.stock_categories:
+                self.available_stocks.append(self.entity.stock_categories[self.stock_selected])
+                self.entity.stock_categories.remove(self.entity.stock_categories[self.stock_selected])
+                self.stock_selected = 0
+
+        x_button = Button(x_deselected_image,
+                          x_selected_image,
+                          x_click,
+                          self.background_pane.rect.right - 28,
+                          self.background_pane.rect.top + 8)
+
+        add_button = Button(small_right_arrow_regular,
+                            small_right_arrow_selected,
+                            add_category,
+                            self.background_pane.rect.x + 220,
+                            self.background_pane.rect.y + 30)
+
+        remove_button = Button(small_left_arrow_regular,
+                               small_left_arrow_selected,
+                               remove_category,
+                               self.background_pane.rect.x + 500,
+                               self.background_pane.rect.y + 30)
+
+        self.buttons = [x_button, add_button, remove_button]
+
+    def in_available_box(self, mouse_pos):
+        if utilities.check_if_inside(self.background_pane.rect.left + 0,
+                                     self.background_pane.rect.left + 291,
+                                     self.background_pane.rect.top + 83,
+                                     self.background_pane.rect.top + 345,
+                                     mouse_pos):
+            return True
+        return False
+
+    def in_stock_box(self, mouse_pos):
+        if utilities.check_if_inside(self.background_pane.rect.left + 311,
+                                     self.background_pane.rect.right,
+                                     self.background_pane.rect.top + 83,
+                                     self.background_pane.rect.top + 345,
+                                     mouse_pos):
+            return True
+        return False
+
+    def update_stock_cache(self):
+        self.stock_cache = []
+        for each in self.entity.stock_categories:
+            self.stock_cache.append(each)
+
+    def update_available_cache(self):
+        self.available_cache = []
+        for each in self.available_stocks:
+            self.available_cache.append(each)
+
+    def mouse_click_dispatcher(self, event, mouse_pos):
+        if event.button == 4:
+            if self.in_available_box(mouse_pos):
+                if self.available_list_top - 1 >= 0:
+                    self.available_list_top -= 1
+            if self.in_stock_box(mouse_pos):
+                if self.stock_list_top - 1 >= 0:
+                    self.stock_list_top -= 1
+        elif event.button == 5:
+            if self.in_available_box(mouse_pos):
+                if self.available_list_top + 14 < len(self.available_cache):
+                    self.available_list_top += 1
+            if self.in_stock_box(mouse_pos):
+                if self.stock_list_top + 14 < len(self.stock_cache):
+                    self.stock_list_top += 1
+        else:
+            click = True
+            count = 0
+            spacer = 18
+            stock_visible_items = self.stock_cache[self.stock_list_top:self.stock_list_top + 14]
+            for each in stock_visible_items:
+                x1 = self.background_pane.rect.left + 540
+                x2 = x1 + 170
+                y1 = (self.background_pane.rect.top + 40 + (count * spacer))
+                y2 = y1 + 19
+                if utilities.check_if_inside(x1, x2, y1, y2, mouse_pos):
+                    if count + self.stock_list_top <= len(self.stock_cache):
+                        self.stock_selected = count + self.stock_list_top
+                count += 1
+            count = 0
+            available_visible_items = self.available_cache[self.available_list_top:self.available_list_top + 14]
+            for each in available_visible_items:
+                x1 = self.background_pane.rect.left + 30
+                x2 = x1 + 170
+                y1 = (self.background_pane.rect.top + 40 + (count * spacer))
+                y2 = y1 + 19
+                if utilities.check_if_inside(x1, x2, y1, y2, mouse_pos):
+                    if count + self.available_list_top <= len(self.available_cache):
+                        self.available_selected = count + self.available_list_top
+                count += 1
+        for button in self.buttons:
+            if utilities.check_if_inside(button.sprite.rect.x,
+                                         button.sprite.rect.right,
+                                         button.sprite.rect.y,
+                                         button.sprite.rect.bottom,
+                                         mouse_pos):
+                button.sprite.image = button.selected
+                if click:
+                    button.click()
+        self.update_available_cache()
+        self.update_stock_cache()
+
+    def draw_decals(self, mouse_pos):
+        font = pygame.font.SysFont('Sitka', 26, True, False)
+        self.screen.blit(font.render(self.entity.display_name, True, utilities.colors.border_gold),
+                         [self.background_pane.rect.left + 280, self.background_pane.rect.top + 20])
+        if utilities.check_if_inside((self.background_pane.rect.left + 220),
+                                     (self.background_pane.rect.left + 370),
+                                     (self.background_pane.rect.top + 350),
+                                     (self.background_pane.rect.top + 390),
+                                     mouse_pos):
+                if len(self.items_to_give) > 0 or len(self.items_to_take) > 0:
+                    self.draw_transaction_box(mouse_pos)
+
+    def draw_item_lists(self, stock_visible_items, available_visible_items):
+        small_font = pygame.font.SysFont('Sitka', 18, True, False)
+        spacer = 18
+        count = 0
+        for each in available_visible_items:
+            name_stamp = small_font.render(each, True, utilities.colors.border_gold)
+            self.screen.blit(name_stamp, [self.background_pane.rect.left + 30,
+                                          self.background_pane.rect.top + 40 + (count * spacer)])
+            count += 1
+        count = 0
+        for each in stock_visible_items:
+            name_stamp = small_font.render(each, True, utilities.colors.border_gold)
+            self.screen.blit(name_stamp, [self.background_pane.rect.left + 540,
+                                          self.background_pane.rect.top + 40 + (count * spacer)])
+            count += 1
+
+    def update_selection_boxes(self, stock_selection_box, available_selection_box):
+        stock_selection_box.image = pygame.Rect(self.background_pane.rect.left + 540,
+                                                self.background_pane.rect.top + 40 + ((self.stock_selected - self.stock_list_top) * 18),
+                                                180,
+                                                19)
+        available_selection_box.image = pygame.Rect(self.background_pane.rect.left + 30,
+                                                    self.background_pane.rect.top + 40 + ((self.available_selected - self.available_list_top) * 18),
+                                                    180,
+                                                    19)
+
+    def draw_selection_boxes(self, stock_selection_box, available_selection_box):
+        if self.stock_selected >= self.stock_list_top and self.stock_selected <= self.stock_list_top + 14:
+            pygame.draw.rect(self.screen, (255, 198, 13), stock_selection_box.image, 1)
+        if self.available_selected >= self.available_list_top and self.available_selected <= self.available_list_top + 14:
+            pygame.draw.rect(self.screen, (255, 198, 13), available_selection_box.image, 1)
+
+    def set_lists(self):
+        available_visible_items = self.available_cache[self.available_list_top:self.available_list_top + 14]
+        stock_visible_items = self.stock_cache[self.stock_list_top:self.stock_list_top + 14]
+        return stock_visible_items, available_visible_items
+
+    def menu_onscreen(self):
+        stock_selection_box = pygame.sprite.Sprite()
+        available_selection_box = pygame.sprite.Sprite()
+        self.update_stock_cache()
+        self.update_available_cache()
+        while self.open:
+            stock_visible_items, available_visible_items = self.set_lists()
+            mouse_pos = pygame.mouse.get_pos()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.display.quit()
+                    pygame.quit()
+
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    self.mouse_click_dispatcher(event, mouse_pos)
+            self.update_selection_boxes(stock_selection_box, available_selection_box)
+            self.screen.blit(self.background_pane.image, [self.background_pane.rect.left, self.background_pane.rect.top])
+            self.render_buttons(mouse_pos)
+            self.draw_item_lists(stock_visible_items, available_visible_items)
+            self.draw_selection_boxes(stock_selection_box, available_selection_box)
+            self.draw_decals(mouse_pos)
+            pygame.display.flip()
+
+
 class NpcEditor(Menu):
     def __init__(self, game_state, pos, entity):
         super().__init__(game_state, pos, entity)
@@ -703,7 +928,8 @@ class NpcEditor(Menu):
             pass
 
         def edit_stock_click():
-            pass
+            new_stock_menu = StockMenu(game_state, pos, entity)
+            new_stock_menu.menu_onscreen()
 
         x_button = Button(x_deselected_image,
                           x_selected_image,
@@ -1348,7 +1574,7 @@ class TradeMenu(Menu):
         self.entity_list_top = 0
         self.player_selected = 0
         self.entity_selected = 0
-        self.categories = ["All", "Weapons", "Armor", "Misc"]
+        self.categories = ["All", "Weapons", "Armor", "Commodities", "Misc"]
         self.current_player_category = 0
         self.current_entity_category = 0
         self.selected_entity_tuple = ()
@@ -1364,29 +1590,31 @@ class TradeMenu(Menu):
         def exit_clicked():
             self.open = False
             for each in self.items_to_give:
-                self.player.items[each.my_type].append(each)
+                self.player.inventory.add_item(each)
             for each in self.items_to_take:
-                self.entity.items[each.my_type].append(each)
+                self.entity.inventory.add_item(each)
 
         def clear_transaction_clicked():
             for each in self.items_to_give:
-                self.player.items[each.my_type].append(each)
+                self.player.inventory.add_item(each)
             self.items_to_give = []
             for each in self.items_to_take:
-                self.entity.items[each.my_type].append(each)
+                self.entity.inventory.add_item(each)
             self.items_to_take = []
             self.trade_value = 0
 
         def buy_clicked():
             if self.selected_entity_tuple:
-                item_to_buy = self.entity.items[self.selected_entity_tuple[1]].pop(self.selected_entity_tuple[2])
+                self.entity.inventory.remove_item(self.selected_entity_tuple[0])
+                item_to_buy = self.selected_entity_tuple[0]
                 self.trade_value -= round(item_to_buy.value * self.player.buy_multiplier)
                 self.items_to_take.append(item_to_buy)
                 self.entity_selected = 0
 
         def sell_clicked():
             if self.selected_player_tuple:
-                item_to_sell = self.player.items[self.selected_player_tuple[1]].pop(self.selected_player_tuple[2])
+                self.player.inventory.remove_item(self.selected_player_tuple[0])
+                item_to_sell = self.selected_player_tuple[0]
                 self.trade_value += round(item_to_sell.value * self.player.sell_multiplier)
                 self.items_to_give.append(item_to_sell)
                 self.player_selected = 0
@@ -1442,20 +1670,19 @@ class TradeMenu(Menu):
         def finalize_clicked():
             if 0 <= self.player.gold + self.trade_value and 0 <= self.entity.gold - self.trade_value:
                 self.player.gold += self.trade_value
-                self.entity.gold -= self.trade_value
                 for each in self.items_to_take:
-                    self.player.items[each.my_type].append(each)
+                    self.player.inventory.add_item(each)
                 for each in self.items_to_give:
-                    self.entity.items[each.my_type].append(each)
+                    self.entity.inventory.add_item(each)
                     if each.equippable and each.is_equipped:
-                        each.unequip(self.player)
+                        self.player.unequip(each)
                 self.items_to_give = []
                 self.items_to_take = []
                 self.trade_value = 0
             elif 0 > self.player.gold + self.trade_value and 0 <= self.entity.gold - self.trade_value:
                 print("player does not have enough gold!")
             elif 0 <= self.player.gold + self.trade_value and 0 > self.entity.gold - self.trade_value:
-                print("entity does not have enough gold!")
+                print("{0} does not have enough gold!".format(entity.display_name))
             else:
                 print("Nobody has enough gold!")
 
@@ -1569,35 +1796,45 @@ class TradeMenu(Menu):
             return True
         return False
 
-    def update_player_cache(self):
-        self.player_cache = {"All": [],
-                             "Weapons": [],
-                             "Armor": [],
-                             "Misc": []}
-        for each in self.player.items["Weapon"]:
-            self.player_cache["Weapons"].append((each, "Weapon", self.player.items["Weapon"].index(each)))
-            self.player_cache["All"].append((each, "Weapon", self.player.items["Weapon"].index(each)))
-        for each in self.player.items["Armor"]:
-            self.player_cache["Armor"].append((each, "Armor", self.player.items["Armor"].index(each)))
-            self.player_cache["All"].append((each, "Armor", self.player.items["Armor"].index(each)))
-        for each in self.player.items["Misc"]:
-            self.player_cache["Misc"].append((each, "Misc", self.player.items["Misc"].index(each)))
-            self.player_cache["All"].append((each, "Misc", self.player.items["Misc"].index(each)))
-
-    def update_entity_cache(self):
+    def update_entity_cache(self, inventory):
         self.entity_cache = {"All": [],
                              "Weapons": [],
                              "Armor": [],
+                             "Commodities": [],
                              "Misc": []}
-        for each in self.entity.items["Weapon"]:
-            self.entity_cache["Weapons"].append((each, "Weapon", self.entity.items["Weapon"].index(each)))
-            self.entity_cache["All"].append((each, "Weapon", self.entity.items["Weapon"].index(each)))
-        for each in self.entity.items["Armor"]:
-            self.entity_cache["Armor"].append((each, "Armor", self.entity.items["Armor"].index(each)))
-            self.entity_cache["All"].append((each, "Armor", self.entity.items["Armor"].index(each)))
-        for each in self.entity.items["Misc"]:
-            self.entity_cache["Misc"].append((each, "Misc", self.entity.items["Misc"].index(each)))
-            self.entity_cache["All"].append((each, "Misc", self.entity.items["Misc"].index(each)))
+
+        for index, each in enumerate(inventory.items["Weapon"]):
+            self.entity_cache["Weapons"].append((each, "Weapon", index))
+            self.entity_cache["All"].append((each, "Weapon", index))
+        for index, each in enumerate(inventory.items["Armor"]):
+            self.entity_cache["Armor"].append((each, "Armor", index))
+            self.entity_cache["All"].append((each, "Armor", index))
+        for index, each in enumerate(inventory.items["Commodity"]):
+            self.entity_cache["Commodities"].append((each, "Commodity", index))
+            self.entity_cache["All"].append((each, "Commodity", index))
+        for index, each in enumerate(inventory.items["Misc"]):
+            self.entity_cache["Misc"].append((each, "Misc", index))
+            self.entity_cache["All"].append((each, "Misc", index))
+
+    def update_player_cache(self, inventory):
+        self.player_cache = {"All": [],
+                             "Weapons": [],
+                             "Armor": [],
+                             "Commodities": [],
+                             "Misc": []}
+
+        for index, each in enumerate(inventory.items["Weapon"]):
+            self.player_cache["Weapons"].append((each, "Weapon", index))
+            self.player_cache["All"].append((each, "Weapon", index))
+        for index, each in enumerate(inventory.items["Armor"]):
+            self.player_cache["Armor"].append((each, "Armor", index))
+            self.player_cache["All"].append((each, "Armor", index))
+        for index, each in enumerate(inventory.items["Commodity"]):
+            self.player_cache["Commodities"].append((each, "Commodity", index))
+            self.player_cache["All"].append((each, "Commodity", index))
+        for index, each in enumerate(inventory.items["Misc"]):
+            self.player_cache["Misc"].append((each, "Misc", index))
+            self.player_cache["All"].append((each, "Misc", index))
 
     def mouse_click_dispatcher(self, event, mouse_pos):
         if event.button == 4:
@@ -1650,8 +1887,8 @@ class TradeMenu(Menu):
                 button.sprite.image = button.selected
                 if click:
                     button.click()
-        self.update_player_cache()
-        self.update_entity_cache()
+        self.update_player_cache(self.player.inventory)
+        self.update_entity_cache(self.entity.inventory)
 
     def draw_decals(self, mouse_pos):
         font = pygame.font.SysFont('Sitka', 26, True, False)
@@ -1757,17 +1994,15 @@ class TradeMenu(Menu):
     def menu_onscreen(self):
         player_selection_box = pygame.sprite.Sprite()
         entity_selection_box = pygame.sprite.Sprite()
-        self.update_player_cache()
-        self.update_entity_cache()
+        self.update_player_cache(self.player.inventory)
+        self.update_entity_cache(self.entity.inventory)
         while self.open:
             player_visible_items, entity_visible_items, self.active_player_list, self.active_entity_list = self.set_lists()
             self.selected_entity_tuple, self.selected_player_tuple = None, None
             if self.active_entity_list:
                 self.selected_entity_tuple = self.active_entity_list[self.entity_selected]
-                
             if self.active_player_list:
                 self.selected_player_tuple = self.active_player_list[self.player_selected]
-                
             mouse_pos = pygame.mouse.get_pos()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -1822,6 +2057,35 @@ class LootMenu(TradeMenu):
         self.buttons = self.buttons[:-4]
         self.buttons.append(take_button)
         self.buttons.append(give_button)
+
+    def draw_item_lists(self, player_visible_items, entity_visible_items):
+        small_font = pygame.font.SysFont('Sitka', 18, True, False)
+        spacer = 18
+        count = 0
+        for each in entity_visible_items:
+            value_stamp = small_font.render(str(round(each[0].value)), True, utilities.colors.border_gold)
+            weight_stamp = small_font.render(str(each[0].weight), True, utilities.colors.border_gold)
+            name_stamp = small_font.render(each[0].name, True, utilities.colors.border_gold)
+            self.screen.blit(value_stamp, [self.background_pane.rect.left + 30,
+                                           self.background_pane.rect.top + 84 + (count * spacer)])
+            self.screen.blit(weight_stamp, [self.background_pane.rect.left + 80,
+                                            self.background_pane.rect.top + 84 + (count * spacer)])
+            self.screen.blit(name_stamp, [self.background_pane.rect.left + 110,
+                                          self.background_pane.rect.top + 84 + (count * spacer)])
+            count += 1
+        count = 0
+        for each in player_visible_items:
+            value_stamp = small_font.render(str(round(each[0].value)), True, utilities.colors.border_gold)
+            weight_stamp = small_font.render(str(each[0].weight), True, utilities.colors.border_gold)
+            name_stamp = small_font.render(each[0].name, True, utilities.colors.border_gold)
+
+            self.screen.blit(value_stamp, [self.background_pane.rect.left + 320,
+                                           self.background_pane.rect.top + 84 + (count * spacer)])
+            self.screen.blit(weight_stamp, [self.background_pane.rect.left + 370,
+                                            self.background_pane.rect.top + 84 + (count * spacer)])
+            self.screen.blit(name_stamp, [self.background_pane.rect.left + 400,
+                                          self.background_pane.rect.top + 84 + (count * spacer)])
+            count += 1
 
     def draw_decals(self, mouse_pos):
         font = pygame.font.SysFont('Sitka', 26, True, False)

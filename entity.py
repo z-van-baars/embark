@@ -221,7 +221,7 @@ class StationaryEntity(Entity):
 
     def set_images(self, image_key):
         if not self.image_index:
-            if len(image_key) > 1:
+            if len(art.image_dict[image_key]) > 1:
                 self.image_index = random.randint(0, len(art.image_dict[image_key]) - 1)
             else:
                 self.image_index = 0

@@ -5,6 +5,7 @@ import navigate
 import ui
 import spritesheet
 import combat
+import inventory
 from entity import Action
 
 pygame.init()
@@ -51,10 +52,10 @@ class Avatar(entity.SentientEntity):
         self.melee_damage = 0
         self.ranged_damage = 0
         self.block = 0
+        self.active_quests = []
+        self.completed_quests = []
 
-        self.items = {"Weapon": [],
-                      "Armor": [],
-                      "Misc": []}
+        self.inventory = inventory.Inventory()
         self.gold = 100
         self.action = Action.idle
         self.target_type = 0
@@ -63,6 +64,16 @@ class Avatar(entity.SentientEntity):
         self.fight_frame = 0
 
         self.set_images(self.image_key)
+
+    def equip(self, item_to_equip):
+        if self.equipped[item_to_equip.equipment_type]:
+            self.unequip(self.equipped[item_to_equip.equipment_type])
+        self.equipped[item_to_equip.equipment_type] = item_to_equip
+        item_to_equip.is_equipped = True
+
+    def unequip(self, item_to_unequip):
+        item_to_unequip.is_equipped = False
+        self.equipped[item_to_unequip.equipment_type] = None
 
     def set_frame(self, action):
         self.set_action_sprite(action)
@@ -125,14 +136,14 @@ class Avatar(entity.SentientEntity):
 
     def set_armor_sprite(self, action, armor):
         if action == Action.idle:
-            self.equipped[armor.armor_type].set_frame(0, 0)
+            self.equipped[armor.equipment_type].set_frame(0, 0)
         elif action == Action.move or action == Action.use:
-            self.equipped[armor.armor_type].set_frame(self.walk_frame_number, 0)
+            self.equipped[armor.equipment_type].set_frame(self.walk_frame_number, 0)
         elif action == Action.attack:
             if self.has_ranged_attack():
-                self.equipped[armor.armor_type].set_frame(self.fight_frame - 1, 2)
+                self.equipped[armor.equipment_type].set_frame(self.fight_frame - 1, 2)
             else:
-                self.equipped[armor.armor_type].set_frame(self.fight_frame - 1, 1)
+                self.equipped[armor.equipment_type].set_frame(self.fight_frame - 1, 1)
 
     def set_images(self, image_key):
         self.healthbar = ui.HealthBar(self.current_map, self.tile_x, self.tile_y, self.health, self.max_health)
@@ -168,7 +179,7 @@ class Avatar(entity.SentientEntity):
 
         self.ranged_fight_frames = []
         for x in range(1):
-            self.ranged_fight_frames.append(avatar_spritesheet.get_image(0, 160, 40, 40).convert_alpha())
+            self.ranged_fight_frames.append(avatar_spritesheet.get_image(0, 0, 20, 40).convert_alpha())
         for x in range(6):
             self.ranged_fight_frames.append(avatar_spritesheet.get_image(40, 160, 40, 40).convert_alpha())
         for x in range(6):
